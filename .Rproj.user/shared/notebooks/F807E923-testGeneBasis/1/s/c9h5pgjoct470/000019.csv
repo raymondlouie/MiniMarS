@@ -1,0 +1,41 @@
+"0","sce  <- SingleCellExperiment(list(counts=t(input_matrix)))"
+"0","logcounts(sce) <- log2(t(input_matrix) + 1)"
+"0",""
+"0","sce = retain_informative_genes(sce)  #92 feature *94124 cells"
+"1","90 genes retained"
+"1","Constructing the True graph.
+"
+"1","True graph is constructed.
+"
+"1","First gene is added: CD21. 15 left.
+"
+"1","New gene is added: Ig light chain λ. 14 left.
+"
+"1","New gene is added: CD8. 13 left.
+"
+"1","New gene is added: TCR Vδ2. 12 left.
+"
+"1","New gene is added: IgA. 11 left.
+"
+"1","New gene is added: CD62L. 10 left.
+"
+"1","New gene is added: IgM. 9 left.
+"
+"1","New gene is added: CD3. 8 left.
+"
+"1","New gene is added: CD26. 7 left.
+"
+"1","New gene is added: CD45RA. 6 left.
+"
+"1","New gene is added: CD73. 5 left.
+"
+"1","New gene is added: CD101. 4 left.
+"
+"1","New gene is added: IgD. 3 left.
+"
+"1","New gene is added: KLRG1. 2 left.
+"
+"1","New gene is added: CD49f. 1 left.
+"
+"1","New gene is added: CD39. 0 left.
+"

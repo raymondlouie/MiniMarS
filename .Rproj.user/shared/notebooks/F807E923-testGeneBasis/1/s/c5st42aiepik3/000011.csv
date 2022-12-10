@@ -1,0 +1,38 @@
+"0","markers_geneBasis = geneBasisWrapper(sce,"
+"0","                                     clusters,"
+"0","                                     num_markers)"
+"1","90 genes retained"
+"1","Constructing the True graph.
+"
+"1","True graph is constructed.
+"
+"1","First gene is added: CD21. 14 left.
+"
+"1","New gene is added: Ig light chain λ. 13 left.
+"
+"1","New gene is added: CD8. 12 left.
+"
+"1","New gene is added: TCR Vδ2. 11 left.
+"
+"1","New gene is added: IgA. 10 left.
+"
+"1","New gene is added: CD62L. 9 left.
+"
+"1","New gene is added: IgM. 8 left.
+"
+"1","New gene is added: CD3. 7 left.
+"
+"1","New gene is added: CD26. 6 left.
+"
+"1","New gene is added: CD45RA. 5 left.
+"
+"1","New gene is added: CD73. 4 left.
+"
+"1","New gene is added: CD101. 3 left.
+"
+"1","New gene is added: IgD. 2 left.
+"
+"1","New gene is added: KLRG1. 1 left.
+"
+"1","New gene is added: CD49f. 0 left.
+"

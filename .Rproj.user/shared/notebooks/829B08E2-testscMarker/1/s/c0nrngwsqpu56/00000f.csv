@@ -1,0 +1,10 @@
+"0",""
+"0",""
+"0",""
+"0","celltype_mapping = get_celltype_mapping(sce , "
+"0","                                        genes.selection = markers_geneBasis,"
+"0","                                        celltype.id = ""cell_type"", "
+"0","                                        return.stat = T)"
+"2","Error in as.list.environment(environment()) : 
+  object 'markers_geneBasis' not found
+"

@@ -1,0 +1,10 @@
+"0","sce  <- SingleCellExperiment(list(counts=t(input_matrix)),"
+"0","logcounts(sce) <- log2(t(input_matrix) + 1)"
+"0",""
+"0","set.seed(2020)"
+"0","sce_citeseq <- importanceADT(sce,"
+"0","                             group = factor(sce$cell_type),"
+"0","                             subsample = TRUE)"
+"2","Error in importanceADT(sce, group = factor(sce$cell_type), altExp_name = ""NULL"",  : 
+  sce does not contain altExp_name as altExpNames
+"

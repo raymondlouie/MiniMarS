@@ -1,0 +1,5 @@
+"0","load(""v0_matrices_protein.RData"")"
+"0","load(""v1b_normalization.RData"")"
+"0",""
+"0","write.table(protein_count_matrix, file=""raw_protein_matrix.txt"", row.names=TRUE, col.names=TRUE,sep=""\t"")"
+"0","write.table(t(list_matrix_protein_norm[[1]]), file=""norm_protein_matrix.txt"", row.names=TRUE, col.names=TRUE,sep=""\t"")"

@@ -1,0 +1,169 @@
+---
+title: "WNN"
+author: "Raymond Louie"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    number_sections: yes
+    self_contained: yes
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes   
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache=FALSE)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(results = 'asis')
+knitr::opts_chunk$set(fig.width = 25)
+knitr::opts_chunk$set(fig.height = 10)
+knitr::opts_chunk$set(fig.pos = '!h')
+knitr::opts_knit$set(root.dir = getwd())
+knitr::knit_hooks$set(timeit = local({
+    now = NULL
+    function(before, options) {
+        if (before) {
+            now <<- Sys.time()
+        } else {
+            res = difftime(Sys.time(), now)
+            now <<- NULL
+            # use options$label if you want the chunk label as well
+            paste('Time for this code chunk:', as.character(res))
+        }
+    }})
+)
+```
+```{r clear, echo=FALSE}
+rm(list = ls())
+graphics.off()
+```
+<!-- First we load the libraries: -->
+
+```{r,warning=FALSE,message=FALSE,echo=FALSE}
+library(Matrix)
+library(dplyr)
+library(Seurat)
+library(ggplot2)
+library(grid)
+require(gridExtra)
+library(data.table)
+library(knitr)
+library(kableExtra)
+# library(CiteFuse)
+library(scater)
+# library(SingleCellExperiment)
+# library(geneBasisR)
+library(sc2marker)
+```
+
+
+
+```{r,warning=FALSE,message=FALSE,echo=FALSE, fig.width=15,fig.height=5,results='asis'}
+immune.combined=readRDS("../../covid/adaptive/integrated_seurat_gene_ref.rds")
+immune.combined_protein=readRDS("../../covid/adaptive/integrated_seurat_protein.rds")
+
+
+```
+
+```{r}
+meta_gene = immune.combined@meta.data
+meta_protein = immune.combined_protein@meta.data
+
+# write.csv(meta_gene,
+#           "meta_gene.csv")
+# 
+# write.csv(meta_protein,
+#           "meta_protein.csv")
+
+print(table(meta_protein$disease))
+
+```
+
+
+```{r}
+cells_healthy = rownames(meta_protein)[which(meta_protein$disease %in% "normal")]
+cells_healthy=cells_healthy[1:1000]
+matrix_protein_norm = t(immune.combined_protein@assays$RNA@counts)
+# matrix_protein_norm = t(immune.combined_protein@assays$RNA@data)
+common_cells = intersect(cells_healthy,rownames(matrix_protein_norm))
+matrix_protein_healthy_norm = matrix_protein_norm[match(common_cells,rownames(matrix_protein_norm)),]
+meta_protein_healthy = meta_protein[match(common_cells,
+                                          rownames(meta_protein)),]
+# matrix_protein3 = immune.combined_protein@assays$RNA@scale.data
+
+
+```
+
+
+```{r}
+input_matrix = matrix_protein_healthy_norm
+clusters = meta_protein_healthy$cell_type
+sce  <- SingleCellExperiment(list(counts=t(input_matrix)),
+                             colData=data.frame(cell_type=clusters))
+logcounts(sce) <- log2(t(input_matrix) + 1)
+num_markers = 15
+
+```
+
+
+```{r}
+# geneBasisWrapper <- function (sce, clusters,num_markers, ...){
+#     
+#     sce = retain_informative_genes(sce)  
+#     marker_output = gene_search(sce, n_genes_total = num_markers)
+#     return(marker_output$gene)
+#     
+# }
+nk.markers <- Detect_single_marker(mca.spleen, id = "NK cell(Spleen)", category = "Flow", org = "mouse")
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+# markers_geneBasis = geneBasisWrapper(sce,
+#                                      clusters,
+#                                      num_markers)
+
+```
+
+
+```{r}
+
+
+
+celltype_mapping = get_celltype_mapping(sce , 
+                                        genes.selection = markers_geneBasis,
+                                        celltype.id = "cell_type", 
+                                        return.stat = T)
+
+celltype_mapping_df = celltype_mapping$mapping
+celltype_stat_df = celltype_mapping$stat
+
+p = plot_mapping_heatmap(celltype_mapping$mapping, title = "Cell type confusion matrix")
+p
+
+
+
+celltype_mapping2 = get_celltype_mapping(sce , 
+                                         genes.selection = markers_geneBasis[1:5],
+                                         celltype.id = "cell_type", 
+                                         return.stat = T)
+
+celltype_mapping_df2 = celltype_mapping2$mapping
+celltype_stat_df2 = celltype_mapping2$stat
+
+p = plot_mapping_heatmap(celltype_mapping2$mapping, title = "Cell type confusion matrix")
+p
+
+```
+
+
+

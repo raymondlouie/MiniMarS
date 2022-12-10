@@ -1,0 +1,8 @@
+"0",""
+"0","variant_df = read.table(""Celiac_1996_all_tapestri.tsv"","
+"0","                        sep=""\t"","
+"0","                        row.names=1,"
+"0","                        header=TRUE)"
+"0",""
+"0","# meta_df = replace_columns(meta_df,"
+"0","#                           data.frame(celltype_name3_colour = colour_df))"

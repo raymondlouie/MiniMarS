@@ -1,0 +1,7 @@
+"0","input_matrix = matrix_protein_healthy_norm"
+"0","clusters = meta_protein_healthy$cell_type"
+"0","sce  <- SingleCellExperiment(list(counts=t(input_matrix)),"
+"0","                             colData=data.frame(cell_type=clusters))"
+"0","logcounts(sce) <- log2(t(input_matrix) + 1)"
+"0","num_markers = 15"
+"0",""

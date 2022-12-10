@@ -1,0 +1,12 @@
+"0","library(Matrix)"
+"0","library(dplyr)"
+"0","library(Seurat)"
+"0","library(ggplot2)"
+"0","library(grid)"
+"0","require(gridExtra)"
+"0","library(knitr)"
+"0","# library(CiteFuse)"
+"0","# library(geneBasisR)"
+"0","library(sc2marker)"
+"2","Error in library(sc2marker) : there is no package called ‘sc2marker’
+"

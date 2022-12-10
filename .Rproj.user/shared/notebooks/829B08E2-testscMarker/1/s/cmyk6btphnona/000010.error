@@ -1,0 +1,1 @@
+{"frames":[{"func":"library(sc2marker)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0},{"func":"stop(packageNotFoundError(package, lib.loc, sys.call()))","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error in library(sc2marker) : there is no package called ‘sc2marker’\n"}
