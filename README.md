@@ -8,7 +8,19 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 devtools::install_github("raymondlouie/ClusterMarkers") 
 ```
 
-### Example work flow
+## Packages required to be installed
+
+Please install the following packages first.
+
+```
+citeFuse
+sc2Marker
+geneBasis
+Seurat
+SingleCellExperiment
+```
+
+## Example work flow
 An example of the `ClusterMarkers` work flow to get started:
 
 ```{r}
