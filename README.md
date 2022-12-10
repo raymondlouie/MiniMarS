@@ -4,11 +4,7 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 
 ## Installation
 
-```
-devtools::install_github("raymondlouie/ClusterMarkers") 
-```
-
-## Packages required to be installed
+### Packages required to be pre-installed
 
 Please install the following packages first.
 
@@ -18,6 +14,12 @@ sc2Marker
 geneBasis
 Seurat
 SingleCellExperiment
+```
+
+### Installation
+
+```
+devtools::install_github("raymondlouie/ClusterMarkers") 
 ```
 
 ## Example work flow
