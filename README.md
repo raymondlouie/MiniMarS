@@ -7,7 +7,7 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 ```
 
 ## Install development version
-devtools::install_github("ray/miloR", ref="devel") 
+devtools::install_github("raymondlouie/ClusterMarkers", ref="devel") 
 ```
 
 ### Example work flow
