@@ -2,18 +2,17 @@
  
 ClusterMarkers finds the markers which best define a cluster, using a number of different pre-exisitng methods.
 
-### Installation
+## Installation
 
 ```
-
-## Install development version
-devtools::install_github("raymondlouie/ClusterMarkers", ref="devel") 
+devtools::install_github("raymondlouie/ClusterMarkers") 
 ```
 
 ### Example work flow
-An example of the `Milo` work flow to get started:
+An example of the `ClusterMarkers` work flow to get started:
 
 ```{r}
+library(SingleCellExperiment)
 data(sce)
 input_matrix = sce@assays@data$counts
 clusters = sce$cell_type
