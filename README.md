@@ -31,10 +31,13 @@ data(sce)
 input_matrix = sce@assays@data$counts
 clusters = sce$cell_type
 
-output_results = findClusterMarkers(input_matrix,
-                                    clusters,
-                                    num_markers = 15,
-                                    method="all")
+output_df = findClusterPerformance(input_matrix,
+                                   clusters,
+                                   num_markers=15,
+                                   subsample_num=3000,
+                                   train_test_ratio=0.9,
+                                   method_cluster="all",
+                                   method_performance="all") 
 ```
 
 

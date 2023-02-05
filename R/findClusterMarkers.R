@@ -8,6 +8,7 @@
 #'   \item \code{citeFUSE}
 #'   \item \code{sc2marker}
 #'   \item \code{geneBasis}
+#'   \item \code{xgBoost}
 #'   \item \code{all}: Use all methods
 #' }
 #'
@@ -22,13 +23,14 @@
 findClusterMarkers <- function (input_matrix,
                                 clusters,
                                 num_markers = 15,
-                                method="all") {
+                                method="all",
+                                ...) {
 
     num_markers_original=num_markers
     # num_markers = min(2*num_markers,
     # dim(input_matrix)[1])
 
-    all_methods = c("citeFuse","sc2marker","geneBasis")
+    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost")
 
     if (method == "all"){
         method = all_methods
@@ -48,15 +50,12 @@ findClusterMarkers <- function (input_matrix,
         stop("Number of clusters do not match the dimension of the input matrix.")
     }
 
-    sce  <- SingleCellExperiment(list(counts=input_matrix),
+    sce  <- SingleCellExperiment::SingleCellExperiment(list(counts=input_matrix),
                                  colData=data.frame(cell_type=clusters))
     logcounts(sce) <- log2(input_matrix + 1)
 
     list_markers = list()
-    list_celltype_pred = list()
-    list_celltype_min = list()
-    list_celltype_median = list()
-    list_celltype_stats = list()
+
     for (i in 1:length(method)) {
         curr_method = method[[i]]
 
@@ -78,26 +77,17 @@ findClusterMarkers <- function (input_matrix,
                                             num_markers)
         }
 
+        if (curr_method == "xgBoost") {
+            curr_markers = xgBoostWrapper(input_matrix,
+                                          clusters,
+                                          num_markers)
+        }
+
         list_markers[[curr_method]] = curr_markers
-
-        cluster_map = get_celltype_mapping(sce ,
-                                           genes.selection = curr_markers[1:num_markers_original],
-                                           celltype.id = "cell_type",
-                                           return.stat = T)
-
-        list_celltype_pred[[curr_method]]=cluster_map$stat
-        list_celltype_min[[curr_method]]=min(cluster_map$stat$frac_correctly_mapped)
-        list_celltype_median[[curr_method]]=median(cluster_map$stat$frac_correctly_mapped)
-        list_celltype_stats[[curr_method]]=cluster_map$stat
 
     }
 
-    output_list = list(markers = list_markers,
-                       score_min =list_celltype_min,
-                       score_median = list_celltype_median,
-                       celltype_stat = list_celltype_stats)
-
-    return(output_list)
+    return(list_markers)
 
 
 }
