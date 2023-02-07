@@ -4,6 +4,7 @@
 #' @param clusters_all Cluster annotation for each cell.
 #' @param num_markers Number of markers to output.
 #' @param subsample_num Number of cells to sub-sample
+#' @param sub.seed Seed number of sub-sample
 #' @param train_test_ratio Ratio of training to test data
 #' @param method_cluster List of methods to find cluster markers.
 #' \itemize{
@@ -30,6 +31,7 @@ findClusterPerformance <- function (matrix_all,
                                     clusters_all,
                                     num_markers,
                                     subsample_num,
+                                    sub.seed=42,
                                     train_test_ratio,
                                     method_cluster="all",
                                     method_performance="all",
@@ -46,6 +48,7 @@ findClusterPerformance <- function (matrix_all,
     }
 
     # subsample
+    set.seed(sub.seed)
     sample_index = sample(x = 1:dim(matrix_all)[1],size = subsample_num,replace = FALSE)
     matrix_sample= matrix_all[sample_index,]
     clusters_sample = clusters_all[sample_index]
