@@ -33,9 +33,17 @@ findClusterPerformance <- function (matrix_all,
                                     train_test_ratio,
                                     method_cluster="all",
                                     method_performance="all",
+                                    verbose=FALSE,
                                     ...) {
 
+    # print("findClusterPerformance")
+    # print(dim(matrix_all))
 
+    if (subsample_num > dim(matrix_all)[1]){
+        warning(paste0("Number of sub-samples more than number of cells. Using all cells"))
+        subsample_num=dim(matrix_all)[1]
+
+    }
 
     # subsample
     sample_index = sample(x = 1:dim(matrix_all)[1],size = subsample_num,replace = FALSE)
@@ -56,34 +64,51 @@ findClusterPerformance <- function (matrix_all,
     index_train = sample(x = 1:dim(matrix_sample)[1],size = round(train_test_ratio*dim(matrix_sample)[1]),replace = FALSE)
     index_test = setdiff(1:dim(matrix_sample)[1] , index_train)
 
-    input_matrix_train = matrix_protein_healthy_norm[index_train,]
+    input_matrix_train = matrix_all[index_train,]
     clusters_train = clusters_sample[index_train]
     clusters_num_train = clusters_newlabel_sample[index_train]
 
     clusters_train_df = data.frame(table(clusters_train))
-    remove_cells = which(clusters_train %in% clusters_train_df$clusters_train[which(clusters_train_df$Freq <2)])
+    remove_cells = which(clusters_train %in% clusters_train_df$clusters_train[which(clusters_train_df$Freq <6)])
     if (length(remove_cells)>0){
         input_matrix_train = input_matrix_train[-remove_cells,]
         clusters_train = clusters_train[-remove_cells]
         clusters_num_train = clusters_num_train[-remove_cells]
     }
 
-    input_matrix_test = matrix_protein_healthy_norm[index_test,]
+    input_matrix_test = matrix_all[index_test,]
     clusters_test = clusters_sample[index_test]
     clusters_num_test = clusters_newlabel_sample[index_test]
 
     clusters_test_df = data.frame(table(clusters_test))
-    remove_cells = which(clusters_test %in% clusters_test_df$clusters_test[which(clusters_test_df$Freq <2)])
+    remove_cells = which(clusters_test %in% clusters_test_df$clusters_test[which(clusters_test_df$Freq <6)])
     if (length(remove_cells)>0){
         input_matrix_test = input_matrix_test[-remove_cells,]
         clusters_test = clusters_test[-remove_cells]
         clusters_num_test = clusters_num_test[-remove_cells]
     }
 
-    list_markers = findClusterMarkers(t(input_matrix_train),
+    if (length(unique(clusters_test))<2){
+        stop("Not enough data in test set. Increase sample size")
+
+    }
+    if (length(unique(clusters_train))<2){
+        stop("Not enough data in training set. Increase sample size")
+
+    }
+
+    if (verbose){
+        print(table(clusters_test))
+        print(table(clusters_train))
+
+
+    }
+
+    list_markers = findClusterMarkers(t(as.matrix(input_matrix_train)),
                                       clusters_train,
                                       num_markers,
-                                      method=method_cluster)
+                                      method=method_cluster,
+                                      verbose=verbose)
 
 
     # calculate most occuring markers
@@ -103,11 +128,28 @@ findClusterPerformance <- function (matrix_all,
     list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
 
 
+    if (verbose){
+        print("Find performance metrics")
+    }
+
     list_performance = c()
     for (i in 1:length(list_markers)){
         markers_sel = list_markers[[i]]
+        # print("ite list_markers")
+        if (verbose){
+            print(names(list_markers)[[i]])
+            print(table(clusters_num_train))
+            print(table(clusters_train))
+            print(table(clusters_num_test))
+            print(table(clusters_test))
+            print(dim(input_matrix_train))
+            print(dim(input_matrix_test))
+        }
+
+
         list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
-                                                                        input_matrix_test,
+                                                                        t(as.matrix(input_matrix_train)),
+                                                                        t(as.matrix(input_matrix_test)),
                                                                         unique_clusters_sample,
                                                                         clusters_num_train,
                                                                         clusters_num_test,
@@ -115,7 +157,8 @@ findClusterPerformance <- function (matrix_all,
                                                                         clusters_test,
                                                                         method=method_performance,
                                                                         nrounds=1500,
-                                                                        nthread=6)
+                                                                        nthread=6,
+                                                                        verbose=verbose)
 
     }
 

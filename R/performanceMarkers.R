@@ -2,6 +2,7 @@
 #'
 #' @param markers_sel Selected markers for classification
 #' @param input_matrix_test Feature matrix with cells as columns, and features as rows.
+#' @param input_matrix_test Feature matrix with cells as columns, and features as rows.
 #' @param unique_clusters_sample Unique clusters
 #' @param clusters_num_train Cluster annotation for training set (numerical)
 #' @param clusters_num_test Cluster annotation for testing set (numerical)
@@ -19,6 +20,7 @@
 #' @return A list containing performance of testing set, for each cluster
 #' @export
 performanceMarkers <- function (markers_sel,
+                                input_matrix_train,
                                 input_matrix_test,
                                 unique_clusters_sample,
                                 clusters_num_train,
@@ -28,6 +30,7 @@ performanceMarkers <- function (markers_sel,
                                 method="all",
                                 nrounds=1500,
                                 nthread=6,
+                                verbose=FALSE,
                                 ...) {
 
     all_methods = c("xgBoost","geneBasis")
@@ -46,11 +49,11 @@ performanceMarkers <- function (markers_sel,
         }
     }
 
-    if (length(clusters_num_test) != dim(input_matrix_test)[1]) {
+    if (length(clusters_num_test) != dim(input_matrix_test)[2]) {
         stop("Number of cells in cluster_num_test does not match the number of cells in the input matrix.")
     }
 
-    if (length(clusters_test) != dim(input_matrix_test)[1]) {
+    if (length(clusters_test) != dim(input_matrix_test)[2]) {
         stop("Number of cells in cluster_test does not match the number of cells in the input matrix.")
     }
 
@@ -61,16 +64,22 @@ performanceMarkers <- function (markers_sel,
     for (i in 1:length(method)) {
         curr_method = method[[i]]
 
-        if (curr_method == "xgBoost") {
+        if (verbose){
+            print(curr_method)
+        }
+
+        if (curr_method == "geneBasis") {
             performance_df=geneBasisPerformance(markers_sel,
-                                                input_matrix_test,
+                                                t(input_matrix_test),
                                                 clusters_test,
                                                 unique_clusters_sample,
                                                 ...)
         }
 
-        if (curr_method == "geneBasis") {
+        if (curr_method == "xgBoost") {
             performance_df=xgboostPerformance(markers_sel,
+                                              t(input_matrix_train),
+                                                t(input_matrix_test),
                                               clusters_num_train,
                                               clusters_num_test,
                                               clusters_train,

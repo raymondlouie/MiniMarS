@@ -9,14 +9,20 @@ citeFuseWrapper <- function (sce,
                              num_markers=15,
                              ...){
 
+    # print("here")
     sce_alt <- SummarizedExperiment(list(raw=sce@assays@data$counts))
     altExp(sce, "protein") <- sce_alt
+    # print("here2")
+    # print(dim(sce))
+    # print(table(sce$cell_type))
 
     set.seed(2020)
     sce <- CiteFuse::importanceADT(sce,
                                    group = factor(sce$cell_type),
                                    altExp_name ="protein",
                                    exprs_value = "raw")
+    # print("here3")
+
     importance_scores = sort(sce@metadata$importanceADT,decreasing=TRUE)
     return(names(importance_scores[1:num_markers]))
 
@@ -46,7 +52,7 @@ sc2markerWrapper <- function (input_matrix,
     list_markers= list()
     for (i in 1:num_markers){
         ii = (i-1) %% num_clusters
-        print(ii)
+        # print(ii)
         curr_df = all.markers[[ii+1]]
         curr_df = curr_df[which(curr_df$direction %in% "+"),]
         index_remove = which(curr_df$gene %in% unlist(list_markers))
@@ -87,7 +93,8 @@ geneBasisWrapper <- function (sce,
 #' @return The most informative markers determined by geneBasis
 #' @export
 xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nthread=6, ...){
-
+    # print("xgboostwrapper")
+    # print(dim(input_matrix))
 
     unique_clusters = unique(clusters)
     num_clust= length(unique_clusters)
@@ -96,7 +103,7 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
     clusters_newlabel = unlist(lapply(clusters,
                                              function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
 
-    input_matrix = t(input_matrix)
+    # input_matrix = t(input_matrix)
 
     # convert features to numbers, because xgb.importance seems to have trouble with greek letters
     marker_num = 1:dim(input_matrix)[2]
@@ -137,6 +144,8 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
 #' Wrapper function for xgboostPerformance
 #'
 #' @param markers_sel Single cell experiment object
+#' @param input_matrix_train Training matrix with cells as columns, and features as rows.
+#' @param input_matrix_test Test matrix with cells as columns, and features as rows.
 #' @param clusters_num_train Number of markers to output
 #' @param clusters_num_test Number of markers to output
 #' @param clusters_train Number of markers to output
@@ -146,6 +155,8 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
 #' @return The most informative markers determined by citeFUSE
 #' @export
 xgboostPerformance <- function (markers_sel,
+                                input_matrix_train,
+                                input_matrix_test,
                                 clusters_num_train,
                                 clusters_num_test,
                                 clusters_train,
@@ -153,14 +164,29 @@ xgboostPerformance <- function (markers_sel,
                                 unique_clusters_sample,
                                 ...){
 
+    clusters_num_train = as.numeric(clusters_num_train)
+    clusters_num_test = as.numeric(clusters_num_test)
+
+    # print(table(clusters_num_train))
+    # print(table(clusters_num_test))
+    # #
+    # print(markers_sel)
+    # print(colnames(input_matrix_train))
+    # print(colnames(input_matrix_test))
+    # print("here")
+
     xgboost_train = xgboost::xgb.DMatrix(data=as.matrix(input_matrix_train[, markers_sel]),
                                          label=clusters_num_train)
+    # print("here2")
 
     xgboost_test = xgboost::xgb.DMatrix(data=as.matrix(input_matrix_test[, markers_sel]),
                                         label=clusters_num_test)
 
+    # print("here3")
     # train a model using our training data
     numberOfClasses <- length(unique(clusters_num_train))
+    # print(numberOfClasses)
+
     xgb_params <- list("objective" = "multi:softprob",
                        "eval_metric" = "mlogloss",
                        "num_class" = numberOfClasses)
@@ -168,9 +194,11 @@ xgboostPerformance <- function (markers_sel,
     built.model <- xgboost::xgb.train(params = xgb_params,
                                       data = xgboost_train,
                                       ...)
+    # print("here4")
 
     pred_test <- predict(built.model,
                          newdata = xgboost_test)
+    # print("here5")
 
 
     test_prediction <- matrix(pred_test, nrow = numberOfClasses,
@@ -219,6 +247,10 @@ geneBasisPerformance <- function (markers_sel,
                                   clusters_test,
                                   unique_clusters_sample,
                                   ...){
+    # print("genebasisperformance")
+    # print(dim(input_matrix_test))
+    # print(rownames(input_matrix_test))
+    # print("here1")
 
     sce_test  <- SingleCellExperiment::SingleCellExperiment(list(counts=t(input_matrix_test)),
                                                             colData=data.frame(cell_type=clusters_test))
@@ -228,6 +260,7 @@ geneBasisPerformance <- function (markers_sel,
                                                    genes.selection = markers_sel,
                                                    celltype.id = "cell_type",
                                                    return.stat = T)
+    # print("here2")
 
     test_prediction=cluster_map$mapping
     test_stat = cluster_map$stat

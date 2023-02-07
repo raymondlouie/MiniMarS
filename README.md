@@ -34,7 +34,7 @@ clusters = sce$cell_type
 output_df = findClusterPerformance(input_matrix,
                                    clusters,
                                    num_markers=15,
-                                   subsample_num=3000,
+                                   subsample_num=100,
                                    train_test_ratio=0.9,
                                    method_cluster="all",
                                    method_performance="all") 

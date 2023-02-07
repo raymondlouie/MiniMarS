@@ -24,8 +24,11 @@ findClusterMarkers <- function (input_matrix,
                                 clusters,
                                 num_markers = 15,
                                 method="all",
+                                verbose=FALSE,
                                 ...) {
 
+    # print("findClusterMarkers")
+    # print(dim(input_matrix))
     num_markers_original=num_markers
     # num_markers = min(2*num_markers,
     # dim(input_matrix)[1])
@@ -59,6 +62,11 @@ findClusterMarkers <- function (input_matrix,
     for (i in 1:length(method)) {
         curr_method = method[[i]]
 
+        if (verbose){
+            print(curr_method)
+        }
+
+
         if (curr_method == "citeFuse") {
             curr_markers = citeFuseWrapper(sce,
                                            num_markers,
@@ -78,12 +86,15 @@ findClusterMarkers <- function (input_matrix,
         }
 
         if (curr_method == "xgBoost") {
-            curr_markers = xgBoostWrapper(input_matrix,
+            curr_markers = xgBoostWrapper(t(input_matrix),
                                           clusters,
                                           num_markers)
         }
 
+        # print(curr_method)
+        # print(curr_markers)
         list_markers[[curr_method]] = curr_markers
+        # print("after list assignment")
 
     }
 
