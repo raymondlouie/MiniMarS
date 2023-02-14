@@ -32,7 +32,7 @@ findClusterPerformance <- function (matrix_all,
                                     num_markers,
                                     subsample_num,
                                     sub.seed=42,
-                                    train_test_ratio,
+                                    train_test_ratio=0.9,
                                     method_cluster="all",
                                     method_performance="all",
                                     verbose=FALSE,
@@ -41,55 +41,77 @@ findClusterPerformance <- function (matrix_all,
     # print("findClusterPerformance")
     # print(dim(matrix_all))
 
+
     if (subsample_num > dim(matrix_all)[1]){
-        warning(paste0("Number of sub-samples more than number of cells. Using all cells"))
+        warning(paste0("Number of sub-samples more than number of cells. Using all cells."))
         subsample_num=dim(matrix_all)[1]
 
     }
-
-    # subsample
     set.seed(sub.seed)
-    sample_index = sample(x = 1:dim(matrix_all)[1],size = subsample_num,replace = FALSE)
+
+
+    unique_clusters = unique(clusters_all)
+
+
+
+    list_index_training = list()
+    list_index_test= list()
+    icount=1
+    for (i in 1:length(unique_clusters)){
+        curr_cluster = unique_clusters[[i]]
+        index_temp= which(clusters_all %in% curr_cluster)
+
+        # index of cells for training and testing
+        # index_training_temp = index_temp[1:round(train_test_ratio*length(index_temp))]
+        # index_test_temp = setdiff(index_temp,
+        #                           index_training_temp)
+
+        # index of cells for training and testing
+        index_test_temp = index_temp[1:ceiling((1-train_test_ratio)*length(index_temp))]
+        index_training_temp = setdiff(index_temp,
+                                      index_test_temp)
+
+        # subsample
+        index_training_sample_temp = index_training_temp[1:min(round(train_test_ratio*subsample_num),
+                                                               length(index_training_temp))]
+        index_test_sample_temp = index_test_temp[1:min(round((1-train_test_ratio)*subsample_num),
+                                                       length(index_test_temp))]
+
+        if (length(index_test_sample_temp)>3 & length(index_training_sample_temp)>3){
+
+            list_index_training[[icount]]=index_training_sample_temp
+            list_index_test[[icount]]=index_test_sample_temp
+            icount=icount+1
+        }
+
+
+    }
+    index_train = unlist(list_index_training)
+    index_test= unlist(list_index_test)
+
+    sample_index = c(index_train,index_test)
     matrix_sample= matrix_all[sample_index,]
     clusters_sample = clusters_all[sample_index]
 
-
     # create numeric form of clusters, used in XgBoost
-    unique_clusters_sample = unique(clusters_sample)
-    num_clust= length(unique_clusters_sample)
+    unique_clusters= unique(clusters_sample)
+    num_clust= length(unique_clusters)
     label <- 0:(num_clust-1)
-    names(unique_clusters_sample) = label
-    clusters_newlabel_sample = unlist(lapply(clusters_sample,
-                                             function (x) as.numeric(names(unique_clusters_sample)[which(as.character(unique_clusters_sample) %in% x)])))
+    names(unique_clusters) = label
 
 
-    # divide data into training and test sets
-    index_train = sample(x = 1:dim(matrix_sample)[1],size = round(train_test_ratio*dim(matrix_sample)[1]),replace = FALSE)
-    index_test = setdiff(1:dim(matrix_sample)[1] , index_train)
 
     input_matrix_train = matrix_all[index_train,]
-    clusters_train = clusters_sample[index_train]
-    clusters_num_train = clusters_newlabel_sample[index_train]
+    clusters_train = clusters_all[index_train]
+    clusters_num_train = unlist(lapply(clusters_train,
+                                       function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
 
-    clusters_train_df = data.frame(table(clusters_train))
-    remove_cells = which(clusters_train %in% clusters_train_df$clusters_train[which(clusters_train_df$Freq <6)])
-    if (length(remove_cells)>0){
-        input_matrix_train = input_matrix_train[-remove_cells,]
-        clusters_train = clusters_train[-remove_cells]
-        clusters_num_train = clusters_num_train[-remove_cells]
-    }
 
     input_matrix_test = matrix_all[index_test,]
-    clusters_test = clusters_sample[index_test]
-    clusters_num_test = clusters_newlabel_sample[index_test]
+    clusters_test = clusters_all[index_test]
+    clusters_num_test= unlist(lapply(clusters_test,
+                                     function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
 
-    clusters_test_df = data.frame(table(clusters_test))
-    remove_cells = which(clusters_test %in% clusters_test_df$clusters_test[which(clusters_test_df$Freq <6)])
-    if (length(remove_cells)>0){
-        input_matrix_test = input_matrix_test[-remove_cells,]
-        clusters_test = clusters_test[-remove_cells]
-        clusters_num_test = clusters_num_test[-remove_cells]
-    }
 
     if (length(unique(clusters_test))<2){
         stop("Not enough data in test set. Increase sample size")
@@ -99,6 +121,7 @@ findClusterPerformance <- function (matrix_all,
         stop("Not enough data in training set. Increase sample size")
 
     }
+
 
     if (verbose){
         print(table(clusters_test))
@@ -153,7 +176,7 @@ findClusterPerformance <- function (matrix_all,
         list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
                                                                         t(as.matrix(input_matrix_train)),
                                                                         t(as.matrix(input_matrix_test)),
-                                                                        unique_clusters_sample,
+                                                                        unique_clusters,
                                                                         clusters_num_train,
                                                                         clusters_num_test,
                                                                         clusters_train,
