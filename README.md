@@ -21,6 +21,10 @@ SingleCellExperiment
 ```
 devtools::install_github("raymondlouie/ClusterMarkers") 
 ```
+or download the package [here](https://www.dropbox.com/s/5dz53xqcp5u4sf4/ClusterMarkers_0.1.0.tar.gz?dl=0) and install it using
+```
+install.packages("~/Downloads/ClusterMarkers_0.1.0.tar.gz", type = "source", repo = NULL)
+```
 
 ## Example work flow
 An example of the `ClusterMarkers` work flow to get started:
