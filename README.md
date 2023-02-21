@@ -37,6 +37,7 @@ clusters = sce$cell_type
 
 output_df = findClusterPerformance(input_matrix,
                                    clusters,
+ 					     clusters_sel=c("CD4-positive, alpha-beta memory T cell","CD8-positive, alpha-beta memory T cell"),
                                    num_markers=15,
                                    subsample_num=100,
 					     sub.seed=42,
