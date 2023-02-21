@@ -39,9 +39,12 @@ output_df = findClusterPerformance(input_matrix,
                                    clusters,
                                    num_markers=15,
                                    subsample_num=100,
+					     sub.seed=42,
                                    train_test_ratio=0.9,
                                    method_cluster="all",
-                                   method_performance="all") 
+                                   method_performance="all",
+                                   cluster_proportion = "proportional",
+                                   verbose=FALSE 
 ```
 
 
