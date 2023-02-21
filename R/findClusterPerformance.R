@@ -1,7 +1,8 @@
 #' Find the most informative cluster markers
 #'
-#' @param matrix_all Feature matrix with cells as columns, and features as rows.
+#' @param matrix_all Feature matrix with cells as rows, and features as columns.
 #' @param clusters_all Cluster annotation for each cell.
+#' @param clusters_sel Selected clusters
 #' @param num_markers Number of markers to output.
 #' @param subsample_num Number of cells to sub-sample
 #' @param sub.seed Seed number of sub-sample
@@ -21,6 +22,11 @@
 #'   \item \code{all}: Use all methods
 #' }
 #'
+#' @param cluster_proportional Sub-sampling equally or proportional
+#' \itemize{
+#'   \item \code{equal}
+#'   \item \code{proportional}
+#' }
 #' @return A list containing
 #' \itemize{
 #'   \item \code{markers}: Informative markers for each method
@@ -29,18 +35,38 @@
 #' @export
 findClusterPerformance <- function (matrix_all,
                                     clusters_all,
+                                    clusters_sel = "ALLCLUSTER",
                                     num_markers,
                                     subsample_num,
                                     sub.seed=42,
                                     train_test_ratio=0.9,
                                     method_cluster="all",
                                     method_performance="all",
+                                    cluster_proportion="proportional",
                                     verbose=FALSE,
                                     ...) {
 
     # print("findClusterPerformance")
     # print(dim(matrix_all))
 
+    if (length(clusters_all) != dim(matrix_all)[1]){
+        stop("Number of cluster annotation cells is not equal to the number of cells in feature matrix.")
+    }
+
+    if (length(clusters_sel)==1 && clusters_sel == "ALLCLUSTER"){
+        clusters_sel = unique(clusters_all)
+    }
+
+    if (length(setdiff(clusters_sel,
+                       unique(clusters_all)
+    ))>0){
+        warning(paste0("Invalid cluster name. Using all clusters"))
+        clusters_sel = unique(clusters_all)
+    }  else{
+        index_keep = which(clusters_all %in% clusters_sel)
+        clusters_all = clusters_all[index_keep]
+        matrix_all = matrix_all[index_keep,]
+    }
 
     if (subsample_num > dim(matrix_all)[1]){
         warning(paste0("Number of sub-samples more than number of cells. Using all cells."))
@@ -52,6 +78,17 @@ findClusterPerformance <- function (matrix_all,
 
     unique_clusters = unique(clusters_all)
 
+
+
+    if (cluster_proportion == "proportional"){
+        temp_table = table(clusters_all)
+        temp_table = temp_table[match(unique_clusters,
+                                      names(temp_table))]
+        cluster_ratio = as.numeric(temp_table/sum(temp_table))
+    } else{
+        cluster_ratio = rep(1/length(unique_clusters),
+                            length(unique_clusters))
+    }
 
 
     list_index_training = list()
@@ -72,9 +109,10 @@ findClusterPerformance <- function (matrix_all,
                                       index_test_temp)
 
         # subsample
-        index_training_sample_temp = index_training_temp[1:min(round(train_test_ratio*subsample_num),
+        index_training_sample_temp = index_training_temp[1:min(max(ceiling(train_test_ratio*subsample_num*cluster_ratio[[i]]),
+                                                                   4),
                                                                length(index_training_temp))]
-        index_test_sample_temp = index_test_temp[1:min(round((1-train_test_ratio)*subsample_num),
+        index_test_sample_temp = index_test_temp[1:min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
                                                        length(index_test_temp))]
 
         if (length(index_test_sample_temp)>3 & length(index_training_sample_temp)>3){
@@ -86,8 +124,9 @@ findClusterPerformance <- function (matrix_all,
 
 
     }
+
     index_train = unlist(list_index_training)
-    index_test= unlist(list_index_test)
+    index_test = unlist(list_index_test)
 
     sample_index = c(index_train,index_test)
     matrix_sample= matrix_all[sample_index,]
@@ -161,6 +200,7 @@ findClusterPerformance <- function (matrix_all,
     list_performance = c()
     for (i in 1:length(list_markers)){
         markers_sel = list_markers[[i]]
+        markers_sel= markers_sel[!is.na(markers_sel)]
         # print("ite list_markers")
         if (verbose){
             print(names(list_markers)[[i]])

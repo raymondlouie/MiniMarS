@@ -1,13 +1,13 @@
 #' Find performance measure of predicted markers
 #'
 #' @param markers_sel Selected markers for classification
-#' @param input_matrix_test Feature matrix with cells as columns, and features as rows.
-#' @param input_matrix_test Feature matrix with cells as columns, and features as rows.
+#' @param input_matrix_train Feature training matrix with cells as columns, and features as rows.
+#' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
 #' @param unique_clusters_sample Unique clusters
 #' @param clusters_num_train Cluster annotation for training set (numerical)
 #' @param clusters_num_test Cluster annotation for testing set (numerical)
 #' @param clusters_train Cluster annotation for training set
-#' @param clusters_test Cluster annotation for training set
+#' @param clusters_test Cluster annotation for test set
 #' @param method List of methods to find cluster markers.
 #' \itemize{
 #'   \item \code{xgBoost}
@@ -50,14 +50,20 @@ performanceMarkers <- function (markers_sel,
     }
 
     if (length(clusters_num_test) != dim(input_matrix_test)[2]) {
-        stop("Number of cells in cluster_num_test does not match the number of cells in the input matrix.")
+        stop("Number of cells in cluster_num_test does not match the number of cells in the test matrix.")
     }
 
     if (length(clusters_test) != dim(input_matrix_test)[2]) {
-        stop("Number of cells in cluster_test does not match the number of cells in the input matrix.")
+        stop("Number of cells in cluster_test does not match the number of cells in the test matrix.")
     }
 
+    if (length(clusters_num_train) != dim(input_matrix_train)[2]) {
+        stop("Number of cells in cluster_num_test does not match the number of cells in the training matrix.")
+    }
 
+    if (length(clusters_train) != dim(input_matrix_train)[2]) {
+        stop("Number of cells in cluster_train does not match the number of cells in the training matrix.")
+    }
 
     list_measures = list()
 

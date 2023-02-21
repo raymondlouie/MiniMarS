@@ -1,9 +1,9 @@
-#' Wrapper function for citeFUSE
+#' Wrapper function for CiteFuse
 #'
 #' @param sce Single cell experiment object
 #' @param num_markers Number of markers to output
 #'
-#' @return The most informative markers determined by citeFUSE
+#' @return The most informative markers determined by CiteFuse
 #' @export
 citeFuseWrapper <- function (sce,
                              num_markers=15,
@@ -38,7 +38,8 @@ citeFuseWrapper <- function (sce,
 #' @export
 sc2markerWrapper <- function (input_matrix,
                               clusters,
-                              num_markers=15, ...){
+                              num_markers=15,
+                              ...){
 
     seurat_object = Seurat::CreateSeuratObject(input_matrix,
                                                meta.data =data.frame(cell_type=clusters) )
@@ -68,6 +69,7 @@ sc2markerWrapper <- function (input_matrix,
 #' Wrapper function for geneBasis
 #'
 #' @param sce Single cell experiment object
+#' @param clusters Cell type annotation
 #' @param num_markers Number of markers to output
 #'
 #' @return The most informative markers determined by geneBasis
@@ -86,11 +88,11 @@ geneBasisWrapper <- function (sce,
 
 #' Wrapper function for xgBoost
 #'
-#' @param input_matrix Marker matrix (cell vs markers)
+#' @param input_matrix Marker matrix with cells as rows, and features as columns.
 #' @param clusters Cell type annotation
 #' @param num_markers Number of markers to output
 #'
-#' @return The most informative markers determined by geneBasis
+#' @return The most informative markers determined by xgBoost
 #' @export
 xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nthread=6, ...){
     # print("xgboostwrapper")
@@ -144,15 +146,15 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
 #' Wrapper function for xgboostPerformance
 #'
 #' @param markers_sel Single cell experiment object
-#' @param input_matrix_train Training matrix with cells as columns, and features as rows.
-#' @param input_matrix_test Test matrix with cells as columns, and features as rows.
-#' @param clusters_num_train Number of markers to output
-#' @param clusters_num_test Number of markers to output
-#' @param clusters_train Number of markers to output
-#' @param clusters_test Number of markers to output
-#' @param unique_clusters_sample Number of markers to output
+#' @param input_matrix_train Feature training matrix with cells as columns, and features as rows.
+#' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
+#' @param clusters_num_train Cluster annotation for training set (numerical)
+#' @param clusters_num_test Cluster annotation for test set (numerical)
+#' @param clusters_train Cluster annotation for training set
+#' @param clusters_test Cluster annotation for test set
+#' @param unique_clusters_sample Unique clusters
 #'
-#' @return The most informative markers determined by citeFUSE
+#' @return The performance of the input markers, as determined by a xgBoost algorithm
 #' @export
 xgboostPerformance <- function (markers_sel,
                                 input_matrix_train,
@@ -236,8 +238,8 @@ xgboostPerformance <- function (markers_sel,
 #' Wrapper function for geneBasisPerformance
 #'
 #' @param markers_sel Selected markers
-#' @param input_matrix_test Input matrix of raw counts
-#' @param clusters_test Cluster annotation in test dataset
+#' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
+#' @param clusters_test Cluster annotation for test set
 #' @param unique_clusters_sample Unique clusters
 #'
 #' @return True positive rate calculated using get_celltype_mapping from geneBasisR

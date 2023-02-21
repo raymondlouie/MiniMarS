@@ -9,9 +9,9 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 Please install the following packages first .
 
 ```
-citeFuse
-sc2Marker
-geneBasis
+CiteFuse
+sc2marker
+geneBasisR
 Seurat
 SingleCellExperiment
 ```
