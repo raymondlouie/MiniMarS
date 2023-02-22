@@ -53,23 +53,23 @@ output_df = findClusterPerformance(input_matrix,
 ## Public datasets
 We provide below public datasets for users to try the `ClusterMarkers` package. The datasets all contain protein features as well as either cell annotation or cluster labels from the corresponding papers or websites.
 
-## Dataset 1
+### Dataset 1
 Blood and bone marrow samples of human from the BD Rhapsody assay.<br>
 Number of cells in this dataset: around 100K<br>
 [Click here to access the data](https://cellxgene.cziscience.com/collections/93eebe82-d8c3-41bc-a906-63b5b5f24a9d)<br>
 
-## Dataset 2
+### Dataset 2
 Mucosa-associated lymphoid tissue samples of human from the 10X technology.<br>
 Number of cells in this dataset: around 10K<br>
 [Click here to access the data](https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.0/malt_10k_protein_v3)<br>
 
-## Dataset 3
+### Dataset 3
 Spleen and lymph nodes samples of mouse from the 10X technology.<br>
 Number of cells in this dataset: around 40K<br>
 [Click here to access the raw data](https://github.com/YosefLab/totalVI_reproducibility/)<br>
 [Click here to access the processed data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE150599)<br>
 
-## Dataset 4
+### Dataset 4
 PBMC (peripheral blood mononuclear cells) samples of human from the 10X technology.<br>
 Number of cells in this dataset: around 10K<br>
 [Click here to access the data](https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.0/pbmc_10k_protein_v3)<br>
