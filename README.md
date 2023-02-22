@@ -66,8 +66,8 @@ Number of cells in this dataset: around 10K<br>
 ### Dataset 3
 Spleen and lymph nodes samples of mouse from the 10X technology.<br>
 Number of cells in this dataset: around 40K<br>
-[Click here to access the raw data](https://github.com/YosefLab/totalVI_reproducibility/)<br>
-[Click here to access the processed data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE150599)<br>
+[Click here to access the raw data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE150599)<br>
+[Click here to access the processed data](https://github.com/YosefLab/totalVI_reproducibility/)<br>
 
 ### Dataset 4
 PBMC (peripheral blood mononuclear cells) samples of human from the 10X technology.<br>
