@@ -45,7 +45,7 @@ output_df = findClusterPerformance(input_matrix,
                                    method_cluster="all",
                                    method_performance="all",
                                    cluster_proportion = "proportional",
-                                   verbose=FALSE 
+                                   verbose=FALSE) 
 ```
 
 <br>
