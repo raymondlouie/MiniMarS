@@ -32,7 +32,7 @@ An example of the `ClusterMarkers` work flow to get started:
 ```{r}
 library(SingleCellExperiment)
 data(sce)
-input_matrix = sce@assays@data$counts
+input_matrix = t(sce@assays@data$counts)
 clusters = sce$cell_type
 
 output_df = findClusterPerformance(input_matrix,
