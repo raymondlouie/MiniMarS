@@ -23,38 +23,45 @@
 findClusterMarkers <- function (input_matrix,
                                 clusters,
                                 num_markers = 15,
-                                method="all",
-                                verbose=FALSE,
+                                method = "all",
+                                verbose = FALSE,
                                 ...) {
 
     # print("findClusterMarkers")
     # print(dim(input_matrix))
-    num_markers_original=num_markers
+    num_markers_original = num_markers
     # num_markers = min(2*num_markers,
     # dim(input_matrix)[1])
 
     all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost")
-
-    if (method == "all"){
-        method = all_methods
-    }
-
-    diff_methods = setdiff(method,all_methods)
-
-    if (length(diff_methods) >  0) {
-        warning(paste0(method, " not found. Using remaining or all methods."))
+    
+    # Recognize the input methods
+    if (length(method) == 0) {
+      stop("No method selected.")
+      
+    } else if((length(method) == 1 & all(method=="all") | all(method %in% all_methods))) {
+      method = all_methods
+    } else {
+      diff_methods = setdiff(method, all_methods)
+      if(length(diff_methods) >  0 & length(diff_methods) < length(method)){
+        warning(paste0(paste(diff_methods, collapse = ", "), " not found. Using the remaining method(s)."))
         method = intersect(method,all_methods)
-        if (length(method) == 0) {
-            method = all_methods
-        }
-    }
-
+      } else if(length(diff_methods) != 0){
+        stop(paste0("No available method selected.\nPlease select at least one method from the following: ", 
+                    paste(all_methods, collapse = ", ")))
+      }
+    } 
+    
+    # Print out the methods used after checks
+    message(paste0("Methods used in this analysis: ", paste(method, collapse = ", ")))
+    
     if (length(clusters) != dim(input_matrix)[2]) {
         stop("Number of clusters do not match the dimension of the input matrix.")
     }
-
-    sce  <- SingleCellExperiment::SingleCellExperiment(list(counts=input_matrix),
-                                 colData=data.frame(cell_type=clusters))
+    
+    # Create a sce object
+    sce  <- SingleCellExperiment::SingleCellExperiment(list(counts = input_matrix),
+                                 colData = data.frame(cell_type = clusters))
     logcounts(sce) <- log2(input_matrix + 1)
 
     list_markers = list()
@@ -70,7 +77,7 @@ findClusterMarkers <- function (input_matrix,
         if (curr_method == "citeFuse") {
             curr_markers = citeFuseWrapper(sce,
                                            num_markers,
-                                           subsample=TRUE)
+                                           subsample = TRUE)
         }
 
         if (curr_method == "sc2marker") {
