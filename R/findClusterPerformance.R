@@ -68,9 +68,12 @@ findClusterPerformance <- function (matrix_all,
         matrix_all = matrix_all[index_keep,]
     }
 
-    if (subsample_num > dim(matrix_all)[1]){
+    if (subsample_num > nrows(matrix_all)){
         warning(paste0("Number of sub-samples more than number of cells. Using all cells."))
-        subsample_num = dim(matrix_all)[1]
+
+
+        subsample_num=nrow(matrix_all)
+
 
     }
     set.seed(sub.seed)

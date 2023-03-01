@@ -14,6 +14,7 @@ sc2marker
 geneBasisR
 Seurat
 SingleCellExperiment
+dplyr
 ```
 
 ### Installation
@@ -27,30 +28,73 @@ install.packages("~/Downloads/ClusterMarkers_0.1.0.tar.gz", type = "source", rep
 ```
 
 ## Example work flow
+
 An example of the `ClusterMarkers` work flow to get started:
 
+Load libraries and example data.
 ```{r}
+library(dplyr)
 library(SingleCellExperiment)
 data(sce)
 input_matrix = t(sce@assays@data$counts)
 clusters = sce$cell_type
+```
 
-output_results = findClusterMarkers(input_matrix,
-                                    clusters,
-                                    num_markers = 15,
-                                    method="all")
 
-output_df = findClusterPerformance(input_matrix,
-                                   clusters,
-				   clusters_sel=c("CD4-positive, alpha-beta memory T cell","CD8-positive, alpha-beta memory T cell"),
-                                   num_markers=15,
-                                   subsample_num=100,
-				   sub.seed=42,
-                                   train_test_ratio=0.9,
-                                   method_cluster="all",
-                                   method_performance="all",
-                                   cluster_proportion = "proportional",
-                                   verbose=FALSE) 
+The input data can be a feature matrix (with cluster vectors), Seurat object or SCE object. 
+
+We will first convert the input to the desired format required for downstream analysis, showing all three examples
+```{r}
+sce_out = processInputFormat(sc_object=sce,
+                            sce_cluster="cell_type",
+                            verbose=TRUE)
+                            
+manual_out = processInputFormat(sc_object=input_matrix,
+                            clusters_all=clusters,
+                            verbose=TRUE)                           
+
+library(Seurat)
+sc_object = CreateSeuratObject(input_matrix)
+Idents(object = sc_object) <- clusters
+seurat_out = processInputFormat(sc_object=sc_object,
+                            verbose=TRUE)
+```
+
+The user can now select a subset of clusters to find markers for, via the `clusters_sel` input.
+```{r}
+sc_out = sce_out
+cluster_selection_out= processClusterSelection(sc_out,
+                                               clusters_sel="all_clusters",
+                                               verbose=TRUE)
+```                                               
+
+The next step is the sub-sampling of the data, and dividing the data into a training and test set.
+```{r}
+final_out = processSubsampling(cluster_selection_out,
+                               clusters_sel="all_clusters",
+                               subsample_num=1000,
+                               train_test_ratio = 0.9,
+                               cluster_proportion= "proportional",
+                               verbose=TRUE)
+```
+
+We now find the markers to distinguish the clusters
+```{r}
+list_markers = findClusterMarkers(final_out$training_matrix,
+                                  final_out$training_clusters,
+                                  num_markers=15,
+                                  method="all",
+                                  verbose=TRUE)
+```
+
+Finally, we will evaulate the performance of the markers using the test data.
+```{r}
+list_performance = performanceAllMarkers(list_markers,
+                                         final_out=final_out,
+                                         method="all",
+                                         nrounds=1500,
+                                         nthread=6,
+                                         verbose=TRUE)
 ```
 
 <br>

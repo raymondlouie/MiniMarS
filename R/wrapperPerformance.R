@@ -85,7 +85,7 @@ performanceMarkers <- function (markers_sel,
         if (curr_method == "xgBoost") {
             performance_df=xgboostPerformance(markers_sel,
                                               t(input_matrix_train),
-                                                t(input_matrix_test),
+                                              t(input_matrix_test),
                                               clusters_num_train,
                                               clusters_num_test,
                                               clusters_train,
