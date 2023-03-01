@@ -1,7 +1,7 @@
 #' Find the most informative cluster markers
 #'
 #' @param matrix_all Feature matrix with cells as rows, and features as columns.
-#' @param clusters_all Cluster annotation for each cell.
+#' @param clusters Cluster annotation for each cell.
 #' @param clusters_sel Selected clusters
 #' @param num_markers Number of markers to output.
 #' @param subsample_num Number of cells to sub-sample
@@ -34,59 +34,59 @@
 #' }
 #' @export
 findClusterPerformance <- function (matrix_all,
-                                    clusters_all,
+                                    clusters,
                                     clusters_sel = "ALLCLUSTER",
                                     num_markers,
                                     subsample_num,
-                                    sub.seed=42,
-                                    train_test_ratio=0.9,
-                                    method_cluster="all",
-                                    method_performance="all",
-                                    cluster_proportion="proportional",
-                                    verbose=FALSE,
+                                    sub.seed = 42,
+                                    train_test_ratio = 0.9,
+                                    method_cluster = "all",
+                                    method_performance = "all",
+                                    cluster_proportion = "proportional",
+                                    verbose = FALSE,
                                     ...) {
 
     # print("findClusterPerformance")
     # print(dim(matrix_all))
 
-    if (length(clusters_all) != dim(matrix_all)[1]){
+    if (length(clusters) != dim(matrix_all)[1]){
         stop("Number of cluster annotation cells is not equal to the number of cells in feature matrix.")
     }
 
-    if (length(clusters_sel)==1 && clusters_sel == "ALLCLUSTER"){
-        clusters_sel = unique(clusters_all)
+    if (length(clusters_sel) == 1 && clusters_sel == "ALLCLUSTER"){
+        clusters_sel = unique(clusters)
     }
 
     if (length(setdiff(clusters_sel,
-                       unique(clusters_all)
+                       unique(clusters)
     ))>0){
         warning(paste0("Invalid cluster name. Using all clusters"))
-        clusters_sel = unique(clusters_all)
+        clusters_sel = unique(clusters)
     }  else{
-        index_keep = which(clusters_all %in% clusters_sel)
-        clusters_all = clusters_all[index_keep]
+        index_keep = which(clusters %in% clusters_sel)
+        clusters = clusters[index_keep]
         matrix_all = matrix_all[index_keep,]
     }
 
     if (subsample_num > dim(matrix_all)[1]){
         warning(paste0("Number of sub-samples more than number of cells. Using all cells."))
-        subsample_num=dim(matrix_all)[1]
+        subsample_num = dim(matrix_all)[1]
 
     }
     set.seed(sub.seed)
 
 
-    unique_clusters = unique(clusters_all)
+    unique_clusters = unique(clusters)
 
 
 
     if (cluster_proportion == "proportional"){
-        temp_table = table(clusters_all)
+        temp_table = table(clusters)
         temp_table = temp_table[match(unique_clusters,
                                       names(temp_table))]
-        cluster_ratio = as.numeric(temp_table/sum(temp_table))
+        cluster_ratio = as.numeric(temp_table / sum(temp_table))
     } else{
-        cluster_ratio = rep(1/length(unique_clusters),
+        cluster_ratio = rep(1 / length(unique_clusters),
                             length(unique_clusters))
     }
 
@@ -96,7 +96,7 @@ findClusterPerformance <- function (matrix_all,
     icount=1
     for (i in 1:length(unique_clusters)){
         curr_cluster = unique_clusters[[i]]
-        index_temp= which(clusters_all %in% curr_cluster)
+        index_temp = which(clusters %in% curr_cluster)
 
         # index of cells for training and testing
         # index_training_temp = index_temp[1:round(train_test_ratio*length(index_temp))]
@@ -104,7 +104,7 @@ findClusterPerformance <- function (matrix_all,
         #                           index_training_temp)
 
         # index of cells for training and testing
-        index_test_temp = index_temp[1:ceiling((1-train_test_ratio)*length(index_temp))]
+        index_test_temp = index_temp[1:ceiling((1 - train_test_ratio) * length(index_temp))]
         index_training_temp = setdiff(index_temp,
                                       index_test_temp)
 
@@ -115,11 +115,11 @@ findClusterPerformance <- function (matrix_all,
         index_test_sample_temp = index_test_temp[1:min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
                                                        length(index_test_temp))]
 
-        if (length(index_test_sample_temp)>3 & length(index_training_sample_temp)>3){
+        if (length(index_test_sample_temp) > 3 & length(index_training_sample_temp) > 3){
 
-            list_index_training[[icount]]=index_training_sample_temp
-            list_index_test[[icount]]=index_test_sample_temp
-            icount=icount+1
+            list_index_training[[icount]] = index_training_sample_temp
+            list_index_test[[icount]] = index_test_sample_temp
+            icount = icount + 1
         }
 
 
@@ -129,25 +129,25 @@ findClusterPerformance <- function (matrix_all,
     index_test = unlist(list_index_test)
 
     sample_index = c(index_train,index_test)
-    matrix_sample= matrix_all[sample_index,]
-    clusters_sample = clusters_all[sample_index]
+    matrix_sample = matrix_all[sample_index,]
+    clusters_sample = clusters[sample_index]
 
     # create numeric form of clusters, used in XgBoost
-    unique_clusters= unique(clusters_sample)
-    num_clust= length(unique_clusters)
-    label <- 0:(num_clust-1)
+    unique_clusters = unique(clusters_sample)
+    num_clust = length(unique_clusters)
+    label <- 0:(num_clust - 1)
     names(unique_clusters) = label
 
 
 
     input_matrix_train = matrix_all[index_train,]
-    clusters_train = clusters_all[index_train]
+    clusters_train = clusters[index_train]
     clusters_num_train = unlist(lapply(clusters_train,
                                        function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
 
 
     input_matrix_test = matrix_all[index_test,]
-    clusters_test = clusters_all[index_test]
+    clusters_test = clusters[index_test]
     clusters_num_test= unlist(lapply(clusters_test,
                                      function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
 
@@ -176,11 +176,11 @@ findClusterPerformance <- function (matrix_all,
                                       verbose=verbose)
 
 
-    # calculate most occuring markers
+    # calculate most occurring markers
     for (i in 1:length(list_markers)){
         curr_df = data.frame(markers = list_markers[[i]],
                              method = names(list_markers)[[i]])
-        if (i==1){
+        if (i == 1){
             total_df = curr_df
         } else{
             total_df = rbind(total_df,curr_df)
@@ -189,7 +189,7 @@ findClusterPerformance <- function (matrix_all,
     }
 
     table_compare = data.frame(table(total_df$markers))
-    table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
+    table_compare = table_compare[order(table_compare$Freq,decreasing = TRUE),]
     list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
 
 
@@ -213,7 +213,7 @@ findClusterPerformance <- function (matrix_all,
         }
 
 
-        list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
+        list_performance[[names(list_markers)[[i]]]] = performanceMarkers(markers_sel,
                                                                         t(as.matrix(input_matrix_train)),
                                                                         t(as.matrix(input_matrix_test)),
                                                                         unique_clusters,
@@ -221,10 +221,10 @@ findClusterPerformance <- function (matrix_all,
                                                                         clusters_num_test,
                                                                         clusters_train,
                                                                         clusters_test,
-                                                                        method=method_performance,
-                                                                        nrounds=1500,
-                                                                        nthread=6,
-                                                                        verbose=verbose)
+                                                                        method = method_performance,
+                                                                        nrounds = 1500,
+                                                                        nthread = 6,
+                                                                        verbose = verbose)
 
     }
 
