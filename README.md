@@ -14,6 +14,7 @@ sc2marker
 geneBasisR
 Seurat
 SingleCellExperiment
+dplyr
 ```
 
 ### Installation
@@ -32,7 +33,7 @@ An example of the `ClusterMarkers` work flow to get started:
 
 Load libraries and example data.
 ```{r}
-library(dplyr
+library(dplyr)
 library(SingleCellExperiment)
 data(sce)
 # input_matrix = t(sce@assays@data$counts)
