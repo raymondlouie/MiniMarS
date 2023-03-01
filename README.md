@@ -36,21 +36,33 @@ Load libraries and example data.
 library(dplyr)
 library(SingleCellExperiment)
 data(sce)
-# input_matrix = t(sce@assays@data$counts)
-# clusters = sce$cell_type
+input_matrix = t(sce@assays@data$counts)
+clusters = sce$cell_type
 ```
 
 
-The input data can be a feature matrix (with cluster vectors), Seurat object or SCE object. We will first convert the input to the desired format required for downstream analysis.
+The input data can be a feature matrix (with cluster vectors), Seurat object or SCE object. 
+
+We will first convert the input to the desired format required for downstream analysis, showing all three examples
 ```{r}
-sc_out = processInputFormat(sc_object=sce,
+sce_out = processInputFormat(sc_object=sce,
                             sce_cluster="cell_type",
                             verbose=TRUE)
+                            
+manual_out = processInputFormat(sc_object=input_matrix,
+                            clusters_all=clusters,
+                            verbose=TRUE)                           
 
+library(Seurat)
+sc_object = CreateSeuratObject(input_matrix)
+Idents(object = sc_object) <- clusters
+seurat_out = processInputFormat(sc_object=sc_object,
+                            verbose=TRUE)
 ```
 
 The user can now select a subset of clusters to find markers for, via the `clusters_sel` input.
 ```{r}
+sc_out = sce_out
 cluster_selection_out= processClusterSelection(sc_out,
                                                clusters_sel="all_clusters",
                                                verbose=TRUE)
@@ -68,7 +80,6 @@ final_out = processSubsampling(cluster_selection_out,
 
 We now find the markers to distinguish the clusters
 ```{r}
-
 list_markers = findClusterMarkers(final_out$training_matrix,
                                   final_out$training_clusters,
                                   num_markers=15,
