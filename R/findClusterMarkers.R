@@ -27,6 +27,7 @@ findClusterMarkers <- function (input_matrix,
                                 verbose=FALSE,
                                 ...) {
 
+    input_matrix= t(as.matrix(input_matrix))
     # print("findClusterMarkers")
     # print(dim(input_matrix))
     num_markers_original=num_markers
@@ -54,7 +55,7 @@ findClusterMarkers <- function (input_matrix,
     }
 
     sce  <- SingleCellExperiment::SingleCellExperiment(list(counts=input_matrix),
-                                 colData=data.frame(cell_type=clusters))
+                                                       colData=data.frame(cell_type=clusters))
     logcounts(sce) <- log2(input_matrix + 1)
 
     list_markers = list()
@@ -98,7 +99,22 @@ findClusterMarkers <- function (input_matrix,
 
     }
 
-    return(list_markers)
+    # calculate most occuring markers
+    for (i in 1:length(list_markers)){
+        curr_df = data.frame(markers = list_markers[[i]],
+                             method = names(list_markers)[[i]])
+        if (i==1){
+            total_df = curr_df
+        } else{
+            total_df = rbind(total_df,curr_df)
+        }
 
+    }
+
+    table_compare = data.frame(table(total_df$markers))
+    table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
+    list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
+
+    return(list_markers)
 
 }

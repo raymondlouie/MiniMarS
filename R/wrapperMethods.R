@@ -103,7 +103,7 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
     label <- 0:(num_clust-1)
     names(unique_clusters) = label
     clusters_newlabel = unlist(lapply(clusters,
-                                             function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
+                                      function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
 
     # input_matrix = t(input_matrix)
 
@@ -119,7 +119,7 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
     # print(dim(input_matrix))
     # print(markers_fstat)
     xgboost_train = xgboost::xgb.DMatrix(data=input_matrix[, markers_fstat],
-                                label=clusters_newlabel)
+                                         label=clusters_newlabel)
 
     # print(dim(input_matrix))
 
@@ -128,9 +128,9 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
                        "num_class" = num_clust)
 
     built.model <- xgboost::xgb.train(params = xgb_params,
-                             data = xgboost_train,
-                             nrounds = nrounds,
-                             nthread = nthread)
+                                      data = xgboost_train,
+                                      nrounds = nrounds,
+                                      nthread = nthread)
     importance.mt <- xgboost::xgb.importance(colnames(xgboost_train), model = built.model)
     markers_xgboost = importance.mt$Feature
 
