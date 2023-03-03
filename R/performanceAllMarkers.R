@@ -1,14 +1,8 @@
 #' Find performance measure of predicted markers
 #'
-#' @param markers_sel Selected markers for classification
-#' @param input_matrix_train Feature training matrix with cells as columns, and features as rows.
-#' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
-#' @param unique_clusters_sample Unique clusters
-#' @param clusters_num_train Cluster annotation for training set (numerical)
-#' @param clusters_num_test Cluster annotation for testing set (numerical)
-#' @param clusters_train Cluster annotation for training set
-#' @param clusters_test Cluster annotation for test set
-#' @param method List of methods to find cluster markers.
+#' @param list_markers Output of `findClusterMarkers` function.
+#' @param final_out Output of `processSubsampling` function.
+#' @param method List of methods to find the performance of the cluster markers.
 #' \itemize{
 #'   \item \code{xgBoost}
 #'   \item \code{geneBasis}
@@ -17,7 +11,7 @@
 #' @param nrounds Number of rounds used in xgBoost algorithm.
 #' @param nthread Number of threads used in xgBoost algorithm.
 #'
-#' @return A list containing performance of testing set, for each cluster
+#' @return A list containing the performance of testing set, for each marker identification method.
 #' @export
 performanceAllMarkers <- function (list_markers,
                                    final_out,
@@ -41,20 +35,19 @@ performanceAllMarkers <- function (list_markers,
         markers_sel= markers_sel[!is.na(markers_sel)]
         method_name = names(list_markers)
 
-        list_performance[[paste0(names(list_markers)[[i]],
-                                 "_performance")]]=performanceMarkers(markers_sel,
-                                                                     t(as.matrix(input_matrix_train)),
-                                                                     t(as.matrix(input_matrix_test)),
-                                                                     unique_clusters,
-                                                                     clusters_num_train,
-                                                                     clusters_num_test,
-                                                                     clusters_train,
-                                                                     clusters_test,
-                                                                     method=method,
-                                                                     nrounds=1500,
-                                                                     nthread=6,
-                                                                     method_marker_name=method_name,
-                                                                     verbose=verbose)
+        list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
+                                                                        t(as.matrix(input_matrix_train)),
+                                                                        t(as.matrix(input_matrix_test)),
+                                                                        unique_clusters,
+                                                                        clusters_num_train,
+                                                                        clusters_num_test,
+                                                                        clusters_train,
+                                                                        clusters_test,
+                                                                        method=method,
+                                                                        nrounds=1500,
+                                                                        nthread=6,
+                                                                        method_marker_name=method_name,
+                                                                        verbose=verbose)
 
     }
 

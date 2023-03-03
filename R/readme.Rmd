@@ -72,8 +72,19 @@ graphics.off()
 
 Load libraries and example data.
 ```{r}
+packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","ClusterMarkers")
+packages_required_not_installed=setdiff(packages_required, rownames(installed.packages()))
+if (length(packages_required_not_installed)>0){
+    stop(paste0("Please install packages",packages_required_not_installed))
+}
+
 library(ClusterMarkers)
 library(dplyr)
+
+# Check to see if packages are installed
+
+
+
 library(SingleCellExperiment)
 data(sce)
 input_matrix = t(sce@assays@data$counts)
@@ -87,16 +98,16 @@ We will first convert the input to the desired format required for downstream an
 sce_in = processInputFormat(sc_object=sce,
                             sce_cluster="cell_type",
                             verbose=TRUE)
-                            
+
 manual_in = processInputFormat(sc_object=input_matrix,
-                            clusters_all=clusters,
-                            verbose=TRUE)                           
+                               clusters_all=clusters,
+                               verbose=TRUE)                           
 
 library(Seurat)
 sc_object = CreateSeuratObject(input_matrix)
 Idents(object = sc_object) <- clusters
 seurat_in = processInputFormat(sc_object=sc_object,
-                            verbose=TRUE)
+                               verbose=TRUE)
 unique(clusters)
 ```
 

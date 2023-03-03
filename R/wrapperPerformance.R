@@ -99,7 +99,7 @@ performanceMarkers <- function (markers_sel,
         }
 
 
-        list_measures[[curr_method]] = performance_df
+        list_measures[[paste0(curr_method,"_performance")]] = performance_df
 
 
     }
