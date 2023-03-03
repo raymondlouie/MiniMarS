@@ -30,7 +30,6 @@ install.packages('Seurat')
 install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
 
 # SingleCellExperiment
-
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("SingleCellExperiment")
@@ -56,7 +55,7 @@ Here is an example of the `ClusterMarkers` work flow to get started:
 
 Load libraries and example data.
 ```{r}
-
+# Check to see if packages are installed.
 packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","ClusterMarkers")
 packages_required_not_installed=setdiff(packages_required, rownames(installed.packages()))
 if (length(packages_required_not_installed)>0){
@@ -91,14 +90,13 @@ sc_object = CreateSeuratObject(input_matrix)
 Idents(object = sc_object) <- clusters
 seurat_in = processInputFormat(sc_object=sc_object,
                             verbose=TRUE)
-unique(clusters)
 ```
 
-We now select a subset of clusters to identify markers for, via the `clusters_sel` input.
+We now select a subset of clusters (`clusters_sel`) to identify markers for. Default is using all clusters.
 ```{r}
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
                  "naive thymus-derived CD8-positive, alpha-beta T cell")
-sc_in = sce_in # as an example, select the SCE input
+sc_in = sce_in # As an example, select the SCE input
 
 cluster_selection_out= processClusterSelection(sc_in,
                                                clusters_sel=clusters_sel,
@@ -139,7 +137,6 @@ sessionInfo()
 ```
 
 ```
-other attached packages:
  [1] sp_1.4-6                    SeuratObject_4.1.0          Seurat_4.1.1.9002           SingleCellExperiment_1.16.0
  [5] SummarizedExperiment_1.24.0 Biobase_2.54.0              GenomicRanges_1.46.1        GenomeInfoDb_1.30.0        
  [9] IRanges_2.28.0              S4Vectors_0.32.3            BiocGenerics_0.40.0         MatrixGenerics_1.6.0       
