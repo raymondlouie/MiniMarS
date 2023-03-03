@@ -30,6 +30,7 @@ performanceMarkers <- function (markers_sel,
                                 method="all",
                                 nrounds=1500,
                                 nthread=6,
+                                method_marker_name="xgBoost",
                                 verbose=FALSE,
                                 ...) {
 
@@ -71,7 +72,8 @@ performanceMarkers <- function (markers_sel,
         curr_method = method[[i]]
 
         if (verbose){
-            print(curr_method)
+            message("Calculating performance of marker selection method:",method_marker_name,  "using performance method:",curr_method,
+                    ".\n")
         }
 
         if (curr_method == "geneBasis") {

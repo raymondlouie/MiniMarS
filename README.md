@@ -13,6 +13,7 @@ Please install the following packages first .
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("CiteFuse")
+devtools::install_github("tpq/propr") # propr package required for CiteFuse to run
 
 # sc2marker
 if (!require("devtools", quietly = TRUE))
@@ -51,42 +52,45 @@ An example of the `ClusterMarkers` work flow to get started:
 
 Load libraries and example data.
 ```{r}
+library(ClusterMarkers)
 library(dplyr)
 library(SingleCellExperiment)
 data(sce)
 input_matrix = t(sce@assays@data$counts)
 clusters = sce$cell_type
 ```
-The input data can be either a i) feature matrix (with cluster vectors), ii) Seurat object or SCE object. 
 
-We will first convert the input to the desired format required for downstream analysis, showing all three input examples:
+The input data can  either be a i) feature matrix (with cluster vectors), ii) Seurat object or SCE object. 
+
+We will first convert the input to the desired format required for downstream analysis, showing all three input data examples:
 ```{r}
-sce_out = processInputFormat(sc_object=sce,
+sce_in = processInputFormat(sc_object=sce,
                             sce_cluster="cell_type",
                             verbose=TRUE)
                             
-manual_out = processInputFormat(sc_object=input_matrix,
+manual_in = processInputFormat(sc_object=input_matrix,
                             clusters_all=clusters,
                             verbose=TRUE)                           
 
 library(Seurat)
 sc_object = CreateSeuratObject(input_matrix)
 Idents(object = sc_object) <- clusters
-seurat_out = processInputFormat(sc_object=sc_object,
+seurat_in = processInputFormat(sc_object=sc_object,
                             verbose=TRUE)
-clusters
+unique(clusters)
 ```
 
-The user can now select a subset of clusters to find markers for, via the `clusters_sel` input.
+We can now select a subset of clusters to identify markers for, via the `clusters_sel` input.
 ```{r}
-print(clusters_sel)
-sc_out = sce_out
-cluster_selection_out= processClusterSelection(sc_out,
-                                               clusters_sel="all_clusters",
+clusters_sel = c("CD4-positive, alpha-beta memory T cell",
+                 "naive thymus-derived CD8-positive, alpha-beta T cell")
+sc_in = sce_in # as an example, select the SCE input
+cluster_selection_out= processClusterSelection(sc_in,
+                                               clusters_sel=clusters_sel,
                                                verbose=TRUE)
-```                                               
+```   
 
-The next step is the sub-sampling of the data, and dividing the data into a training and test set.
+In the next step, we i) Sub-sample  the data, and ii) Divide the data into a training and test set.
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
                                clusters_sel="all_clusters",
@@ -96,7 +100,7 @@ final_out = processSubsampling(cluster_selection_out,
                                verbose=TRUE)
 ```
 
-We now find the markers to distinguish the clusters
+We now find the markers to identify the cluster. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
 ```{r}
 list_markers = findClusterMarkers(final_out$training_matrix,
                                   final_out$training_clusters,
@@ -105,7 +109,7 @@ list_markers = findClusterMarkers(final_out$training_matrix,
                                   verbose=TRUE)
 ```
 
-Finally, we will evaulate the performance of the markers using the test data.
+Finally, we  evaulate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
 ```{r}
 list_performance = performanceAllMarkers(list_markers,
                                          final_out=final_out,
@@ -113,6 +117,18 @@ list_performance = performanceAllMarkers(list_markers,
                                          nrounds=1500,
                                          nthread=6,
                                          verbose=TRUE)
+```
+
+```{r}
+sessionInfo()
+```
+
+```
+other attached packages:
+ [1] sp_1.4-6                    SeuratObject_4.1.0          Seurat_4.1.1.9002           SingleCellExperiment_1.16.0
+ [5] SummarizedExperiment_1.24.0 Biobase_2.54.0              GenomicRanges_1.46.1        GenomeInfoDb_1.30.0        
+ [9] IRanges_2.28.0              S4Vectors_0.32.3            BiocGenerics_0.40.0         MatrixGenerics_1.6.0       
+[13] matrixStats_0.61.0          dplyr_1.0.7                 ClusterMarkers_0.1.0 
 ```
 
 <br>

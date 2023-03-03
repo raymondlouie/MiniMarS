@@ -28,18 +28,15 @@ findClusterMarkers <- function (input_matrix,
                                 ...) {
 
     input_matrix= t(as.matrix(input_matrix))
-    # print("findClusterMarkers")
-    # print(dim(input_matrix))
+
     num_markers_original = num_markers
-    # num_markers = min(2*num_markers,
-    # dim(input_matrix)[1])
 
     all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost")
-    
+
     # Recognize the input methods
     if (length(method) == 0) {
       stop("No method selected.")
-      
+
     } else if((length(method) == 1 & all(method=="all") | all(method %in% all_methods))) {
       method = all_methods
     } else {
@@ -48,14 +45,14 @@ findClusterMarkers <- function (input_matrix,
         warning(paste0(paste(diff_methods, collapse = ", "), " not found. Using the remaining method(s)."))
         method = intersect(method,all_methods)
       } else if(length(diff_methods) != 0){
-        stop(paste0("No available method selected.\nPlease select at least one method from the following: ", 
+        stop(paste0("No available method selected.\nPlease select at least one method from the following: ",
                     paste(all_methods, collapse = ", ")))
       }
-    } 
-    
+    }
+
     # Print out the methods used after checks
     message(paste0("Methods used in this analysis: ", paste(method, collapse = ", ")))
-    
+
     if (length(clusters) != dim(input_matrix)[2]) {
         stop("Number of clusters do not match the dimension of the input matrix.")
     }
@@ -72,7 +69,7 @@ findClusterMarkers <- function (input_matrix,
         curr_method = method[[i]]
 
         if (verbose){
-            print(curr_method)
+            message(paste0("Caclulating markers using ", curr_method,".\n"))
         }
 
 
@@ -100,10 +97,7 @@ findClusterMarkers <- function (input_matrix,
                                           num_markers)
         }
 
-        # print(curr_method)
-        # print(curr_markers)
         list_markers[[curr_method]] = curr_markers
-        # print("after list assignment")
 
     }
 

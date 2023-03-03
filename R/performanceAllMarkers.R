@@ -39,30 +39,22 @@ performanceAllMarkers <- function (list_markers,
     for (i in 1:length(list_markers)){
         markers_sel = list_markers[[i]]
         markers_sel= markers_sel[!is.na(markers_sel)]
-        # print("ite list_markers")
-        if (verbose){
-            print(names(list_markers)[[i]])
-            print(table(clusters_num_train))
-            print(table(clusters_train))
-            print(table(clusters_num_test))
-            print(table(clusters_test))
-            print(dim(input_matrix_train))
-            print(dim(input_matrix_test))
-        }
+        method_name = names(list_markers)
 
-
-        list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
-                                                                        t(as.matrix(input_matrix_train)),
-                                                                        t(as.matrix(input_matrix_test)),
-                                                                        unique_clusters,
-                                                                        clusters_num_train,
-                                                                        clusters_num_test,
-                                                                        clusters_train,
-                                                                        clusters_test,
-                                                                        method=method,
-                                                                        nrounds=1500,
-                                                                        nthread=6,
-                                                                        verbose=verbose)
+        list_performance[[paste0(names(list_markers)[[i]],
+                                 "_performance")]]=performanceMarkers(markers_sel,
+                                                                     t(as.matrix(input_matrix_train)),
+                                                                     t(as.matrix(input_matrix_test)),
+                                                                     unique_clusters,
+                                                                     clusters_num_train,
+                                                                     clusters_num_test,
+                                                                     clusters_train,
+                                                                     clusters_test,
+                                                                     method=method,
+                                                                     nrounds=1500,
+                                                                     nthread=6,
+                                                                     method_marker_name=method_name,
+                                                                     verbose=verbose)
 
     }
 
