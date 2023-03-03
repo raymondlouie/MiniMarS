@@ -9,11 +9,9 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 Please install the following packages first .
 
 ```{r}
-
 # CiteFuse
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-
 BiocManager::install("CiteFuse")
 
 # sc2marker
@@ -31,15 +29,13 @@ install.packages('Seurat')
 
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-
 BiocManager::install("SingleCellExperiment")
 
 # dplyr
 install.packages("dplyr")
-
 ```
 
-### Installation
+### Installation of ClusterMarkers
 
 ```
 devtools::install_github("raymondlouie/ClusterMarkers") 
@@ -61,11 +57,9 @@ data(sce)
 input_matrix = t(sce@assays@data$counts)
 clusters = sce$cell_type
 ```
+The input data can be either a i) feature matrix (with cluster vectors), ii) Seurat object or SCE object. 
 
-
-The input data can be a feature matrix (with cluster vectors), Seurat object or SCE object. 
-
-We will first convert the input to the desired format required for downstream analysis, showing all three examples
+We will first convert the input to the desired format required for downstream analysis, showing all three input examples:
 ```{r}
 sce_out = processInputFormat(sc_object=sce,
                             sce_cluster="cell_type",
@@ -80,10 +74,12 @@ sc_object = CreateSeuratObject(input_matrix)
 Idents(object = sc_object) <- clusters
 seurat_out = processInputFormat(sc_object=sc_object,
                             verbose=TRUE)
+clusters
 ```
 
 The user can now select a subset of clusters to find markers for, via the `clusters_sel` input.
 ```{r}
+print(clusters_sel)
 sc_out = sce_out
 cluster_selection_out= processClusterSelection(sc_out,
                                                clusters_sel="all_clusters",
