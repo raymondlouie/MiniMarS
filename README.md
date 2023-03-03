@@ -6,7 +6,7 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 
 ### Packages required to be pre-installed
 
-Please install the following packages first .
+Please install the following packages first.
 
 ```{r}
 # CiteFuse
@@ -38,6 +38,7 @@ install.packages("dplyr")
 
 ### Installation of ClusterMarkers
 
+Please run the following to install the `ClusterMarkers` package:
 ```
 devtools::install_github("raymondlouie/ClusterMarkers") 
 ```
@@ -48,7 +49,7 @@ install.packages("~/Downloads/ClusterMarkers_0.1.0.tar.gz", type = "source", rep
 
 ## Example work flow
 
-An example of the `ClusterMarkers` work flow to get started:
+Here is an example of the `ClusterMarkers` work flow to get started:
 
 Load libraries and example data.
 ```{r}
@@ -64,14 +65,17 @@ The input data can  either be a i) feature matrix (with cluster vectors), ii) Se
 
 We will first convert the input to the desired format required for downstream analysis, showing all three input data examples:
 ```{r}
+# SCE input example. 
 sce_in = processInputFormat(sc_object=sce,
                             sce_cluster="cell_type",
                             verbose=TRUE)
-                            
+
+# Feature matrix with cluster vector example.                            
 manual_in = processInputFormat(sc_object=input_matrix,
                             clusters_all=clusters,
                             verbose=TRUE)                           
 
+# Seurat input example.
 library(Seurat)
 sc_object = CreateSeuratObject(input_matrix)
 Idents(object = sc_object) <- clusters
@@ -80,17 +84,18 @@ seurat_in = processInputFormat(sc_object=sc_object,
 unique(clusters)
 ```
 
-We can now select a subset of clusters to identify markers for, via the `clusters_sel` input.
+We now select a subset of clusters to identify markers for, via the `clusters_sel` input.
 ```{r}
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
                  "naive thymus-derived CD8-positive, alpha-beta T cell")
 sc_in = sce_in # as an example, select the SCE input
+
 cluster_selection_out= processClusterSelection(sc_in,
                                                clusters_sel=clusters_sel,
                                                verbose=TRUE)
 ```   
 
-In the next step, we i) Sub-sample  the data, and ii) Divide the data into a training and test set.
+In the next step, we i) sub-sample  the data, and ii) divide the data into a training and test set.
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
                                clusters_sel="all_clusters",
@@ -100,7 +105,7 @@ final_out = processSubsampling(cluster_selection_out,
                                verbose=TRUE)
 ```
 
-We now find the markers to identify the cluster. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
+We now find the markers to identify the clusters. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
 ```{r}
 list_markers = findClusterMarkers(final_out$training_matrix,
                                   final_out$training_clusters,
