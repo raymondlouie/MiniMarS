@@ -8,13 +8,35 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 
 Please install the following packages first .
 
-```
-CiteFuse
-sc2marker
-geneBasisR
-Seurat
-SingleCellExperiment
-dplyr
+```{r}
+
+# CiteFuse
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("CiteFuse")
+
+# sc2marker
+if (!require("devtools", quietly = TRUE))
+  install.packages("devtools")
+devtools::install_github("https://github.com/CostaLab/sc2marker", build_vignettes = TRUE)
+
+# geneBasisR
+devtools::install_github("MarioniLab/geneBasisR") 
+
+# Seurat
+install.packages('Seurat')
+
+# SingleCellExperiment
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SingleCellExperiment")
+
+# dplyr
+install.packages("dplyr")
+
 ```
 
 ### Installation
