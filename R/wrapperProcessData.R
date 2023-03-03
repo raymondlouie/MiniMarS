@@ -1,10 +1,15 @@
 #' Process input format (feature matrix, Seurat object, SCE object) to a format usable in other functions
 #'
-#' @param sc_object X
-#' @param clusters_all X
-#' @param sce_cluster X
-#' @param seurat_assay X
-#' @param seurat_slot X
+#' @param sc_object Input matrix and cell type object (required). Can be
+#' \itemize{
+#'   \item \code{Matrix:} Feature matrix (cells as rows, features as columns). cluster annotation has to be provided in `clusters_all` input.
+#'   \item \code{SCE object}: SCE object, with the cluster annotation specified by the `sce_cluster` column name in the `colData` slot.
+#'   \item \code{Seurat object}: Seurat object, with the cluster annotation in the `active.idents` slot. 
+#' }
+#' @param clusters_all Cluster annotation, used if the input `sc_object` is a feature matrix.
+#' @param sce_cluster Cluster annotation column name in the 'colData' slot, to be used if the input `sc_object` is a SCE object.
+#' @param seurat_assay Seurat assay slot, if the input is a Seurat object. If not specified, default assay is used.
+#' @param seurat_data Seurat data slot, if the input is a Seurat object. If not specified, the `data` slot will be used.
 #'
 #' @return List containing
 #' \itemize{
@@ -23,7 +28,7 @@ processInputFormat =function(sc_object,
 
     if (inherits(x = sc_object, what = c("matrix", "Matrix", "dgCMatrix"))) {
         if (verbose){
-            cat("Matrix input.\n")
+            message("Matrix input.\n")
         }
         sc_matrix <- sc_object
         if (is.null(clusters_all)){
@@ -57,13 +62,13 @@ processInputFormat =function(sc_object,
             seurat_assay = DefaultAssay(sc_object)
         }
 
-        if (is.null(seurat_slot)) {
-            seurat_slot= "data"
-            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_slot)))
-            cat(paste0("The default Seurat slot used will be `", seurat_slot, "`. Please provide an alternative slot input if this is not correct."),'\n')
+        if (is.null(seurat_data)) {
+            seurat_data= "data"
+            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_data)))
+            cat(paste0("The default Seurat slot used will be `", seurat_data, "`. Please provide an alternative slot input if this is not correct."),'\n')
         } else{
-            seurat_slot= "data"
-            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_slot)))
+            seurat_data= "data"
+            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_data)))
         }
 
         cat("The active idents will be used for the cluster annotation. If this is not correct, please change the active idents to the correct annotation.")
@@ -100,8 +105,8 @@ processInputFormat =function(sc_object,
 
 #' Select clusters to compare with (based on user input)
 #'
-#' @param sc_out X
-#' @param clusters_sel X
+#' @param sc_out Output of function `processInputFormat`.
+#' @param clusters_sel Subset of clusters to identify. Default is to use all clusters.
 #'
 #' @return List containing
 #' \itemize{
@@ -151,11 +156,14 @@ processClusterSelection =function(sc_out,
 
 #' Sub-sample and split data into training and test set
 #'
-#' @param cluster_selection_out X
-#' @param clusters_sel X
-#' @param subsample_num X
-#' @param train_test_ratio X
-#' @param cluster_proportion X
+#' @param Output of function `processInputFormat`.
+#' @param subsample_num Number of cells after sub-sammpling.
+#' @param train_test_ratio Training to test data ratio.
+#' @param cluster_proportion 
+#' \itemize{
+#'   \item \code{proportional:} (default) Same proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
+#'   \item \code{equal}: Equal proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
+#' }
 #'
 #' @return List containing
 #' \itemize{
@@ -168,7 +176,6 @@ processClusterSelection =function(sc_out,
 #' }
 #' @export
 processSubsampling =function(cluster_selection_out,
-                             clusters_sel="all_clusters",
                              subsample_num=1000,
                              train_test_ratio = 0.9,
                              cluster_proportion= "proportional",
