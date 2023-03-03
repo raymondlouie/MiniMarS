@@ -26,6 +26,9 @@ devtools::install_github("MarioniLab/geneBasisR")
 # Seurat
 install.packages('Seurat')
 
+# xgboost
+install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
+
 # SingleCellExperiment
 
 if (!require("BiocManager", quietly = TRUE))
@@ -53,6 +56,13 @@ Here is an example of the `ClusterMarkers` work flow to get started:
 
 Load libraries and example data.
 ```{r}
+
+packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","ClusterMarkers")
+packages_required_not_installed=setdiff(packages_required, rownames(installed.packages()))
+if (length(packages_required_not_installed)>0){
+    stop(paste0("Please install packages",packages_required_not_installed))
+}
+
 library(ClusterMarkers)
 library(dplyr)
 library(SingleCellExperiment)
