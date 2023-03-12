@@ -6,7 +6,7 @@ ClusterMarkers finds the markers which best define a cluster, using a number of 
 
 ### Packages required to be pre-installed
 
-Please install the following packages first.
+Please install the following packages first. test
 
 ```{r}
 # CiteFuse
