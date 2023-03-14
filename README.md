@@ -36,6 +36,9 @@ BiocManager::install("SingleCellExperiment")
 
 # dplyr
 install.packages("dplyr")
+
+# Propr
+devtools::install_github("tpq/propr")
 ```
 
 ### Installation of ClusterMarkers
@@ -59,7 +62,7 @@ Load libraries and example data.
 packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","ClusterMarkers")
 packages_required_not_installed=setdiff(packages_required, rownames(installed.packages()))
 if (length(packages_required_not_installed)>0){
-    stop(paste0("Please install packages",packages_required_not_installed))
+    stop(paste0("Please install packages ",packages_required_not_installed,"\n"))
 }
 
 library(ClusterMarkers)

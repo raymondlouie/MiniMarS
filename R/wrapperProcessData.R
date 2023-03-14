@@ -4,7 +4,7 @@
 #' \itemize{
 #'   \item \code{Matrix:} Feature matrix (cells as rows, features as columns). cluster annotation has to be provided in `clusters_all` input.
 #'   \item \code{SCE object}: SCE object, with the cluster annotation specified by the `sce_cluster` column name in the `colData` slot.
-#'   \item \code{Seurat object}: Seurat object, with the cluster annotation in the `active.idents` slot. 
+#'   \item \code{Seurat object}: Seurat object, with the cluster annotation in the `active.idents` slot.
 #' }
 #' @param clusters_all Cluster annotation, used if the input `sc_object` is a feature matrix.
 #' @param sce_cluster Cluster annotation column name in the 'colData' slot, to be used if the input `sc_object` is a SCE object.
@@ -62,13 +62,13 @@ processInputFormat =function(sc_object,
             seurat_assay = DefaultAssay(sc_object)
         }
 
-        if (is.null(seurat_data)) {
-            seurat_data= "data"
-            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_data)))
-            cat(paste0("The default Seurat slot used will be `", seurat_data, "`. Please provide an alternative slot input if this is not correct."),'\n')
+        if (is.null(seurat_slot)) {
+            seurat_slot= "data"
+            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_slot)))
+            cat(paste0("The default Seurat slot used will be `", seurat_slot, "`. Please provide an alternative slot input if this is not correct."),'\n')
         } else{
-            seurat_data= "data"
-            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_data)))
+            seurat_slot= "data"
+            sc_matrix <- t(as.matrix(Seurat::GetAssayData(sc_object, assay = seurat_assay, slot = seurat_slot)))
         }
 
         cat("The active idents will be used for the cluster annotation. If this is not correct, please change the active idents to the correct annotation.")
@@ -159,7 +159,7 @@ processClusterSelection =function(sc_out,
 #' @param Output of function `processInputFormat`.
 #' @param subsample_num Number of cells after sub-sammpling.
 #' @param train_test_ratio Training to test data ratio.
-#' @param cluster_proportion 
+#' @param cluster_proportion
 #' \itemize{
 #'   \item \code{proportional:} (default) Same proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
 #'   \item \code{equal}: Equal proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
