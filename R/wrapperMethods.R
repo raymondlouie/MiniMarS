@@ -18,7 +18,7 @@ citeFuseWrapper <- function (sce,
                                    altExp_name ="protein",
                                    exprs_value = "raw")
 
-        importance_scores = sort(sce@metadata$importanceADT,decreasing=TRUE)
+    importance_scores = sort(sce@metadata$importanceADT,decreasing=TRUE)
     return(names(importance_scores[1:num_markers]))
 
 }
@@ -119,6 +119,16 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
                                       nthread = nthread)
     importance.mt <- xgboost::xgb.importance(colnames(xgboost_train), model = built.model)
     markers_xgboost = importance.mt$Feature
+
+
+    if (length(markers_xgboost)<num_markers){
+        # warning(paste0("XgBoost produced less markers than selected: ", paste(markers_xgboost,collapse=", "),
+        #                ". Adding additional markers from the fstat algorithm."))
+        message("XgBoost produced less markers than selected. Adding additional markers from the fstat algorithm.")
+        additional_markers = setdiff(markers_fstat,markers_xgboost)
+        markers_xgboost = c(markers_xgboost,additional_markers)
+        markers_xgboost = markers_xgboost[1:num_markers]
+    }
 
     markers_xgboost_label = unlist(lapply(markers_xgboost,
                                           function (x) names(marker_num)[which(marker_num %in% x)]))
@@ -224,7 +234,8 @@ geneBasisPerformance <- function (markers_sel,
 
     sce_test  <- SingleCellExperiment::SingleCellExperiment(list(counts=t(input_matrix_test)),
                                                             colData=data.frame(cell_type=clusters_test))
-    logcounts(sce_test) <- log2(t(input_matrix_test) + 1)
+    # logcounts(sce_test) <- log2(t(input_matrix_test) + 1)
+    logcounts(sce_test) <- t(input_matrix_test)
 
     cluster_map = geneBasisR::get_celltype_mapping(sce_test ,
                                                    genes.selection = markers_sel,

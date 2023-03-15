@@ -240,6 +240,14 @@ processSubsampling =function(cluster_selection_out,
     sample_index = c(index_train,index_test)
     clusters_sample = clusters_all[sample_index]
 
+    if (length(index_train)<10){
+        stop("Not enough cells in dataset.")
+    }
+
+    if (length(index_test)<10){
+        stop("Not enough cells in dataset.")
+    }
+
     # Create numeric form of clusters, used in XgBoost
     unique_clusters_sample = unique(clusters_sample)
     num_clust= length(unique_clusters_sample)

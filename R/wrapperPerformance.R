@@ -43,7 +43,7 @@ performanceMarkers <- function (markers_sel,
     diff_methods = setdiff(method,all_methods)
 
     if (length(diff_methods) >  0) {
-        warning(paste0(method, " not found. Using remaining or all methods."))
+        warning(paste0(method, " not found. Using remaining or all methods.\n"))
         method = intersect(method,all_methods)
         if (length(method) == 0) {
             method = all_methods
@@ -72,7 +72,8 @@ performanceMarkers <- function (markers_sel,
         curr_method = method[[i]]
 
         if (verbose){
-            message("Calculating performance of marker selection method:",method_marker_name,  "using performance method:",curr_method,
+            message("Calculating performance of marker selection method(x): ", paste(method_marker_name,sep=", ")
+                    ". Using performance method:",curr_method,
                     ".\n")
         }
 
