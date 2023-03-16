@@ -9,7 +9,7 @@
 #' @param clusters_all Cluster annotation, used if the input `sc_object` is a feature matrix.
 #' @param sce_cluster Cluster annotation column name in the 'colData' slot, to be used if the input `sc_object` is a SCE object.
 #' @param seurat_assay Seurat assay slot, if the input is a Seurat object. If not specified, default assay is used.
-#' @param seurat_data Seurat data slot, if the input is a Seurat object. If not specified, the `data` slot will be used.
+#' @param seurat_slot Seurat data slot, if the input is a Seurat object. If not specified, the `data` slot will be used.
 #'
 #' @return List containing
 #' \itemize{
