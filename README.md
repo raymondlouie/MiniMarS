@@ -36,9 +36,6 @@ BiocManager::install("SingleCellExperiment")
 
 # dplyr
 install.packages("dplyr")
-
-# Propr
-devtools::install_github("tpq/propr")
 ```
 
 ### Installation of ClusterMarkers
