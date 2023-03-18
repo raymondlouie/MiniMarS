@@ -150,23 +150,31 @@ We provide below public datasets for users to try the `ClusterMarkers` package. 
 
 ### Dataset 1
 Blood and bone marrow samples of human from the BD Rhapsody assay.<br>
-Number of cells in this dataset: around 100K<br>
+Number of cells in this dataset: around 100,000 (after QC: 49,100 from healthy controls and 31,600 from leukemia patients)<br>
+Number of protein features: 97<br>
+43 cell types from the data provider<br>
 [Click here to access the data](https://cellxgene.cziscience.com/collections/93eebe82-d8c3-41bc-a906-63b5b5f24a9d)<br>
 
 ### Dataset 2
 Mucosa-associated lymphoid tissue samples of human from the 10X technology.<br>
-Number of cells in this dataset: around 10K<br>
+Number of cells in this dataset: around 10,000 (after QC: 8,500)<br>
+Number of protein features: 17<br>
+11 cell types from the data provider<br>
 [Click here to access the data](https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.0/malt_10k_protein_v3)<br>
 
 ### Dataset 3
 Spleen and lymph nodes samples of mouse from the 10X technology.<br>
-Number of cells in this dataset: around 40K<br>
+Number of cells in this dataset: around 40,000 (after QC: 16,800 with 111 protein features, 15,800 with 206 protein features)<br>
+Number of protein features: 111 and 206 (two sets of data) - need to find the name of each protein feature (16 Mar 2023)<br>
+Both sets, 35 cell types from the data provider<br>
 [Click here to access the raw data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE150599)<br>
 [Click here to access the processed data](https://github.com/YosefLab/totalVI_reproducibility/)<br>
 
 ### Dataset 4
 PBMC (peripheral blood mononuclear cells) samples of human from the 10X technology.<br>
-Number of cells in this dataset: around 10K<br>
+Number of cells in this dataset: around 10,000 (after QC: 7,800)<br>
+Number of protein features: 17<br>
+11 cell types from the data provider<br>
 [Click here to access the data](https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.0/pbmc_10k_protein_v3)<br>
 
 
