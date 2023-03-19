@@ -95,6 +95,8 @@ findClusterMarkers <- function (input_matrix,
         }
 
         if (curr_method == "geneBasis") {
+            logcounts(sce) <- input_matrix-min(input_matrix)
+
             curr_markers = geneBasisWrapper(sce,
                                             clusters,
                                             num_markers)
