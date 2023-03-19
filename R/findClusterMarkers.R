@@ -66,6 +66,11 @@ findClusterMarkers <- function (input_matrix,
     }
 
 
+    if (is.null(colnames(input_matrix))){
+        warning("No cell names in matrix. Manually assigning names. Please manually check the input matrix matches up with cluster input.\n")
+        colnames(input_matrix) = 1:dim(input_matrix)[2]
+    }
+
     sce  <- SingleCellExperiment::SingleCellExperiment(list(counts=input_matrix),
                                                        colData=data.frame(cell_type=clusters))
 
@@ -89,6 +94,7 @@ findClusterMarkers <- function (input_matrix,
         }
 
         if (curr_method == "sc2marker") {
+
             curr_markers = sc2markerWrapper(input_matrix,
                                             clusters,
                                             num_markers)
