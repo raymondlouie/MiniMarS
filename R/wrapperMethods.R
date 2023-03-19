@@ -73,7 +73,13 @@ geneBasisWrapper <- function (sce,
                               num_markers=15,
                               ...){
 
-    sce = geneBasisR::retain_informative_genes(sce,...)
+    sce = geneBasisR::retain_informative_genes(sce,
+                                               ...)
+    geneBasis_num_markers = dim(sce)[1]
+    if (geneBasis_num_markers<num_markers){
+        warning("Number of markers from geneBasis is less than the number of input markers. Reducing number of markers. \n")
+        num_markers = geneBasis_num_markers-1
+    }
     marker_output = geneBasisR::gene_search(sce, n_genes_total = num_markers,...)
     return(marker_output$gene)
 
