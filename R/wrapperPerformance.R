@@ -72,7 +72,7 @@ performanceMarkers <- function (markers_sel,
         curr_method = method[[i]]
 
         if (verbose){
-            message("Calculating performance of marker selection method(x): ", paste(method_marker_name,collapse=", "),
+            message("Calculating performance of marker selection method(s): ", paste(method_marker_name,collapse=", "),
                     ". Using performance method:",curr_method,
                     ".\n")
         }
