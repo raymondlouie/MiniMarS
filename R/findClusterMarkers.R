@@ -118,21 +118,25 @@ findClusterMarkers <- function (input_matrix,
 
     }
 
-    # calculate most occuring markers
-    for (i in 1:length(list_markers)){
-        curr_df = data.frame(markers = list_markers[[i]],
-                             method = names(list_markers)[[i]])
-        if (i==1){
-            total_df = curr_df
-        } else{
-            total_df = rbind(total_df,curr_df)
+
+
+    # calculate consensus if more than one method chosen
+    if (length(method)>1){
+        for (i in 1:length(list_markers)){
+            curr_df = data.frame(markers = list_markers[[i]],
+                                 method = names(list_markers)[[i]])
+            if (i==1){
+                total_df = curr_df
+            } else{
+                total_df = rbind(total_df,curr_df)
+            }
+
         }
 
+        table_compare = data.frame(table(total_df$markers))
+        table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
+        list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
     }
-
-    table_compare = data.frame(table(total_df$markers))
-    table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
-    list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
 
     return(list_markers)
 
