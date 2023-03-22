@@ -197,7 +197,7 @@ findClusterPerformance <- function (matrix_all,
 
 
     if (verbose){
-        print("Find performance metrics")
+        print("Find performance metrics.\n")
     }
 
     list_performance = c()
@@ -205,15 +205,15 @@ findClusterPerformance <- function (matrix_all,
         markers_sel = list_markers[[i]]
         markers_sel= markers_sel[!is.na(markers_sel)]
         # print("ite list_markers")
-        if (verbose){
-            print(names(list_markers)[[i]])
-            print(table(clusters_num_train))
-            print(table(clusters_train))
-            print(table(clusters_num_test))
-            print(table(clusters_test))
-            print(dim(input_matrix_train))
-            print(dim(input_matrix_test))
-        }
+        # if (verbose){
+        #     print(names(list_markers)[[i]])
+        #     print(table(clusters_num_train))
+        #     print(table(clusters_train))
+        #     print(table(clusters_num_test))
+        #     print(table(clusters_test))
+        #     print(dim(input_matrix_train))
+        #     print(dim(input_matrix_test))
+        # }
 
 
         list_performance[[names(list_markers)[[i]]]] = performanceMarkers(markers_sel,
