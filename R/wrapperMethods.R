@@ -36,15 +36,28 @@ sc2markerWrapper <- function (input_matrix,
                               num_markers=15,
                               ...){
 
+
     seurat_object = Seurat::CreateSeuratObject(input_matrix,
                                                meta.data =data.frame(cell_type=clusters) )
-    names(clusters) = colnames(input_matrix)
     Seurat::Idents(object = seurat_object)=clusters
     all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
 
     unique_clusters = names(all.markers)
     num_clusters = length(unique_clusters)
 
+    # old code
+    # list_markers= list()
+    # for (i in 1:num_markers){
+    #     ii = (i-1) %% num_clusters
+    #     curr_df = all.markers[[ii+1]]
+    #     curr_df = curr_df[which(curr_df$direction %in% "+"),]
+    #     index_remove = which(curr_df$gene %in% unlist(list_markers))
+    #     if (length(index_remove)>0){
+    #         curr_df = curr_df[-index_remove,]
+    #     }
+    #     list_markers[[i]] = curr_df$gene[[1]]
+    # }
+    icount=1
     list_markers= list()
     for (i in 1:num_markers){
         ii = (i-1) %% num_clusters
@@ -54,7 +67,10 @@ sc2markerWrapper <- function (input_matrix,
         if (length(index_remove)>0){
             curr_df = curr_df[-index_remove,]
         }
-        list_markers[[i]] = curr_df$gene[[1]]
+        if (dim(curr_df)[1]>0){
+            list_markers[[icount]] = curr_df$gene[[1]]
+            icount=icount+1
+        }
     }
     return(unlist(list_markers))
 
@@ -77,7 +93,7 @@ geneBasisWrapper <- function (sce,
                                                ...)
     geneBasis_num_markers = dim(sce)[1]
     if (geneBasis_num_markers<num_markers){
-        warning("Number of markers from geneBasis is less than the number of input markers. Reducing number of markers. \n")
+        warning("\n Number of markers from geneBasis is less than the number of input markers. Reducing number of markers. \n")
         num_markers = geneBasis_num_markers-1
     }
     marker_output = geneBasisR::gene_search(sce, n_genes_total = num_markers,...)
