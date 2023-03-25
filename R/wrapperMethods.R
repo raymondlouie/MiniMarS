@@ -68,7 +68,10 @@ sc2markerWrapper <- function (input_matrix,
         if (length(index_remove)>0){
             curr_df = curr_df[-index_remove,]
         }
-    
+        message(i)
+        message(paste(curr_df$gene,collapse=", "))
+        # message(paste0(capture.output(curr_df), collapse = "\n"))
+        # print(curr_df)
         if (dim(curr_df)[1]>0){
             list_markers[[icount]] = curr_df$gene[[1]]
             icount=icount+1
@@ -96,10 +99,11 @@ geneBasisWrapper <- function (sce,
     geneBasis_num_markers = dim(sce)[1]
     if (geneBasis_num_markers<num_markers){
         warning("\n Number of markers from geneBasis is less than the number of input markers. Reducing number of markers. \n")
+        num_markers_original=num_markers
         num_markers = geneBasis_num_markers-1
     }
     marker_output = geneBasisR::gene_search(sce, n_genes_total = num_markers,...)
-    return(marker_output$gene)
+    return(c(marker_output$gene,rep(NA,num_markers_original-num_markers)))
 
 }
 

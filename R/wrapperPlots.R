@@ -15,14 +15,16 @@ plotMarkers =function(list_markers,
                       coord_ratio  = 0.2,
                       ...){
 
-    markers_df = melt(data.frame(list_markers),
-                      measure.vars = names(list_markers))
+
+    markers_df = reshape2::melt(data.frame(list_markers),
+                                measure.vars = names(list_markers))
     table_markers_df = data.frame(table(markers_df$value))
     table_markers_df = table_markers_df[order(table_markers_df$Freq,decreasing=TRUE),]
 
     # Order markers according to most frequent.
     markers_df$value = factor(markers_df$value,
                               levels=rev(table_markers_df$Var1))
+    markers_df = markers_df[!is.na(markers_df$value),]
 
     p1=ggplot(markers_df, aes(x = variable, y = value),...) +
         geom_tile(color=color_tile,fill=fill_tile) + theme_classic()+
@@ -48,10 +50,10 @@ plotPerformance =function(list_performance,
 
     # Create dataframe suitable for plotting
     performance_df = data.frame(list_performance)
-    performance_melt_df = melt(performance_df,
-                               id.vars = grep("performance.cluster",colnames(performance_df)))
-    performance_melt_df2 = melt(performance_melt_df,
-                                id.vars = c("variable","value"))
+    performance_melt_df = reshape2::melt(performance_df,
+                                         id.vars = grep("performance.cluster",colnames(performance_df)))
+    performance_melt_df2 = reshape2::melt(performance_melt_df,
+                                          id.vars = c("variable","value"))
     colnames(performance_melt_df2) = c("name","TP","name2","Clusters")
     performance_plot_df = performance_melt_df2[,c("name", "TP","Clusters")]
     tempSplit = lapply(as.character(performance_plot_df$name),
@@ -76,7 +78,7 @@ plotPerformance =function(list_performance,
         curr_performance = unique_performance[[i]]
         curr_plot = performance_plot_df[which(performance_plot_df$performance_method %in% curr_performance),]
 
-        p1=ggplot(curr_plot, aes(x = marker_method, y = Clusters,fill=TP)) +
+        p1=ggplot(curr_plot, aes(x = marker_method, y = factor(Clusters),fill=TP)) +
             geom_tile(color="black") + theme_bw()+
             scale_fill_gradient(low = "white", high = "red") +
             theme(axis.text = element_text(size=text_size),

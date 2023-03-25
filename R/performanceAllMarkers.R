@@ -33,7 +33,7 @@ performanceAllMarkers <- function (list_markers,
     for (i in 1:length(list_markers)){
         markers_sel = list_markers[[i]]
         markers_sel= markers_sel[!is.na(markers_sel)]
-        method_name = names(list_markers)
+        method_name = names(list_markers)[[i]]
 
         list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
                                                                         t(as.matrix(input_matrix_train)),

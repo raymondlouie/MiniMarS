@@ -34,6 +34,12 @@ performanceMarkers <- function (markers_sel,
                                 verbose=FALSE,
                                 ...) {
 
+    # Remove NA markers, which may occur due to geneBasis
+    indexNA  = which(is.na(markers_sel))
+    if (length(indexNA)>0){
+        markers_sel = markers_sel[-indexNA]
+    }
+
     all_methods = c("xgBoost","geneBasis")
 
     if (method == "all"){
@@ -72,8 +78,8 @@ performanceMarkers <- function (markers_sel,
         curr_method = method[[i]]
 
         if (verbose){
-            message("Calculating performance of marker selection method(s): ", paste(method_marker_name,collapse=", "),
-                    ". Using performance method: ",curr_method,
+            message("Calculating performance of marker selection method: ", paste(method_marker_name,collapse=", "),
+                    " using performance method: ",curr_method,
                     ".\n")
         }
 
