@@ -132,6 +132,12 @@ list_performance = performanceAllMarkers(list_markers,
                                          verbose=TRUE)
 ```
 
+We now plot the identified markers and their performance
+```{r}
+plotMarkers(list_markers)
+plotPerformance(list_performance)
+```
+
 ```{r}
 sessionInfo()
 ```
