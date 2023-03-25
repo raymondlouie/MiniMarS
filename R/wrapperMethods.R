@@ -57,6 +57,7 @@ sc2markerWrapper <- function (input_matrix,
     #     }
     #     list_markers[[i]] = curr_df$gene[[1]]
     # }
+    message(num_markers)
     icount=1
     list_markers= list()
     for (i in 1:num_markers){
@@ -67,6 +68,10 @@ sc2markerWrapper <- function (input_matrix,
         if (length(index_remove)>0){
             curr_df = curr_df[-index_remove,]
         }
+        message(i)
+        message(paste(curr_df$gene,collapse=", "))
+        # message(paste0(capture.output(curr_df), collapse = "\n"))
+        # print(curr_df)
         if (dim(curr_df)[1]>0){
             list_markers[[icount]] = curr_df$gene[[1]]
             icount=icount+1
