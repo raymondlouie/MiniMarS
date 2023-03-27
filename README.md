@@ -129,6 +129,7 @@ list_markers_time = findClusterMarkers(final_out$training_matrix,
                                   method = "all",
                                   verbose = TRUE)
 
+# time to run each method
 list_time = list_markers_time$runtime_secs
 names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
                                                                                     "runtime_secs")))]
