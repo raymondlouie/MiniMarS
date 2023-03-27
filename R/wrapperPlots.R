@@ -1,6 +1,7 @@
 #' Plot markers identified by each method on a heatmap
 #'
 #' @param list_markers List of selected markers from each method, from output of findClusterMarkers function.
+#' @param tile_text_size Tile text size
 #' @param text_size Text size
 #' @param color_tile Color of each tile
 #' @param fill_tile Fill of each tile
@@ -9,6 +10,7 @@
 #' @return A ggplot output
 #' @export
 plotMarkers =function(list_markers,
+                      tile_text_size=7,
                       text_size=40,
                       color_tile = "blue",
                       fill_tile = "blue",
@@ -109,7 +111,7 @@ plotPerformance =function(list_performance,
             xlab("Method") + ylab("Clusters") +
             coord_fixed(ratio=0.2)+
             geom_text(aes(marker_method, Clusters, label=TPround), colour = "black", check_overlap = FALSE,
-                      size=7)  +
+                      size=tile_text_size)  +
             ggtitle(curr_performance)
         list_p1[[i]] = p1
         print(p1)
