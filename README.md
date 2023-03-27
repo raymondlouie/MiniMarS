@@ -1,6 +1,6 @@
 # ClusterMarkers
  
-ClusterMarkers finds the markers which best define a cluster, using a number of different pre-exisitng methods.
+ClusterMarkers finds the markers which best define a cluster, using a number of different pre-existing methods.
 
 ## Installation
 
