@@ -122,11 +122,16 @@ final_out = processSubsampling(cluster_selection_out,
 
 Fourth, we now find the markers to identify the clusters. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
 ```{r}
-list_markers = findClusterMarkers(final_out$training_matrix,
+list_markers_time = findClusterMarkers(final_out$training_matrix,
                                   final_out$training_clusters,
                                   num_markers = 15,
                                   method = "all",
                                   verbose = TRUE)
+
+list_time = list_markers_time$runtime_secs
+names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
+                                                                                    "runtime_secs")))]
+list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
 ```
 
 Finally, we  evaulate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
