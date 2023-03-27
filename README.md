@@ -44,6 +44,7 @@ Please run the following to install the `ClusterMarkers` package from Developmen
 ```
 devtools::install_github("raymondlouie/ClusterMarkers", ref = "Dev")
 ```
+
 or download the package [here](https://www.dropbox.com/s/7gpdmll1zzo2qtr/ClusterMarkers_0.1.2.tar.gz?dl=0) and install it using the following command
 ```
 install.packages("~/Downloads/ClusterMarkers_0.1.2.tar.gz", type = "source", repo = NULL)
@@ -194,7 +195,6 @@ PBMC (peripheral blood mononuclear cells) samples of human from the 10X technolo
 Number of cells in this dataset: around 10,000 (after QC: 7,800)<br>
 Number of protein features: 17<br>
 11 cell types/clusters from the data provider<br>
-Download `Feature / cell matrix (filtered)` and `Clustering analysis` in the following link: <br>
 [Click here to access the data](https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.0/pbmc_10k_protein_v3)<br>
 
 
