@@ -50,20 +50,40 @@ plotPerformance =function(list_performance,
 
     # Create dataframe suitable for plotting
     performance_df = data.frame(list_performance)
-    performance_melt_df = reshape2::melt(performance_df,
-                                         id.vars = grep("performance.cluster",colnames(performance_df)))
-    performance_melt_df2 = reshape2::melt(performance_melt_df,
-                                          id.vars = c("variable","value"))
-    colnames(performance_melt_df2) = c("name","TP","name2","Clusters")
-    performance_plot_df = performance_melt_df2[,c("name", "TP","Clusters")]
-    tempSplit = lapply(as.character(performance_plot_df$name),
-                       function (x) strsplit(x,split="[.]")[[1]])
-    performance_plot_df$marker_method = unlist(lapply(tempSplit,
-                                                      function (x) x[[1]]))
-
-    performance_plot_df$performance_method = unlist(lapply(tempSplit,
-                                                           function (x) x[[2]]))
-    performance_plot_df$performance_method = gsub("_performance","",performance_plot_df$performance_method)
+    
+    for (i in seq(1,dim(performance_df)[2],2)){
+        curr_df = performance_df[,c(i,i+1)]
+        tempSplit = unlist(lapply(as.character(colnames(curr_df)),
+                           function (x) strsplit(x,split="[.]")[[1]]))
+        colnames(curr_df) = c("Clusters","TP")
+        curr_df$marker_method=tempSplit[[1]]
+        curr_df$performance_method=gsub("_performance",
+                                        "",
+                                        tempSplit[[2]])
+        curr_df$TP
+        if (i==1){
+            performance_plot_df = curr_df
+        } else{
+            performance_plot_df = rbind(performance_plot_df,curr_df)
+        }
+        
+    }
+    
+    
+    # performance_melt_df = reshape2::melt(performance_df,
+    #                                      id.vars = grep("performance.cluster",colnames(performance_df)))
+    # performance_melt_df2 = reshape2::melt(performance_melt_df,
+    #                                       id.vars = c("variable","value"))
+    # colnames(performance_melt_df2) = c("name","TP","name2","Clusters")
+    # performance_plot_df = performance_melt_df2[,c("name", "TP","Clusters")]
+    # tempSplit = lapply(as.character(performance_plot_df$name),
+    #                    function (x) strsplit(x,split="[.]")[[1]])
+    # performance_plot_df$marker_method = unlist(lapply(tempSplit,
+    #                                                   function (x) x[[1]]))
+    # 
+    # performance_plot_df$performance_method = unlist(lapply(tempSplit,
+    #                                                        function (x) x[[2]]))
+    # performance_plot_df$performance_method = gsub("_performance","",performance_plot_df$performance_method)
     performance_plot_df$TPround = round(performance_plot_df$TP,digits=3)
 
 
@@ -78,7 +98,7 @@ plotPerformance =function(list_performance,
         curr_performance = unique_performance[[i]]
         curr_plot = performance_plot_df[which(performance_plot_df$performance_method %in% curr_performance),]
 
-        p1=ggplot(curr_plot, aes(x = marker_method, y = factor(Clusters),fill=TP)) +
+        p1=ggplot(curr_plot, aes(x = marker_method, y = Clusters,fill=TP)) +
             geom_tile(color="black") + theme_bw()+
             scale_fill_gradient(low = "white", high = "red") +
             theme(axis.text = element_text(size=text_size),
@@ -88,8 +108,8 @@ plotPerformance =function(list_performance,
                   legend.position="none")+
             xlab("Method") + ylab("Clusters") +
             coord_fixed(ratio=0.2)+
-            geom_text(aes(marker_method, Clusters, label=TPround), colour = "black", check_overlap = TRUE,
-                      size=10)  +
+            geom_text(aes(marker_method, Clusters, label=TPround), colour = "black", check_overlap = FALSE,
+                      size=7)  +
             ggtitle(curr_performance)
         list_p1[[i]] = p1
         print(p1)
