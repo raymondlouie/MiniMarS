@@ -20,7 +20,7 @@ performanceAllMarkers <- function (list_markers,
                                    nthread=6,
                                    verbose=FALSE,
                                    ...) {
-
+    
     input_matrix_train = final_out$training_matrix
     input_matrix_test = final_out$test_matrix
     unique_clusters = final_out$unique_clusters_sample
@@ -28,30 +28,34 @@ performanceAllMarkers <- function (list_markers,
     clusters_num_test = final_out$test_clusters_num
     clusters_train = final_out$training_clusters
     clusters_test = final_out$test_clusters
-
+    
     list_performance = c()
     for (i in 1:length(list_markers)){
         markers_sel = list_markers[[i]]
         markers_sel= markers_sel[!is.na(markers_sel)]
-        method_name = names(list_markers)
-
-        list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
-                                                                        t(as.matrix(input_matrix_train)),
-                                                                        t(as.matrix(input_matrix_test)),
-                                                                        unique_clusters,
-                                                                        clusters_num_train,
-                                                                        clusters_num_test,
-                                                                        clusters_train,
-                                                                        clusters_test,
-                                                                        method=method,
-                                                                        nrounds=1500,
-                                                                        nthread=6,
-                                                                        method_marker_name=method_name,
-                                                                        verbose=verbose)
-
+        method_name = names(list_markers)[[i]]
+        
+        # message(method_name)
+        if (method_name != "runtime_secs"){
+            
+            list_performance[[names(list_markers)[[i]]]]=performanceMarkers(markers_sel,
+                                                                            t(as.matrix(input_matrix_train)),
+                                                                            t(as.matrix(input_matrix_test)),
+                                                                            unique_clusters,
+                                                                            clusters_num_train,
+                                                                            clusters_num_test,
+                                                                            clusters_train,
+                                                                            clusters_test,
+                                                                            method=method,
+                                                                            nrounds=1500,
+                                                                            nthread=6,
+                                                                            method_marker_name=method_name,
+                                                                            verbose=verbose)
+            
+        }
     }
-
+    
     return(list_performance)
-
-
+    
+    
 }

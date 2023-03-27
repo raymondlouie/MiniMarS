@@ -40,13 +40,14 @@ install.packages("dplyr")
 
 ### Installation of ClusterMarkers
 
-Please run the following to install the `ClusterMarkers` package:
+Please run the following to install the `ClusterMarkers` package from Development branch:
 ```
-devtools::install_github("raymondlouie/ClusterMarkers") 
+devtools::install_github("raymondlouie/ClusterMarkers", ref = "Dev")
 ```
-or download the package [here](https://www.dropbox.com/s/mpjeu9o64g7jkmd/ClusterMarkers_0.1.1.tar.gz?dl=0) and install it using
+
+or download the package [here](https://www.dropbox.com/s/7gpdmll1zzo2qtr/ClusterMarkers_0.1.2.tar.gz?dl=0) and install it using the following command
 ```
-install.packages("~/Downloads/ClusterMarkers_0.1.1.tar.gz", type = "source", repo = NULL)
+install.packages("~/Downloads/ClusterMarkers_0.1.2.tar.gz", type = "source", repo = NULL)
 ```
 
 ## Example work flow
@@ -65,71 +66,90 @@ if (length(packages_required_not_installed)>0){
 library(ClusterMarkers)
 library(dplyr)
 library(SingleCellExperiment)
-data(sce)
-input_matrix = t(sce@assays@data$counts)
-clusters = sce$cell_type
 ```
 
 The input data can  either be a i) feature matrix (with cluster vectors), ii) Seurat object or SCE object. 
 
-We will first convert the input to the desired format required for downstream analysis, showing all three input data examples:
+Here we use the SCE object included in the package as an example
 ```{r}
-# SCE input example. 
-sce_in = processInputFormat(sc_object=sce,
-                            sce_cluster="cell_type",
-                            verbose=TRUE)
-
-# Feature matrix with cluster vector example.                            
-manual_in = processInputFormat(sc_object=input_matrix,
-                            clusters_all=clusters,
-                            verbose=TRUE)                           
-
-# Seurat input example.
-library(Seurat)
-sc_object = CreateSeuratObject(input_matrix)
-Idents(object = sc_object) <- clusters
-seurat_in = processInputFormat(sc_object=sc_object,
-                            verbose=TRUE)
+# Load the dataset
+data(sce)
 ```
 
-We now select a subset of clusters (`clusters_sel`) to identify markers for. Default is using all clusters.
+First, we convert the input to the desired format required for downstream analysis, showing all three input data examples:
+```{r}
+# SCE input example. 
+sc_in = processInputFormat(sc_object = sce,
+                           sce_cluster = "cell_type",
+                           verbose = TRUE)
+                               
+# Feature matrix with cluster vector example.
+# The 'input_matrix' should be formatted as feature x cell matrix
+input_matrix = sce@assays@data$counts
+# The 'clusters'should be a vector of cell cluster annotations corresponding to each cell (i.e., row of the input_matrix)
+clusters = sce$cell_type
+sc_in = processInputFormat(sc_object = input_matrix,
+                               clusters_all = clusters,
+                               verbose = TRUE)
+                               
+# Seurat input example.
+library(Seurat)
+# Create a seurat object or read in user's own object
+sc_object = CreateSeuratObject(input_matrix, assay = "Protein")
+Idents(object = sc_object) <- clusters
+sc_in = processInputFormat(sc_object = sc_object,
+                           verbose=TRUE)
+```
+
+Second, we select a subset of clusters (`clusters_sel`) to identify markers for. Default is using all clusters.
 ```{r}
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
                  "naive thymus-derived CD8-positive, alpha-beta T cell")
-sc_in = sce_in # As an example, select the SCE input
 
 cluster_selection_out= processClusterSelection(sc_in,
-                                               clusters_sel=clusters_sel,
-                                               verbose=TRUE)
+                                               clusters_sel = clusters_sel,
+                                               verbose = TRUE)
 ```   
 
-In the next step, we i) sub-sample  the data, and ii) divide the data into a training and test set.
+Third, we i) sub-sample  the data, and ii) divide the data into a training and test set.
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
-                               clusters_sel="all_clusters",
-                               subsample_num=1000,
+                               clusters_sel = "all_clusters",
+                               subsample_num = 1000,
                                train_test_ratio = 0.9,
-                               cluster_proportion= "proportional",
-                               verbose=TRUE)
+                               cluster_proportion = "proportional",
+                               verbose = TRUE)
 ```
 
-We now find the markers to identify the clusters. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
+Fourth, we now find the markers to identify the clusters. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
 ```{r}
-list_markers = findClusterMarkers(final_out$training_matrix,
+list_markers_time = findClusterMarkers(final_out$training_matrix,
                                   final_out$training_clusters,
-                                  num_markers=15,
-                                  method="all",
-                                  verbose=TRUE)
+                                  num_markers = 15,
+                                  method = "all",
+                                  verbose = TRUE)
+
+list_time = list_markers_time$runtime_secs
+names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
+                                                                                    "runtime_secs")))]
+list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
 ```
 
 Finally, we  evaulate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
 ```{r}
 list_performance = performanceAllMarkers(list_markers,
-                                         final_out=final_out,
-                                         method="all",
-                                         nrounds=1500,
-                                         nthread=6,
-                                         verbose=TRUE)
+                                         final_out = final_out,
+                                         method = "all",
+                                         nrounds = 1500,
+                                         nthread = 6,
+                                         verbose = TRUE)
+```
+
+We can print out the identified markers and their performance:
+```{r}
+library(ggplot2)
+plotMarkers(list_markers)
+plotPerformance(list_performance)
 ```
 
 ```{r}

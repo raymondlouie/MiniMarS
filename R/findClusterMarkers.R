@@ -18,6 +18,7 @@
 #'   \item \code{score_min}: Minimum of cell type scores as predicted by geneBasis
 #'   \item \code{score_median}: Median of cell type scores as predicted by geneBasis
 #'   \item \code{celltype_stat}: Cell type stats as predicted by geneBasis
+#'   \item \code{runtime}: Computation time for each method
 #' }
 #' @export
 findClusterMarkers <- function (input_matrix,
@@ -66,10 +67,13 @@ findClusterMarkers <- function (input_matrix,
     }
 
 
+    # print(colnames(input_matrix))
     if (is.null(colnames(input_matrix))){
         warning("No cell names in matrix. Manually assigning names. Please manually check the input matrix matches up with cluster input.\n")
         colnames(input_matrix) = 1:dim(input_matrix)[2]
+
     }
+    names(clusters) = colnames(input_matrix)
 
     sce  <- SingleCellExperiment::SingleCellExperiment(list(counts=input_matrix),
                                                        colData=data.frame(cell_type=clusters))
@@ -78,6 +82,7 @@ findClusterMarkers <- function (input_matrix,
     logcounts(sce) <- input_matrix
 
     list_markers = list()
+    runtime_secs <- c()
 
     for (i in 1:length(method)) {
         curr_method = method[[i]]
@@ -88,51 +93,72 @@ findClusterMarkers <- function (input_matrix,
 
 
         if (curr_method == "citeFuse") {
+          start_time <- Sys.time()
             curr_markers = citeFuseWrapper(sce,
                                            num_markers,
                                            subsample = TRUE)
+          end_time <- Sys.time()
+          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+          names(runtime_secs)[i] <- "citeFuse"
         }
 
         if (curr_method == "sc2marker") {
-
+          start_time <- Sys.time()
             curr_markers = sc2markerWrapper(input_matrix,
                                             clusters,
                                             num_markers)
+          end_time <- Sys.time()
+          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+          names(runtime_secs)[i] <- "sc2marker"
         }
 
         if (curr_method == "geneBasis") {
+          start_time <- Sys.time()
             logcounts(sce) <- input_matrix-min(input_matrix)
 
             curr_markers = geneBasisWrapper(sce,
                                             clusters,
                                             num_markers)
+          end_time <- Sys.time()
+          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+          names(runtime_secs)[i] <- "geneBasis"
         }
 
         if (curr_method == "xgBoost") {
+          start_time <- Sys.time()
             curr_markers = xgBoostWrapper(t(input_matrix),
                                           clusters,
                                           num_markers)
+          end_time <- Sys.time()
+          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+          names(runtime_secs)[i] <- "xgBoost"
         }
 
         list_markers[[curr_method]] = curr_markers
 
     }
 
-    # calculate most occuring markers
-    for (i in 1:length(list_markers)){
-        curr_df = data.frame(markers = list_markers[[i]],
-                             method = names(list_markers)[[i]])
-        if (i==1){
-            total_df = curr_df
-        } else{
-            total_df = rbind(total_df,curr_df)
+
+
+    # calculate consensus if more than one method chosen
+    if (length(method)>1){
+        for (i in 1:length(list_markers)){
+            curr_df = data.frame(markers = list_markers[[i]],
+                                 method = names(list_markers)[[i]])
+            if (i==1){
+                total_df = curr_df
+            } else{
+                total_df = rbind(total_df,curr_df)
+            }
+
         }
 
+        table_compare = data.frame(table(total_df$markers))
+        table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
+        list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
     }
-
-    table_compare = data.frame(table(total_df$markers))
-    table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
-    list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
+  
+    list_markers[["runtime_secs"]] <- runtime_secs
 
     return(list_markers)
 
