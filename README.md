@@ -40,13 +40,13 @@ install.packages("dplyr")
 
 ### Installation of ClusterMarkers
 
-Please run the following to install the `ClusterMarkers` package:
+Please run the following to install the `ClusterMarkers` package from Development branch:
 ```
-devtools::install_github("raymondlouie/ClusterMarkers") 
+devtools::install_github("raymondlouie/ClusterMarkers", ref = "Dev")
 ```
-or download the package [here](https://www.dropbox.com/s/5dz53xqcp5u4sf4/ClusterMarkers_0.1.0.tar.gz?dl=0) and install it using
+or download the package [here](https://www.dropbox.com/s/7gpdmll1zzo2qtr/ClusterMarkers_0.1.2.tar.gz?dl=0) and install it using the following command
 ```
-install.packages("~/Downloads/ClusterMarkers_0.1.0.tar.gz", type = "source", repo = NULL)
+install.packages("~/Downloads/ClusterMarkers_0.1.2.tar.gz", type = "source", repo = NULL)
 ```
 
 ## Example work flow
