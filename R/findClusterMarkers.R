@@ -33,14 +33,21 @@ findClusterMarkers <- function (input_matrix,
     num_markers_original = num_markers
 
     all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost")
-    method = intersect(method,all_methods)
+    
+    if(method = "all" | identical(sort(method), sort(all_methods))){
+      message("Using all methods.")
+    } else{
+      method = intersect(method,all_methods)
 
     # Recognize the input methods
-    if (length(method) == 0) {
-        warning("No method or invalid method selected. Using all methods.\n")
-        method = all_methods
+      if (length(method) == 0) {
+          warning("No method or invalid method selected. Using all methods.\n")
+          method = all_methods
+      } else {
+          message(paste0("Using the following method(s): ", paste(method, collapse = ", ")))
+        }
     }
-
+  
     # # Recognize the input methods
     # if (length(method) == 0) {
     #   stop("No method or invalid method selected.")
