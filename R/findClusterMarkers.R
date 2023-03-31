@@ -34,7 +34,7 @@ findClusterMarkers <- function (input_matrix,
 
     all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost")
     
-    if(method = "all" | identical(sort(method), sort(all_methods))){
+    if(method == "all" | identical(sort(method), sort(all_methods))){
       message("Using all methods.")
     } else{
       method = intersect(method,all_methods)
