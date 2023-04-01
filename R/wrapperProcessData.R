@@ -180,7 +180,7 @@ processSubsampling =function(cluster_selection_out,
                              train_test_ratio = 0.9,
                              cluster_proportion= "proportional",
                              verbose=TRUE,
-                             seed = 8
+                             seed = 8,
                              ...){
     set.seed(seed)
     clusters_all = cluster_selection_out$clusters
