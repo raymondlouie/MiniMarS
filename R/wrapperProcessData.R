@@ -217,7 +217,7 @@ processSubsampling =function(cluster_selection_out,
         index_temp= which(clusters_all %in% curr_cluster)
         
         # index of cells for training and testing
-        sample_test = sample[1:length(index_temp),
+        sample_test = sample[length(index_temp),
                              ceiling((1-train_test_ratio)*length(index_temp)),
                              replace=FALSE]
         index_test_temp = index_temp[sample_test]
@@ -226,7 +226,7 @@ processSubsampling =function(cluster_selection_out,
                                       index_test_temp)
         
         # Sub-sample to obtain training and test data
-        sample_index_training = sample[1:length(index_training_temp),
+        sample_index_training = sample[length(index_training_temp),
                                        min(max(ceiling(train_test_ratio*subsample_num*cluster_ratio[[i]]),
                                                4),
                                            length(index_training_temp)),
@@ -235,7 +235,7 @@ processSubsampling =function(cluster_selection_out,
         # index_training_sample_temp = index_training_temp[1:min(max(ceiling(train_test_ratio*subsample_num*cluster_ratio[[i]]),
         #                                                            4),
         #                                                        length(index_training_temp))]
-        sample_index_test = sample[1:length(index_test_temp),
+        sample_index_test = sample[length(index_test_temp),
                                    min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
                                        length(index_test_temp)),
                                    replace=FALSE]
