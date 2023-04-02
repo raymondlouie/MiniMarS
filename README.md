@@ -150,6 +150,15 @@ We can print out the identified markers and their performance:
 library(ggplot2)
 plotMarkers(list_markers)
 plotPerformance(list_performance)
+
+library(RColorBrewer)
+plotExpression(list_markers,
+                   sc_in,
+                   plot_type="violin")
+
+plotExpression(list_markers,
+                   sc_in,
+                   plot_type="umap")
 ```
 
 ```{r}
