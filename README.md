@@ -91,7 +91,8 @@ clusters = sce$cell_type
 sc_in = processInputFormat(sc_object = input_matrix,
                                clusters_all = clusters,
                                verbose = TRUE)
-                               
+
+sc_in_all=sc_in                               
 # Seurat input example.
 library(Seurat)
 # Create a seurat object or read in user's own object
@@ -153,11 +154,11 @@ plotPerformance(list_performance)
 
 library(RColorBrewer)
 plotExpression(list_markers,
-                   sc_in,
+                   sc_in_all,
                    plot_type="violin")
 
 plotExpression(list_markers,
-                   sc_in,
+                   sc_in_all,
                    plot_type="umap")
 ```
 
