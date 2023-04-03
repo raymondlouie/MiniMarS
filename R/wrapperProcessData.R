@@ -231,6 +231,7 @@ processSubsampling =function(cluster_selection_out,
                                                4),
                                            length(index_training_temp)),
                                        replace=FALSE)
+
         index_training_sample_temp = index_training_temp[sample_index_training]
         # index_training_sample_temp = index_training_temp[1:min(max(ceiling(train_test_ratio*subsample_num*cluster_ratio[[i]]),
         #                                                            4),
@@ -239,7 +240,8 @@ processSubsampling =function(cluster_selection_out,
                                    min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
                                        length(index_test_temp)),
                                    replace=FALSE)
-        index_test_sample_temp = index_test_temp[1:sample_index_test]
+
+        index_test_sample_temp = index_test_temp[sample_index_test]
         # index_test_sample_temp = index_test_temp[1:min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
         #                                                length(index_test_temp))]
         
