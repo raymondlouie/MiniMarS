@@ -115,11 +115,11 @@ cluster_selection_out= processClusterSelection(sc_in,
 Third, we i) sub-sample  the data, and ii) divide the data into a training and test set.
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
-                               clusters_sel = "all_clusters",
                                subsample_num = 1000,
                                train_test_ratio = 0.9,
                                cluster_proportion = "proportional",
-                               verbose = TRUE)
+                               verbose = TRUE,
+                               seed = 8)
 ```
 
 Fourth, we now find the markers to identify the clusters. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
