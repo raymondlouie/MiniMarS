@@ -1,6 +1,6 @@
 # ClusterMarkers
  
-ClusterMarkers finds the markers which best define a cluster, using a number of different pre-existing methods.
+ClusterMarkers finds the markers which best define a cluster, using a number of different pre-exisitng methods.
 
 ## Installation
 
@@ -45,9 +45,9 @@ Please run the following to install the `ClusterMarkers` package from Developmen
 devtools::install_github("raymondlouie/ClusterMarkers", ref = "Dev")
 ```
 
-or download the package [here](https://www.dropbox.com/s/7gpdmll1zzo2qtr/ClusterMarkers_0.1.2.tar.gz?dl=0) and install it using the following command
+or download the package [here](https://www.dropbox.com/s/9osz2l9txnc2qw5/ClusterMarkers_0.1.3.tar.gz?dl=0) and install it using the following command
 ```
-install.packages("~/Downloads/ClusterMarkers_0.1.2.tar.gz", type = "source", repo = NULL)
+install.packages("~/Downloads/ClusterMarkers_0.1.3.tar.gz", type = "source", repo = NULL)
 ```
 
 ## Example work flow
@@ -91,7 +91,8 @@ clusters = sce$cell_type
 sc_in = processInputFormat(sc_object = input_matrix,
                                clusters_all = clusters,
                                verbose = TRUE)
-                               
+
+sc_in_all=sc_in                               
 # Seurat input example.
 library(Seurat)
 # Create a seurat object or read in user's own object
@@ -114,11 +115,11 @@ cluster_selection_out= processClusterSelection(sc_in,
 Third, we i) sub-sample  the data, and ii) divide the data into a training and test set.
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
-                               clusters_sel = "all_clusters",
                                subsample_num = 1000,
                                train_test_ratio = 0.9,
                                cluster_proportion = "proportional",
-                               verbose = TRUE)
+                               verbose = TRUE,
+                               seed = 8)
 ```
 
 Fourth, we now find the markers to identify the clusters. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
@@ -129,7 +130,6 @@ list_markers_time = findClusterMarkers(final_out$training_matrix,
                                   method = "all",
                                   verbose = TRUE)
 
-# time to run each method
 list_time = list_markers_time$runtime_secs
 names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
                                                                                     "runtime_secs")))]
@@ -151,6 +151,15 @@ We can print out the identified markers and their performance:
 library(ggplot2)
 plotMarkers(list_markers)
 plotPerformance(list_performance)
+
+library(RColorBrewer)
+plotExpression(list_markers,
+                   sc_in_all,
+                   plot_type="violin")
+
+plotExpression(list_markers,
+                   sc_in_all,
+                   plot_type="umap")
 ```
 
 ```{r}
