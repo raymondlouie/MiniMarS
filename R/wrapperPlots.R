@@ -9,13 +9,17 @@
 #' @return A ggplot output
 #' @export
 plotMarkers =function(list_markers,
-                      text_size=40,
+                      text_size = 20,
                       color_tile = "blue",
                       fill_tile = "blue",
                       coord_ratio  = 0.2,
                       ...){
     
-    
+    # Impute the component that has less number of markers than the set number
+    max_len <- max(lengths(list_markers))
+    list_markers <- lapply(list_markers, `length<-`, max_len)
+  
+    # create a rectangular data frame 
     markers_df = reshape2::melt(data.frame(list_markers),
                                 measure.vars = names(list_markers))
     table_markers_df = data.frame(table(markers_df$value))
@@ -23,17 +27,17 @@ plotMarkers =function(list_markers,
     
     # Order markers according to most frequent.
     markers_df$value = factor(markers_df$value,
-                              levels=rev(table_markers_df$Var1))
+                              levels = rev(table_markers_df$Var1))
     markers_df = markers_df[!is.na(markers_df$value),]
     
     p1=ggplot(markers_df, aes(x = variable, y = value),...) +
-        geom_tile(color=color_tile,fill=fill_tile) + theme_classic()+
-        theme(axis.text = element_text(size=text_size),
-              axis.title = element_text(size=text_size),
-              axis.text.x = element_text(angle=45,hjust=1,size=text_size))+
+        geom_tile(color = color_tile, fill = fill_tile) + theme_classic()+
+        theme(axis.text = element_text(size = text_size),
+              axis.title = element_text(size = text_size),
+              axis.text.x = element_text(angle = 45, hjust = 1, size = text_size))+
         xlab("Method") + ylab("Feature markers") +
         coord_fixed(ratio=coord_ratio)
-    print(p1)
+    
     return(p1)
 }
 
@@ -46,8 +50,8 @@ plotMarkers =function(list_markers,
 #' @return A list of ggplot outputs
 #' @export
 plotPerformance =function(list_performance,
-                          tile_text_size=7,
-                          text_size=40,
+                          tile_text_size = 7,
+                          text_size = 20,
                           ...){
     
     # Create dataframe suitable for plotting
@@ -103,18 +107,18 @@ plotPerformance =function(list_performance,
         p1=ggplot(curr_plot, aes(x = marker_method, y = Clusters,fill=TP)) +
             geom_tile(color="black") + theme_bw()+
             scale_fill_gradient(low = "white", high = "red") +
-            theme(axis.text = element_text(size=text_size),
-                  axis.title = element_text(size=text_size),
-                  axis.text.x = element_text(angle=45,hjust=1,text_size),
-                  plot.title = element_text(size=text_size),
+            theme(axis.text = element_text(size = text_size),
+                  axis.title = element_text(size = text_size),
+                  axis.text.x = element_text(angle = 45, hjust = 1, size = text_size),
+                  plot.title = element_text(size = text_size),
                   legend.position="none")+
             xlab("Method") + ylab("Clusters") +
             coord_fixed(ratio=0.2)+
-            geom_text(aes(marker_method, Clusters, label=TPround), colour = "black", check_overlap = FALSE,
-                      size=tile_text_size)  +
+            geom_text(aes(marker_method, Clusters, label = TPround), colour = "black", check_overlap = FALSE,
+                      size = tile_text_size)  +
             ggtitle(curr_performance)
         list_p1[[i]] = p1
-        print(p1)
+        
     }
     
     return(list_p1)
