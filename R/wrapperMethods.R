@@ -11,7 +11,7 @@ citeFuseWrapper <- function (sce,
 
     # Remove cells with very low library size, which causes issues in CiteFuse
     totalCount = rowSums(sce@assays@data$counts)
-    index_remove = which(totalCount < quantile(totalCount,0.01))
+    index_remove = which(totalCount < quantile(totalCount,0.1))
     if (length(index_remove)>0){
         message(paste0(length(index_remove), " cell(s) with low library size have been removed.\n"))
         sce = sce[,-index_remove]
