@@ -139,7 +139,7 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
     colnames(input_matrix) = marker_num
 
     fstat=apply(input_matrix,2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
-    fstat <- fstat[order(fstat, decreasing = T)]
+    fstat <- fstat[order(unlist(fstat), decreasing = T)]
     markers_fstat <- names(fstat)[1:min(num_markers*3,dim(input_matrix)[2])]
 
     xgboost_train = xgboost::xgb.DMatrix(data=input_matrix[, markers_fstat],
@@ -231,6 +231,7 @@ xgboostPerformance <- function (markers_sel,
     test_prediction$true_lab <- clusters_test
     test_prediction$predict_lab <- unlist(lapply(test_prediction$predict_num,
                                                  function (x) unique_clusters_sample[which(names(unique_clusters_sample) %in% x)]))
+
 
     for (i in 1:length(unique_clusters_sample)){
         curr_cluster = unique_clusters_sample[[i]]
