@@ -327,7 +327,7 @@ calculateConsensus <- function (list_markers,
                                 input_matrix_train,
                                 clusters_train,
                                 num_markers=15,
-                                method = "xgboost",
+                                method = "other",
                                 verbose=TRUE,
                                 ...){
 
