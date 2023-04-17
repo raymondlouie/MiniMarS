@@ -11,10 +11,21 @@ citeFuseWrapper <- function (sce,
 
     # Remove cells with very low library size, which causes issues in CiteFuse
     totalCount = rowSums(sce@assays@data$counts)
-    index_remove = which(totalCount < quantile(totalCount,0.1))
+    # index_remove = which(totalCount < quantile(totalCount,0.1))
+    index_remove = which(totalCount < (-70))
+
     if (length(index_remove)>0){
         message(paste0(length(index_remove), " cell(s) with low library size have been removed.\n"))
         sce = sce[,-index_remove]
+    }
+
+    table_df = data.frame(table(sce$cell_type))
+
+    cell_remove_type = table_df$Var1[which(table_df$Freq<5)]
+    index_remove= which(sce$cell_type %in% cell_remove_type)
+
+    if (length(index_remove)>0){
+        sce= sce[,-index_remove]
     }
 
     sce_alt <- SummarizedExperiment(list(raw=sce@assays@data$counts))
@@ -218,6 +229,10 @@ xgboostPerformance <- function (markers_sel,
                                       data = xgboost_train,
                                       ...)
 
+    importance_train.mt <- xgboost::xgb.importance(colnames(xgboost_train),
+                                                   model = built.model)
+
+
     pred_test <- predict(built.model,
                          newdata = xgboost_test)
 
@@ -248,7 +263,10 @@ xgboostPerformance <- function (markers_sel,
         }
     }
 
-    return(performance_xgBoost_df)
+    out_performance = list(TP = performance_xgBoost_df,
+                           feature = importance_train.mt)
+
+    return(out_performance)
 
 }
 
@@ -298,5 +316,104 @@ geneBasisPerformance <- function (markers_sel,
     }
 
     return(performance_genebasis_df)
+
+}
+
+
+
+#' Wrapper function for Consensus function
+
+calculateConsensus <- function (list_markers,
+                                input_matrix_train,
+                                clusters_train,
+                                num_markers=15,
+                                method = "xgboost",
+                                verbose=TRUE,
+                                ...){
+
+
+    for (i in 1:length(list_markers)){
+        curr_df = data.frame(markers = list_markers[[i]],
+                             method = names(list_markers)[[i]])
+        if (i==1){
+            total_df = curr_df
+        } else{
+            total_df = rbind(total_df,curr_df)
+        }
+
+    }
+
+    table_compare = data.frame(table(total_df$markers))
+    table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
+    table_compare$finalAdd = table_compare$Var1
+
+    if (method =="fstat"){
+        fstat=apply(input_matrix_train,2,
+                    function (x) na.omit(anova(aov(x~as.factor(clusters_train)))$"F value"))
+        temp_gain <- fstat[order(unlist(fstat), decreasing = T)]
+
+        tempValue = rep(0,dim(table_compare)[1])
+        common_names = intersect(table_compare$Var1,names(temp_gain))
+        tempValue[match(common_names,table_compare$Var1)] = temp_gain[match(common_names,
+                                                                            names(temp_gain))]
+        table_compare$finalAdd =table_compare$Freq + tempValue
+
+        if (verbose){
+            message("Calculating consensus using majority and fstat to resolve ties.")
+        }
+
+
+    } else if (method=="xgboost"){
+
+        unique_clusters = unique(clusters_train)
+        num_clust= length(unique_clusters)
+        label <- 0:(num_clust-1)
+        names(unique_clusters) = label
+        clusters_num_train = unlist(lapply(clusters_train,
+                                           function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
+
+
+        xgboost_train = xgboost::xgb.DMatrix(data=as.matrix(input_matrix_train[, table_compare$Var1]),
+                                             label=clusters_num_train)
+
+        # train a model using our training data
+        numberOfClasses <- length(unique(clusters_num_train))
+
+        xgb_params <- list("objective" = "multi:softprob",
+                           "eval_metric" = "mlogloss",
+                           "num_class" = numberOfClasses)
+
+        built.model <- xgboost::xgb.train(params = xgb_params,
+                                          data = xgboost_train,
+                                          nrounds=2)
+
+        importance_train.mt <- xgboost::xgb.importance(colnames(xgboost_train),
+                                                       model = built.model)
+        temp_gain = importance_train.mt$Gain
+        names(temp_gain) = importance_train.mt$Feature
+
+        tempValue = rep(0,dim(table_compare)[1])
+        common_names = intersect(table_compare$Var1,names(temp_gain))
+        tempValue[match(common_names,table_compare$Var1)] = temp_gain[match(common_names,
+                                                                            names(temp_gain))]
+
+        table_compare$finalAdd =table_compare$Freq + tempValue
+
+        if (verbose){
+            message("Calculating consensus using majority and xgBoost to resolve ties.")
+        }
+
+    } else{
+        if (verbose){
+            message("Calculating consensus using simple majority with random ties.")
+        }
+
+    }
+    table_compare = table_compare[order(table_compare$finalAdd,
+                                        decreasing=TRUE),]
+
+    consensus_markers = as.character(table_compare$Var1[1:num_markers])
+
+    return(consensus_markers)
 
 }
