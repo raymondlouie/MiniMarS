@@ -87,7 +87,7 @@ findClusterMarkers <- function (input_matrix,
                                                        colData=data.frame(cell_type=clusters))
 
     # logcounts(sce) <- log2(input_matrix + 1)
-    logcounts(sce) <- input_matrix
+    SingleCellExperiment::logcounts(sce) <- input_matrix
 
     list_markers = list()
     runtime_secs <- c()
@@ -122,7 +122,7 @@ findClusterMarkers <- function (input_matrix,
 
         if (curr_method == "geneBasis") {
             start_time <- Sys.time()
-            logcounts(sce) <- input_matrix-min(input_matrix)
+            SingleCellExperiment::logcounts(sce) <- input_matrix-min(input_matrix)
 
             curr_markers = geneBasisWrapper(sce,
                                             clusters,

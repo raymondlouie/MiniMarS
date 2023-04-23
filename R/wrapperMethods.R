@@ -10,9 +10,9 @@ citeFuseWrapper <- function (sce,
                              ...){
 
     # Remove cells with very low library size, which causes issues in CiteFuse
-    totalCount = rowSums(sce@assays@data$counts)
+    totalCount = colSums(sce@assays@data$counts)
     # index_remove = which(totalCount < quantile(totalCount,0.1))
-    index_remove = which(totalCount < (-70))
+    index_remove = which(totalCount < (-60))
 
     if (length(index_remove)>0){
         message(paste0(length(index_remove), " cell(s) with low library size have been removed.\n"))
@@ -27,9 +27,9 @@ citeFuseWrapper <- function (sce,
     if (length(index_remove)>0){
         sce= sce[,-index_remove]
     }
-
-    sce_alt <- SummarizedExperiment(list(raw=sce@assays@data$counts))
-    altExp(sce, "protein") <- sce_alt
+    sce$cell_type  = droplevels(factor(sce$cell_type))
+    sce_alt <- SummarizedExperiment::SummarizedExperiment(list(raw=sce@assays@data$counts))
+    SingleCellExperiment::altExp(sce, "protein") <- sce_alt
 
     set.seed(2020)
     sce <- CiteFuse::importanceADT(sce,
@@ -290,7 +290,7 @@ geneBasisPerformance <- function (markers_sel,
     sce_test  <- SingleCellExperiment::SingleCellExperiment(list(counts=t(input_matrix_test)),
                                                             colData=data.frame(cell_type=clusters_test))
     # logcounts(sce_test) <- log2(t(input_matrix_test) + 1)
-    logcounts(sce_test) <- t(input_matrix_test)
+    SingleCellExperiment::logcounts(sce_test) <- t(input_matrix_test)
 
     cluster_map = geneBasisR::get_celltype_mapping(sce_test ,
                                                    genes.selection = markers_sel,
