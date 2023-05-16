@@ -31,7 +31,7 @@ citeFuseWrapper <- function (sce,
     sce_alt <- SummarizedExperiment::SummarizedExperiment(list(raw=sce@assays@data$counts))
     SingleCellExperiment::altExp(sce, "protein") <- sce_alt
 
-    set.seed(2020)
+    # set.seed(2020)
     sce <- CiteFuse::importanceADT(sce,
                                    group = factor(sce$cell_type),
                                    altExp_name ="protein",

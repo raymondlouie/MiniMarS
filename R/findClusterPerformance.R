@@ -38,7 +38,7 @@ findClusterPerformance <- function (matrix_all,
                                     clusters_sel = "ALLCLUSTER",
                                     num_markers,
                                     subsample_num,
-                                    sub.seed = 42,
+                                    # sub.seed = 42,
                                     train_test_ratio = 0.9,
                                     method_cluster = "all",
                                     method_performance = "all",
@@ -76,7 +76,7 @@ findClusterPerformance <- function (matrix_all,
 
 
     }
-    set.seed(sub.seed)
+    # set.seed(sub.seed)
 
 
     unique_clusters = unique(clusters)
