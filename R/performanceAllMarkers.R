@@ -47,8 +47,8 @@ performanceAllMarkers <- function (list_markers,
                                                                             clusters_train,
                                                                             clusters_test,
                                                                             method=method,
-                                                                            nrounds=1500,
-                                                                            nthread=6,
+                                                                            nrounds=nrounds,
+                                                                            nthread=nthread,
                                                                             method_marker_name=method_name,
                                                                             verbose=verbose)
             
