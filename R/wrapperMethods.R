@@ -248,6 +248,8 @@ xgboostPerformance <- function (markers_sel,
                                                  function (x) unique_clusters_sample[which(names(unique_clusters_sample) %in% x)]))
 
 
+
+
     for (i in 1:length(unique_clusters_sample)){
         curr_cluster = unique_clusters_sample[[i]]
         curr_test_predict = test_prediction[which(test_prediction$true_lab %in% curr_cluster),]
@@ -262,6 +264,13 @@ xgboostPerformance <- function (markers_sel,
 
         }
     }
+
+    number_correct_all= which(test_prediction$true_lab==test_prediction$predict_lab)
+    TP_all = length(number_correct_all)/dim(test_prediction)[1]
+    performance_xgBoost_df = rbind(performance_xgBoost_df,
+                                   data.frame(cluster = "all",
+                                              TP = TP_all))
+
 
     out_performance = list(TP = performance_xgBoost_df,
                            feature = importance_train.mt)
@@ -300,6 +309,8 @@ geneBasisPerformance <- function (markers_sel,
     test_prediction=cluster_map$mapping
     test_stat = cluster_map$stat
 
+
+
     for (i in 1:length(unique_clusters_sample)){
         curr_cluster = unique_clusters_sample[[i]]
         curr_test_predict = test_prediction[which(test_prediction$celltype %in% curr_cluster),]
@@ -314,6 +325,13 @@ geneBasisPerformance <- function (markers_sel,
 
         }
     }
+
+
+    number_correct_all= which(test_prediction$celltype==test_prediction$mapped_celltype)
+    TP_all = length(number_correct_all)/dim(test_prediction)[1]
+    performance_genebasis_df = rbind(performance_genebasis_df,
+                                     data.frame(cluster = "all",
+                                               TP = TP_all))
 
     return(performance_genebasis_df)
 
