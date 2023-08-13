@@ -42,6 +42,56 @@ citeFuseWrapper <- function (sce,
 
 }
 
+
+#' Wrapper function for sc2marker
+#'
+#' @param input_matrix Marker matrix (cell vs markers)
+#' @param clusters Cell type annotation
+#' @param num_markers Number of markers to output
+#' @param method Differential algorithm
+#'
+#' @return The most informative markers determined by sc2marker
+#' @export
+seuratWrapper <- function (input_matrix,
+                              clusters,
+                              num_markers=15,
+                           method = "bimod",
+                              ...){
+
+
+    seurat_object = Seurat::CreateSeuratObject(input_matrix)
+    Seurat::Idents(object = seurat_object)=clusters
+
+    markers_df = Seurat::FindAllMarkers(seurat_object,
+                                        test.use = method,
+                                        only.pos=TRUE)
+
+    num_markers_each = floor(num_markers/length(unique(clusters)))
+
+    # Calculate initial markers
+    markers_df1=markers_df %>%
+        group_by(cluster) %>%
+        slice_max(n = num_markers_each, order_by = avg_log2FC)
+
+    # Calculate markers to fill up, based on the top FC
+
+    markers_df2=markers_df %>%
+        group_by(cluster) %>%
+        slice_max(n = num_markers_each+1, order_by = avg_log2FC)
+
+    markers_df3 = markers_df2[which(markers_df2$gene %in%
+                                        setdiff(markers_df2$gene,markers_df1$gene)),]
+
+    first_list = unique(markers_df1$gene)
+    second_list = unique(markers_df3$gene)
+
+    final_list = c(first_list,second_list[1:(num_markers-length(first_list))])
+
+
+    return(final_list)
+
+}
+
 #' Wrapper function for sc2marker
 #'
 #' @param input_matrix Marker matrix (cell vs markers)
@@ -127,6 +177,39 @@ geneBasisWrapper <- function (sce,
 }
 
 
+
+#' Wrapper function for xgBoost
+#'
+#' @param input_matrix Marker matrix with cells as rows, and features as columns.
+#' @param clusters Cell type annotation
+#' @param num_markers Number of markers to output
+#'
+#' @return The most informative markers determined by xgBoost
+#' @export
+fstatWrapper <- function (input_matrix, clusters,num_markers,  ...){
+
+    # unique_clusters = unique(clusters)
+    # num_clust= length(unique_clusters)
+    # label <- 0:(num_clust-1)
+    # names(unique_clusters) = label
+    # clusters_newlabel = unlist(lapply(clusters,
+    #                                   function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
+
+    # convert features to numbers, because xgb.importance seems to have trouble with greek letters
+    # marker_num = 1:dim(input_matrix)[2]
+    # names(marker_num) = colnames(input_matrix)
+    # colnames(input_matrix) = marker_num
+
+    fstat=apply(input_matrix,2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
+    fstat <- fstat[order(unlist(fstat), decreasing = T)]
+    # markers_fstat <- names(fstat)[1:min(num_markers*3,dim(input_matrix)[2])]
+
+
+    return(names(fstat)[1:num_markers])
+
+}
+
+
 #' Wrapper function for xgBoost
 #'
 #' @param input_matrix Marker matrix with cells as rows, and features as columns.
@@ -186,156 +269,7 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
 
 
 
-#' Wrapper function for xgboostPerformance
-#'
-#' @param markers_sel Single cell experiment object
-#' @param input_matrix_train Feature training matrix with cells as columns, and features as rows.
-#' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
-#' @param clusters_num_train Cluster annotation for training set (numerical)
-#' @param clusters_num_test Cluster annotation for test set (numerical)
-#' @param clusters_train Cluster annotation for training set
-#' @param clusters_test Cluster annotation for test set
-#' @param unique_clusters_sample Unique clusters
-#'
-#' @return The performance of the input markers, as determined by a xgBoost algorithm
-#' @export
-xgboostPerformance <- function (markers_sel,
-                                input_matrix_train,
-                                input_matrix_test,
-                                clusters_num_train,
-                                clusters_num_test,
-                                clusters_train,
-                                clusters_test,
-                                unique_clusters_sample,
-                                ...){
 
-    clusters_num_train = as.numeric(clusters_num_train)
-    clusters_num_test = as.numeric(clusters_num_test)
-
-    xgboost_train = xgboost::xgb.DMatrix(data=as.matrix(input_matrix_train[, markers_sel]),
-                                         label=clusters_num_train)
-
-    xgboost_test = xgboost::xgb.DMatrix(data=as.matrix(input_matrix_test[, markers_sel]),
-                                        label=clusters_num_test)
-
-    # train a model using our training data
-    numberOfClasses <- length(unique(clusters_num_train))
-
-    xgb_params <- list("objective" = "multi:softprob",
-                       "eval_metric" = "mlogloss",
-                       "num_class" = numberOfClasses)
-
-    built.model <- xgboost::xgb.train(params = xgb_params,
-                                      data = xgboost_train,
-                                      ...)
-
-    importance_train.mt <- xgboost::xgb.importance(colnames(xgboost_train),
-                                                   model = built.model)
-
-
-    pred_test <- predict(built.model,
-                         newdata = xgboost_test)
-
-    test_prediction <- matrix(pred_test, nrow = numberOfClasses,
-                              ncol=length(pred_test)/numberOfClasses) %>%
-        t() %>%
-        data.frame() %>%
-        mutate(true = clusters_num_test ,
-               predict_num = max.col(., "last")-1) ##predicted
-
-    test_prediction$true_lab <- clusters_test
-    test_prediction$predict_lab <- unlist(lapply(test_prediction$predict_num,
-                                                 function (x) unique_clusters_sample[which(names(unique_clusters_sample) %in% x)]))
-
-
-
-
-    for (i in 1:length(unique_clusters_sample)){
-        curr_cluster = unique_clusters_sample[[i]]
-        curr_test_predict = test_prediction[which(test_prediction$true_lab %in% curr_cluster),]
-        number_correct= which(curr_test_predict$true_lab==curr_test_predict$predict_lab)
-        curr_TP = length(number_correct)/dim(curr_test_predict)[1]
-        curr_df = data.frame(cluster = curr_cluster,
-                             TP = curr_TP)
-        if (i==1){
-            performance_xgBoost_df = curr_df
-        } else{
-            performance_xgBoost_df = rbind(performance_xgBoost_df,curr_df)
-
-        }
-    }
-
-    number_correct_all= which(test_prediction$true_lab==test_prediction$predict_lab)
-    TP_all = length(number_correct_all)/dim(test_prediction)[1]
-    performance_xgBoost_df = rbind(performance_xgBoost_df,
-                                   data.frame(cluster = "all",
-                                              TP = TP_all))
-
-
-    out_performance = list(TP = performance_xgBoost_df,
-                           feature = importance_train.mt)
-
-    return(out_performance)
-
-}
-
-
-
-#' Wrapper function for geneBasisPerformance
-#'
-#' @param markers_sel Selected markers
-#' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
-#' @param clusters_test Cluster annotation for test set
-#' @param unique_clusters_sample Unique clusters
-#'
-#' @return True positive rate calculated using get_celltype_mapping from geneBasisR
-#' @export
-geneBasisPerformance <- function (markers_sel,
-                                  input_matrix_test,
-                                  clusters_test,
-                                  unique_clusters_sample,
-                                  ...){
-
-    sce_test  <- SingleCellExperiment::SingleCellExperiment(list(counts=t(input_matrix_test)),
-                                                            colData=data.frame(cell_type=clusters_test))
-    # logcounts(sce_test) <- log2(t(input_matrix_test) + 1)
-    SingleCellExperiment::logcounts(sce_test) <- t(input_matrix_test)
-
-    cluster_map = geneBasisR::get_celltype_mapping(sce_test ,
-                                                   genes.selection = markers_sel,
-                                                   celltype.id = "cell_type",
-                                                   return.stat = T)
-
-    test_prediction=cluster_map$mapping
-    test_stat = cluster_map$stat
-
-
-
-    for (i in 1:length(unique_clusters_sample)){
-        curr_cluster = unique_clusters_sample[[i]]
-        curr_test_predict = test_prediction[which(test_prediction$celltype %in% curr_cluster),]
-        number_correct= which(curr_test_predict$celltype==curr_test_predict$mapped_celltype)
-        curr_TP = length(number_correct)/dim(curr_test_predict)[1]
-        curr_df = data.frame(cluster = curr_cluster,
-                             TP = curr_TP)
-        if (i==1){
-            performance_genebasis_df = curr_df
-        } else{
-            performance_genebasis_df = rbind(performance_genebasis_df,curr_df)
-
-        }
-    }
-
-
-    number_correct_all= which(test_prediction$celltype==test_prediction$mapped_celltype)
-    TP_all = length(number_correct_all)/dim(test_prediction)[1]
-    performance_genebasis_df = rbind(performance_genebasis_df,
-                                     data.frame(cluster = "all",
-                                               TP = TP_all))
-
-    return(performance_genebasis_df)
-
-}
 
 
 
@@ -381,7 +315,7 @@ calculateConsensus <- function (list_markers,
         }
 
 
-    } else if (method=="xgboost"){
+    } else if (method=="xgBoost"){
 
         unique_clusters = unique(clusters_train)
         num_clust= length(unique_clusters)

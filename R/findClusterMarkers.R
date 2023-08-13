@@ -32,9 +32,15 @@ findClusterMarkers <- function (input_matrix,
 
     num_markers_original = num_markers
 
-    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost")
+    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
+                    "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
 
-    if(method == "all" | identical(sort(method), sort(all_methods))){
+    # # put to lower in case of user typo
+    # method_old = all_methods
+    #     all_methods=unlist(lapply(all_methods, tolower))
+    # method=unlist(lapply(method, tolower))
+
+    if ((length(method)==1 && method == "all") | (identical(sort(method), sort(all_methods)))){
         message("Using all methods.")
         method = all_methods
     } else{
@@ -94,6 +100,7 @@ findClusterMarkers <- function (input_matrix,
 
     for (i in 1:length(method)) {
         curr_method = method[[i]]
+        # curr_method_old = method_old[[i]]
 
         if (verbose){
             message(paste0("\nCaclulating markers using ", curr_method,".\n"))
@@ -142,6 +149,29 @@ findClusterMarkers <- function (input_matrix,
             names(runtime_secs)[i] <- "xgBoost"
         }
 
+        if (curr_method == "fstat") {
+            start_time <- Sys.time()
+            curr_markers = fstatWrapper(t(input_matrix),
+                                        clusters,
+                                        num_markers)
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "fstat"
+        }
+
+        if (length(grep("seurat",curr_method))>0){
+            start_time <- Sys.time()
+            curr_method2 = gsub("seurat_","",curr_method)
+            curr_markers = seuratWrapper(input_matrix,
+                                         clusters,
+                                         num_markers,
+                                         curr_method2)
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- curr_method
+
+        }
+
         list_markers[[curr_method]] = curr_markers
 
     }
@@ -151,31 +181,40 @@ findClusterMarkers <- function (input_matrix,
     # calculate consensus if more than one method chosen
     if (length(method)>1){
 
-        # consensus_markers = calculate_consensus(list_markers,
-        #                                         t(input_matrix))
-        # for (i in 1:length(list_markers)){
-        #     curr_df = data.frame(markers = list_markers[[i]],
-        #                          method = names(list_markers)[[i]])
-        #     if (i==1){
-        #         total_df = curr_df
-        #     } else{
-        #         total_df = rbind(total_df,curr_df)
-        #     }
-        #
-        # }
-        #
-        # table_compare = data.frame(table(total_df$markers))
-        # table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
-        # list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+        list_markers[["consensus_naive"]] = calculateConsensus(list_markers,
+                                                               t(input_matrix),
+                                                               clusters,
+                                                               num_markers=num_markers,
+                                                               verbose=TRUE)
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_naive"
 
-        print(length(list_markers))
-        print(dim(t(input_matrix)))
-        print(length(clusters))
-        list_markers[["consensus"]] = calculateConsensus(list_markers,
-                                                         t(input_matrix),
-                                                         clusters,
-                                                         num_markers=num_markers,
-                                                         verbose=TRUE)
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+        list_markers[["consensus_fstat"]] =  calculateConsensus(list_markers,
+                                                                t(input_matrix),
+                                                                clusters,
+                                                                num_markers=num_markers,
+                                                                method = "fstat",
+                                                                verbose=TRUE)
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_fstat"
+
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+        list_markers[["consensus_xgboost"]] = calculateConsensus(list_markers,
+                                                                 t(input_matrix),
+                                                                 clusters,
+                                                                 num_markers=num_markers,
+                                                                 method = "xgboost",
+                                                                 verbose=TRUE)
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_xgboost"
 
     }
 
