@@ -147,7 +147,7 @@ processClusterSelection =function(sc_out,
     }
 
     cluster_selection_out = list(matrix=sc_matrix,
-                                 clusters=droplevels(sc_clusters))
+                                 clusters=sc_clusters)
 
     return(cluster_selection_out)
 
