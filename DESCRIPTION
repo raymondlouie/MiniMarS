@@ -2,14 +2,14 @@ Package: ClusterMarkers
 Type: Package
 Title: Identifying the minimal number of protein markers for cell type
         annotation by consensus-based methods
-Version: 0.1.3
+Version: 0.1.4
 Author: Dhruti Parikh, Angli Xue, Hsiao-Chi Liao, Felix Marsh-Wakefield, Raymond Hall Yip Louie
 Maintainer: Raymond Louie <raylouie@hotmail.com>
-Description: ClusterMarkers finds the markers which best define a cluster, using a number of different pre-exisitng methods.
+Description: ClusterMarkers finds the markers that best define a cluster, using a number of different pre-existing methods.
 License: GPL-3.0 license
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
 Depends: R (>= 2.10)
 NeedsCompilation: no
-Packaged: 2023-03-27 11:49:52 UTC; anglix
+Packaged: 2023-09-11 15:23:52 UTC; anglix
