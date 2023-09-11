@@ -150,11 +150,8 @@ We can print out the identified markers and their performance:
 ```{r}
 library(ggplot2)
 
-p1 <- plotMarkers(list_markers)
-p1
-
-p2 <- plotPerformance(list_performance)
-p2
+plotMarkers(list_markers)
+plotPerformance(list_performance)
 
 library(RColorBrewer)
 plotExpression(list_markers,
@@ -183,21 +180,21 @@ sessionInfo()
 We provide below public datasets for users to try the `ClusterMarkers` package. The datasets all contain protein features as well as either cell annotation or cluster labels from the corresponding papers or websites.
 
 ### Dataset 1
-Blood and bone marrow samples of human from the BD Rhapsody assay.<br>
+Human bone marrow samples from the BD Rhapsody assay.<br>
 Number of cells in this dataset: around 100,000 (after QC: 49,100 from healthy controls and 31,600 from leukemia patients)<br>
 Number of protein features: 97<br>
 43 cell types/clusters from the data provider<br>
 [Click here to access the data](https://cellxgene.cziscience.com/collections/93eebe82-d8c3-41bc-a906-63b5b5f24a9d)<br>
 
 ### Dataset 2
-Mucosa-associated lymphoid tissue samples of human from the 10X technology.<br>
+Human mucosa-associated lymphoid tissue samples from the 10X technology.<br>
 Number of cells in this dataset: around 10,000 (after QC: 8,500)<br>
 Number of protein features: 17<br>
 11 cell types/clusters from the data provider<br>
 [Click here to access the data](https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.0/malt_10k_protein_v3)<br>
 
 ### Dataset 3
-Spleen and lymph nodes samples of mouse from the 10X technology.<br>
+Mouse spleen and lymph nodes samples from the 10X technology.<br>
 Number of cells in this dataset: around 40,000 (after QC: 16,800 with 111 protein features, 15,800 with 206 protein features)<br>
 Number of protein features: 111 and 206 (two sets of data) - need to find the name of each protein feature (16 Mar 2023)<br>
 Both sets, 35 cell types/clusters from the data provider<br>
@@ -205,7 +202,7 @@ Both sets, 35 cell types/clusters from the data provider<br>
 [Click here to access the processed data](https://github.com/YosefLab/totalVI_reproducibility/)<br>
 
 ### Dataset 4
-PBMC (peripheral blood mononuclear cells) samples of human from the 10X technology.<br>
+Human PBMC (peripheral blood mononuclear cells) samples from the 10X technology.<br>
 Number of cells in this dataset: around 10,000 (after QC: 7,800)<br>
 Number of protein features: 17<br>
 11 cell types/clusters from the data provider<br>

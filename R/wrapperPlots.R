@@ -107,10 +107,12 @@ plotPerformance =function(list_performance,
         p1=ggplot(curr_plot, aes(x = marker_method, y = Clusters,fill=TP)) +
             geom_tile(color="black") + theme_bw()+
             scale_fill_gradient(low = "white", high = "red") +
+
             theme(axis.text = element_text(size = text_size),
                   axis.title = element_text(size = text_size),
                   axis.text.x = element_text(angle = 45, hjust = 1, size = text_size),
                   plot.title = element_text(size = text_size),
+
                   legend.position="none")+
             xlab("Method") + ylab("Clusters") +
             coord_fixed(ratio=0.2)+
