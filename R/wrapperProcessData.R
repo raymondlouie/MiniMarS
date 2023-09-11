@@ -93,7 +93,7 @@ processInputFormat =function(sc_object,
     }
 
     if (verbose){
-        cat("Feature matrix dimension:", dim(sc_object)[1],"x",dim(sc_object)[2], ". Cluster annotation vector length:", length(sc_clusters),".")
+        cat("Feature matrix dimension:", dim(sc_object)[1],"x",dim(sc_object)[2], ". Cluster annotation vector length:", length(sc_clusters),".", '\n')
     }
 
     sc_out = list(matrix=sc_matrix,
