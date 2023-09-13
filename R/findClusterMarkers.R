@@ -215,6 +215,18 @@ findClusterMarkers <- function (input_matrix,
         end_time <- Sys.time()
         runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
         names(runtime_secs)[i] <- "consensus_xgboost"
+        
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+        list_markers[["consensus_weighted"]] = calculateConsensus(list_markers,
+                                                                 t(input_matrix),
+                                                                 clusters,
+                                                                 num_markers=num_markers,
+                                                                 method = "weighted",
+                                                                 verbose=TRUE)
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_weighted"
 
     }
 
