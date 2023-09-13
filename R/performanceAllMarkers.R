@@ -18,16 +18,25 @@ performanceAllMarkers <- function (list_markers,
                                    method="all",
                                    nrounds=1500,
                                    nthread=6,
+                                   testSet = "test"
                                    verbose=FALSE,
                                    ...) {
     
     input_matrix_train = final_out$training_matrix
-    input_matrix_test = final_out$test_matrix
     unique_clusters = final_out$unique_clusters_sample
     clusters_num_train = final_out$training_clusters_num
-    clusters_num_test = final_out$test_clusters_num
     clusters_train = final_out$training_clusters
-    clusters_test = final_out$test_clusters
+    
+    
+    if (testSet %in% "test"){
+        input_matrix_test = final_out$test_matrix
+        clusters_num_test = final_out$test_clusters_num
+        clusters_test = final_out$test_clusters
+    } else{
+        input_matrix_test = final_out$valid_matrix
+        clusters_num_test = final_out$valid_clusters_num
+        clusters_test = final_out$valid_clusters
+    }
     
     list_performance = c()
     for (i in 1:length(list_markers)){
