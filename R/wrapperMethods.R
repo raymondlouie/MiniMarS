@@ -368,6 +368,10 @@ calculateConsensus <- function (list_markers,
                                 FUN = sum)
         colnames(table_compare) = c("Var1","finalAdd")
         
+        if (verbose){
+            message("Calculating consensus using weighted.")
+        }
+        
         
     } else{
         if (verbose){
