@@ -18,7 +18,7 @@ performanceAllMarkers <- function (list_markers,
                                    method="all",
                                    nrounds=1500,
                                    nthread=6,
-                                   testSet = "test"
+                                   testSet = "test",
                                    verbose=FALSE,
                                    ...) {
     

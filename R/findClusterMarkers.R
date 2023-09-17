@@ -1,7 +1,5 @@
 #' Find the most informative cluster markers
 #'
-#' @param input_matrix Feature matrix with cells as columns, and features as rows.
-#' @param clusters Cluster annotation for each cell.
 #' @param num_markers Number of markers to output.
 #' @param method List of methods to find cluster markers.
 #' \itemize{
@@ -22,8 +20,6 @@
 #' }
 #' @export
 findClusterMarkers <- function (final_out,
-                                # input_matrix,
-                                #                         clusters,
                                 num_markers = 15,
                                 method = "all",
                                 verbose = FALSE,
