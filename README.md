@@ -179,15 +179,14 @@ sessionInfo()
 ## Using the user's own marker panel
 Under some scenarios, the users may want to test their own customised marker panel instead of the predicted ones. We recommend using the following codes to evaluate the performance of the user's customised marker input.
 ```{r}
-user_markers = c("CD16", "CD38", CD56", "CD45RA", "CD161", "TCR-Vα24-Jα18", "CD141", "HLA-DR", "TCR-γ-δ", "CD62L", "CD197", "CD20", "CD123", "CD183")
-
+user_markers = c("CD80", "CD86", "CD274", "CD273", "CD275", "CD11b", "CD137L", "CD70", "unidentified_marker1","unidentified_marker2")
 own_list_performance = performanceOwnMarkers(user_markers,
                                          final_out = final_out,
                                          method = "all",
                                          nrounds = 1500,
                                          nthread = 6,
                                          verbose = TRUE)
-
+print(own_list_performance)
 ```
 
 <br>
