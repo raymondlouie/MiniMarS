@@ -1,7 +1,5 @@
 #' Find the most informative cluster markers
 #'
-#' @param input_matrix Feature matrix with cells as columns, and features as rows.
-#' @param clusters Cluster annotation for each cell.
 #' @param num_markers Number of markers to output.
 #' @param method List of methods to find cluster markers.
 #' \itemize{
@@ -21,24 +19,39 @@
 #'   \item \code{runtime}: Computation time for each method
 #' }
 #' @export
-findClusterMarkers <- function (input_matrix,
-                                clusters,
+findClusterMarkers <- function (final_out,
                                 num_markers = 15,
                                 method = "all",
                                 verbose = FALSE,
                                 ...) {
 
-    input_matrix= t(as.matrix(input_matrix))
+    # input_matrix= t(as.matrix(input_matrix))
+    input_matrix = t(as.matrix(final_out$training_matrix))
+    clusters = final_out$training_clusters
 
     num_markers_original = num_markers
 
-    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost")
-    method = intersect(method,all_methods)
+    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
+                    "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
 
-    # Recognize the input methods
-    if (length(method) == 0) {
-        warning("No method or invalid method selected. Using all methods.\n")
+    # # put to lower in case of user typo
+    # method_old = all_methods
+    #     all_methods=unlist(lapply(all_methods, tolower))
+    # method=unlist(lapply(method, tolower))
+
+    if ((length(method)==1 && method == "all") | (identical(sort(method), sort(all_methods)))){
+        message("Using all methods.")
         method = all_methods
+    } else{
+        method = all_methods[which(all_methods %in% method)]
+
+        # Recognize the input methods
+        if (length(method) == 0) {
+            warning("No method or invalid method selected. Using all methods.\n")
+            method = all_methods
+        } else {
+            message(paste0("\nUsing the following method(s): ", paste(method, collapse = ", ")))
+        }
     }
 
     # # Recognize the input methods
@@ -79,13 +92,14 @@ findClusterMarkers <- function (input_matrix,
                                                        colData=data.frame(cell_type=clusters))
 
     # logcounts(sce) <- log2(input_matrix + 1)
-    logcounts(sce) <- input_matrix
+    SingleCellExperiment::logcounts(sce) <- input_matrix
 
     list_markers = list()
     runtime_secs <- c()
 
     for (i in 1:length(method)) {
         curr_method = method[[i]]
+        # curr_method_old = method_old[[i]]
 
         if (verbose){
             message(paste0("\nCaclulating markers using ", curr_method,".\n"))
@@ -93,71 +107,162 @@ findClusterMarkers <- function (input_matrix,
 
 
         if (curr_method == "citeFuse") {
-          start_time <- Sys.time()
+            start_time <- Sys.time()
             curr_markers = citeFuseWrapper(sce,
                                            num_markers,
                                            subsample = TRUE)
-          end_time <- Sys.time()
-          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-          names(runtime_secs)[i] <- "citeFuse"
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "citeFuse"
         }
 
         if (curr_method == "sc2marker") {
-          start_time <- Sys.time()
+            start_time <- Sys.time()
             curr_markers = sc2markerWrapper(input_matrix,
                                             clusters,
                                             num_markers)
-          end_time <- Sys.time()
-          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-          names(runtime_secs)[i] <- "sc2marker"
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "sc2marker"
         }
 
         if (curr_method == "geneBasis") {
-          start_time <- Sys.time()
-            logcounts(sce) <- input_matrix-min(input_matrix)
+            start_time <- Sys.time()
+            SingleCellExperiment::logcounts(sce) <- input_matrix-min(input_matrix)
 
             curr_markers = geneBasisWrapper(sce,
                                             clusters,
                                             num_markers)
-          end_time <- Sys.time()
-          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-          names(runtime_secs)[i] <- "geneBasis"
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "geneBasis"
         }
 
         if (curr_method == "xgBoost") {
-          start_time <- Sys.time()
+            start_time <- Sys.time()
             curr_markers = xgBoostWrapper(t(input_matrix),
                                           clusters,
                                           num_markers)
-          end_time <- Sys.time()
-          runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-          names(runtime_secs)[i] <- "xgBoost"
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "xgBoost"
+        }
+
+        if (curr_method == "fstat") {
+            start_time <- Sys.time()
+            curr_markers = fstatWrapper(t(input_matrix),
+                                        clusters,
+                                        num_markers)
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "fstat"
+        }
+
+        if (length(grep("seurat",curr_method))>0){
+            start_time <- Sys.time()
+            curr_method2 = gsub("seurat_","",curr_method)
+            curr_markers = seuratWrapper(input_matrix,
+                                         clusters,
+                                         num_markers,
+                                         curr_method2)
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- curr_method
+
         }
 
         list_markers[[curr_method]] = curr_markers
 
     }
 
-
+    list_markers_temp = list_markers
 
     # calculate consensus if more than one method chosen
     if (length(method)>1){
-        for (i in 1:length(list_markers)){
-            curr_df = data.frame(markers = list_markers[[i]],
-                                 method = names(list_markers)[[i]])
-            if (i==1){
-                total_df = curr_df
-            } else{
-                total_df = rbind(total_df,curr_df)
-            }
 
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+
+        list_performance_valid = performanceAllMarkers(list_markers_temp,
+                                                       final_out=final_out,
+                                                       method="all",
+                                                       nrounds=1500,
+                                                       nthread=6,
+                                                       testSet = "valid",
+                                                       verbose=FALSE)
+
+        chosen_measure = "F1_macro"
+        index_remove = grep("consensus",names(list_performance_valid))
+        if (length(index_remove)>0){
+            list_performance_valid = list_performance_valid[-index_remove]
         }
 
-        table_compare = data.frame(table(total_df$markers))
-        table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
-        list_markers[["consensus"]] = as.character(table_compare$Var1[1:num_markers])
+        list_weight = list()
+        for (jj in 1:length(list_performance_valid)){
+            curr_list_measures = list_performance_valid[[jj]]$xgBoost_performance_all
+            list_weight[[names(list_performance_valid)[[jj]]]] = as.numeric(curr_list_measures[which(names(curr_list_measures) %in% chosen_measure)])
+        }
+        list_weight_num = as.numeric(list_weight)
+        list_weight_num= list_weight_num/sum(list_weight_num)
+        names(list_weight_num) = names(list_performance_valid)
+
+        if (verbose){
+            message(paste0("Weighted list is ", list_weight_num))
+        }
+
+
+        list_markers[["consensus_weighted"]] = calculateConsensus(list_markers_temp,
+                                                                  t(input_matrix),
+                                                                  clusters,
+                                                                  num_markers=num_markers,
+                                                                  method = "weighted",
+                                                                  list_weight_num = list_weight_num,
+                                                                  verbose=TRUE)
+
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_weighted"
+
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+        list_markers[["consensus_naive"]] = calculateConsensus(list_markers_temp,
+                                                               t(input_matrix),
+                                                               clusters,
+                                                               num_markers=num_markers,
+                                                               verbose=TRUE)
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_naive"
+
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+        list_markers[["consensus_fstat"]] =  calculateConsensus(list_markers_temp,
+                                                                t(input_matrix),
+                                                                clusters,
+                                                                num_markers=num_markers,
+                                                                method = "fstat",
+                                                                verbose=TRUE)
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_fstat"
+
+        i = length(runtime_secs)+1
+        start_time <- Sys.time()
+        list_markers[["consensus_xgboost"]] = calculateConsensus(list_markers_temp,
+                                                                 t(input_matrix),
+                                                                 clusters,
+                                                                 num_markers=num_markers,
+                                                                 method = "xgBoost",
+                                                                 verbose=TRUE)
+        end_time <- Sys.time()
+        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+        names(runtime_secs)[i] <- "consensus_xgboost"
+
+
+
+
     }
-  
+
     list_markers[["runtime_secs"]] <- runtime_secs
 
     return(list_markers)

@@ -93,7 +93,7 @@ processInputFormat =function(sc_object,
     }
 
     if (verbose){
-        cat("Feature matrix dimension:", dim(sc_object)[1],"x",dim(sc_object)[2], ". Cluster annotation vector length:", length(sc_clusters),".")
+        cat("Feature matrix dimension:", dim(sc_object)[1],"x",dim(sc_object)[2], ". Cluster annotation vector length:", length(sc_clusters),".", '\n')
     }
 
     sc_out = list(matrix=sc_matrix,
@@ -177,11 +177,12 @@ processClusterSelection =function(sc_out,
 #' @export
 processSubsampling =function(cluster_selection_out,
                              subsample_num=1000,
-                             train_test_ratio = 0.9,
+                             train_test_ratio = 0.5,
                              cluster_proportion= "proportional",
                              verbose=TRUE,
+                             seed = 8,
                              ...){
-
+    set.seed(seed)
     clusters_all = cluster_selection_out$clusters
     matrix_all = cluster_selection_out$matrix
 
@@ -216,16 +217,33 @@ processSubsampling =function(cluster_selection_out,
         index_temp= which(clusters_all %in% curr_cluster)
 
         # index of cells for training and testing
-        index_test_temp = index_temp[1:ceiling((1-train_test_ratio)*length(index_temp))]
+        sample_test = sample(length(index_temp),
+                             ceiling((1-train_test_ratio)*length(index_temp)),
+                             replace=FALSE)
+        index_test_temp = index_temp[sample_test]
+        # index_test_temp = index_temp[1:ceiling((1-train_test_ratio)*length(index_temp))]
         index_training_temp = setdiff(index_temp,
                                       index_test_temp)
 
         # Sub-sample to obtain training and test data
-        index_training_sample_temp = index_training_temp[1:min(max(ceiling(train_test_ratio*subsample_num*cluster_ratio[[i]]),
-                                                                   4),
-                                                               length(index_training_temp))]
-        index_test_sample_temp = index_test_temp[1:min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
-                                                       length(index_test_temp))]
+        sample_index_training = sample(length(index_training_temp),
+                                       min(max(ceiling(train_test_ratio*subsample_num*cluster_ratio[[i]]),
+                                               4),
+                                           length(index_training_temp)),
+                                       replace=FALSE)
+
+        index_training_sample_temp = index_training_temp[sample_index_training]
+        # index_training_sample_temp = index_training_temp[1:min(max(ceiling(train_test_ratio*subsample_num*cluster_ratio[[i]]),
+        #                                                            4),
+        #                                                        length(index_training_temp))]
+        sample_index_test = sample(length(index_test_temp),
+                                   min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
+                                       length(index_test_temp)),
+                                   replace=FALSE)
+
+        index_test_sample_temp = index_test_temp[sample_index_test]
+        # index_test_sample_temp = index_test_temp[1:min(max(ceiling((1-train_test_ratio)*subsample_num*cluster_ratio[[i]]),4),
+        #                                                length(index_test_temp))]
 
         if (length(index_test_sample_temp)>3 & length(index_training_sample_temp)>3){
             list_index_training[[icount]]=index_training_sample_temp
@@ -288,4 +306,197 @@ processSubsampling =function(cluster_selection_out,
                      unique_clusters_sample=unique_clusters_sample)
 
     return(final_out)
+}
+
+
+#' Sub-sample and split data into training and test set
+#'
+#' @param Output of function `processInputFormat`.
+#' @param subsample_num Number of cells after sub-sammpling.
+#' @param train_test_ratio Training to test data ratio.
+#' @param cluster_proportion
+#' \itemize{
+#'   \item \code{proportional:} (default) Same proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
+#'   \item \code{equal}: Equal proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
+#' }
+#'
+#' @return List containing
+#' \itemize{
+#'   \item \code{training_matrix}:
+#'   \item \code{training_clusters}:
+#'   \item \code{training_clusters_num}:
+#'   \item \code{test_matrix}:
+#'   \item \code{test_clusters}:
+#'   \item \code{test_clusters_num}:
+#' }
+#' @export
+processSubsampling2 =function(cluster_selection_out,
+                              subsample_num=1000,
+                              # train_test_ratio = 0.5,
+                              cluster_proportion= "proportional",
+                              verbose=TRUE,
+                              seed = 8,
+                              ...){
+    set.seed(seed)
+    clusters_all = cluster_selection_out$clusters
+    matrix_all = cluster_selection_out$matrix
+
+    # if (train_test_ratio <= 0 | train_test_ratio>=1){
+    #     stop("Please choose a training:test ratio between 0 and 1.")
+    # }
+
+    numCells = dim(matrix_all)[1]
+    if (subsample_num > numCells){
+        warning(paste0("Number of sub-samples more than number of cells. Using all cells."))
+        subsample_num=numCells
+    }
+
+    unique_clusters_all = unique(clusters_all)
+    # if (cluster_proportion == "proportional"){
+    temp_table = table(clusters_all)
+    temp_table = temp_table[match(unique_clusters_all,
+                                  names(temp_table))]
+    cluster_ratio_prop = as.numeric(temp_table/sum(temp_table))
+    # } else{
+    cluster_ratio_balance = rep(1/length(unique_clusters_all),
+                                length(unique_clusters_all))
+    # }
+
+    if (cluster_proportion == "proportional"){
+        cluster_ratio = cluster_ratio_prop
+    } else{
+        cluster_ratio = cluster_ratio_balance
+
+    }
+
+
+
+    list_index_training = list()
+    list_index_valid= list()
+    list_index_test= list()
+
+    icount=1
+
+    i=1
+    # Sub-sample for each cluster. Ensure each training and validation data has at least four cells in the cluster, otherwise errors occur downstream.
+    for (i in 1:length(unique_clusters_all)){
+        curr_cluster = unique_clusters_all[[i]]
+        index_temp= which(clusters_all %in% curr_cluster)
+
+        # Sub-sample training
+        # sample_training = sample(length(index_temp),
+        #                      subsample_num,
+        #                      replace=FALSE)
+        #
+        # index_training_temp = index_temp[sample_training]
+
+        # sub-sample training
+        sample_index_training = sample(length(index_temp),
+                                       min(max(ceiling(subsample_num*cluster_ratio[[i]]),
+                                               4),
+                                           length(index_temp)),
+                                       replace=FALSE)
+
+        index_training_temp = index_temp[sample_index_training]
+        index_valid_test_temp = setdiff(index_temp,
+                                        index_training_temp)
+
+        # sample validation
+        sample_index_valid= sample(length(index_valid_test_temp),
+                                   min(max(ceiling(subsample_num*cluster_ratio_prop[[i]]),4),
+                                       length(index_valid_test_temp)),
+                                   replace=FALSE)
+        index_valid_temp =index_valid_test_temp[sample_index_valid]
+
+
+        index_test_temp = setdiff(index_temp,
+                                  c(index_training_temp,
+                                    index_valid_temp))
+
+
+        # sample test
+        sample_index_test= sample(length(index_test_temp),
+                                  min(max(ceiling((numCells-2*subsample_num)*cluster_ratio_prop[[i]]),4),
+                                      length(index_test_temp)),
+                                  replace=FALSE)
+
+        index_test_temp =index_test_temp[sample_index_test]
+
+
+        if (length(index_training_temp)>3 & length(index_valid_temp)>3 & length(index_test_temp)>3){
+            list_index_training[[icount]]=index_training_temp
+            list_index_test[[icount]]=index_test_temp
+            list_index_valid[[icount]]=index_valid_temp
+
+            icount=icount+1
+        }
+    }
+
+    index_train = unlist(list_index_training)
+    index_test = unlist(list_index_test)
+    index_valid = unlist(list_index_valid)
+
+    sample_index = c(index_train,index_valid,index_test)
+    clusters_sample = clusters_all[sample_index]
+
+    if (length(index_train)<10){
+        stop("Not enough cells in dataset.")
+    }
+
+    if (length(index_test)<10){
+        stop("Not enough cells in dataset.")
+    }
+
+    # Create numeric form of clusters, used in XgBoost
+    unique_clusters_sample = unique(clusters_sample)
+    num_clust= length(unique_clusters_sample)
+    label <- 0:(num_clust-1)
+    names(unique_clusters_sample) = label
+
+    # Form training cluster and matrix
+    input_matrix_train = matrix_all[index_train,]
+    clusters_train = clusters_all[index_train]
+    clusters_num_train = unlist(lapply(clusters_train,
+                                       function (x) as.numeric(names(unique_clusters_sample)[which(as.character(unique_clusters_sample) %in% x)])))
+
+    # Form test cluster and matrix
+    input_matrix_test = matrix_all[index_test,]
+    clusters_test = clusters_all[index_test]
+    clusters_num_test= unlist(lapply(clusters_test,
+                                     function (x) as.numeric(names(unique_clusters_sample)[which(as.character(unique_clusters_sample) %in% x)])))
+
+    # Form validation cluster and matrix
+    input_matrix_valid = matrix_all[index_valid,]
+    clusters_valid = clusters_all[index_valid]
+    clusters_num_valid= unlist(lapply(clusters_valid,
+                                      function (x) as.numeric(names(unique_clusters_sample)[which(as.character(unique_clusters_sample) %in% x)])))
+
+    if (length(unique(clusters_test))<2){
+        stop("Less than two clusters after sub-sampling in the testing data. Please increase sub-sample size.")
+
+    }
+    if (length(unique(clusters_train))<2){
+        stop("Less than two clusters after sub-sampling in the training data. Please increase sub-sample size.")
+    }
+
+    if (verbose){
+        print(table(clusters_test))
+        print(table(clusters_train))
+        print(table(clusters_valid))
+
+    }
+
+    final_out = list(training_matrix=input_matrix_train,
+                     training_clusters=clusters_train,
+                     training_clusters_num = clusters_num_train,
+                     test_matrix=input_matrix_test,
+                     test_clusters=clusters_test,
+                     test_clusters_num = clusters_num_test,
+                     valid_matrix=input_matrix_valid,
+                     valid_clusters=clusters_valid,
+                     valid_clusters_num = clusters_num_valid,
+                     unique_clusters_sample=unique_clusters_sample)
+
+    return(final_out)
+
 }

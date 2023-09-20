@@ -149,6 +149,7 @@ list_performance = performanceAllMarkers(list_markers,
 We can print out the identified markers and their performance:
 ```{r}
 library(ggplot2)
+
 plotMarkers(list_markers)
 plotPerformance(list_performance)
 
