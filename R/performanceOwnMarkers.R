@@ -69,7 +69,6 @@ performanceOwnMarkers <- function (user_markers,
                                           method_marker_name = "customised",
                                           verbose = verbose)
         
-    }
     
     return(list_performance)
     
