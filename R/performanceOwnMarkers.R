@@ -68,7 +68,7 @@ performanceOwnMarkers <- function (user_markers,
                                           nthread = nthread,
                                           method_marker_name = "customised",
                                           verbose = verbose)
-        }
+        
     }
     
     return(list_performance)
