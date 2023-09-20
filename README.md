@@ -1,6 +1,6 @@
 # ClusterMarkers
  
-ClusterMarkers finds the markers which best define a cluster, using a number of different pre-exisitng methods.
+ClusterMarkers finds the markers that best define a cluster, using a number of different pre-existing methods.
 
 ## Installation
 
@@ -40,7 +40,7 @@ install.packages("dplyr")
 
 ### Installation of ClusterMarkers
 
-Please run the following to install the `ClusterMarkers` package from Development branch:
+Please run the following to install the `ClusterMarkers` package from the Development branch:
 ```
 devtools::install_github("raymondlouie/ClusterMarkers", ref = "Dev")
 ```
@@ -50,9 +50,9 @@ or download the package [here](https://www.dropbox.com/s/9osz2l9txnc2qw5/Cluster
 install.packages("~/Downloads/ClusterMarkers_0.1.3.tar.gz", type = "source", repo = NULL)
 ```
 
-## Example work flow
+## Example workflow
 
-Here is an example of the `ClusterMarkers` work flow to get started:
+Here is an example of the `ClusterMarkers` workflow to get started:
 
 Load libraries and example data.
 ```{r}
@@ -68,7 +68,7 @@ library(dplyr)
 library(SingleCellExperiment)
 ```
 
-The input data can  either be a i) feature matrix (with cluster vectors), ii) Seurat object or SCE object. 
+The input data can  either be i) a feature matrix (with cluster vectors), ii) a Seurat object or an SCE object. 
 
 Here we use the SCE object included in the package as an example
 ```{r}
@@ -86,7 +86,7 @@ sc_in = processInputFormat(sc_object = sce,
 # Feature matrix with cluster vector example.
 # The 'input_matrix' should be formatted as feature x cell matrix
 input_matrix = sce@assays@data$counts
-# The 'clusters'should be a vector of cell cluster annotations corresponding to each cell (i.e., row of the input_matrix)
+# The 'clusters' should be a vector of cell cluster annotations corresponding to each cell (i.e., the row of the input_matrix)
 clusters = sce$cell_type
 sc_in = processInputFormat(sc_object = input_matrix,
                                clusters_all = clusters,
@@ -95,14 +95,14 @@ sc_in = processInputFormat(sc_object = input_matrix,
 sc_in_all=sc_in                               
 # Seurat input example.
 library(Seurat)
-# Create a seurat object or read in user's own object
+# Create a Seurat object or read in the user's own object
 sc_object = CreateSeuratObject(input_matrix, assay = "Protein")
 Idents(object = sc_object) <- clusters
 sc_in = processInputFormat(sc_object = sc_object,
                            verbose=TRUE)
 ```
 
-Second, we select a subset of clusters (`clusters_sel`) to identify markers for. Default is using all clusters.
+Second, we select a subset of clusters (`clusters_sel`) to identify markers. The default is to use all clusters.
 ```{r}
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
                  "naive thymus-derived CD8-positive, alpha-beta T cell")
@@ -136,7 +136,7 @@ names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in
 list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
 ```
 
-Finally, we  evaulate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
+Finally, we  evaluate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
 ```{r}
 list_performance = performanceAllMarkers(list_markers,
                                          final_out = final_out,
@@ -172,6 +172,22 @@ sessionInfo()
  [5] SummarizedExperiment_1.24.0 Biobase_2.54.0              GenomicRanges_1.46.1        GenomeInfoDb_1.30.0        
  [9] IRanges_2.28.0              S4Vectors_0.32.3            BiocGenerics_0.40.0         MatrixGenerics_1.6.0       
 [13] matrixStats_0.61.0          dplyr_1.0.7                 ClusterMarkers_0.1.0 
+```
+
+<br>
+
+## Using the user's own marker panel
+Under some scenarios, the users may want to test their own customised marker panel instead of the predicted ones. We recommend using the following codes to evaluate the performance of the user's customised marker input.
+```{r}
+user_markers = c("CD16", "CD38", CD56", "CD45RA", "CD161", "TCR-Vα24-Jα18", "CD141", "HLA-DR", "TCR-γ-δ", "CD62L", "CD197", "CD20", "CD123", "CD183")
+
+own_list_performance = performanceOwnMarkers(user_markers,
+                                         final_out = final_out,
+                                         method = "all",
+                                         nrounds = 1500,
+                                         nthread = 6,
+                                         verbose = TRUE)
+
 ```
 
 <br>
