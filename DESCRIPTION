@@ -12,4 +12,4 @@ LazyData: true
 RoxygenNote: 7.1.2
 Depends: R (>= 2.10)
 NeedsCompilation: no
-Packaged: 2023-10-17 12:52:43 UTC; anglix
+Packaged: 2023-10-17 13:39:03 UTC; anglix
