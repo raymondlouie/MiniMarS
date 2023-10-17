@@ -1,6 +1,6 @@
-# ClusterMarkers
+# MiniMarS
  
-ClusterMarkers finds the markers that best define a cluster, using a number of different pre-existing methods.
+MiniMarS finds the markers that best define a cluster, using a number of different pre-existing methods.
 
 ## Installation
 
@@ -38,32 +38,32 @@ BiocManager::install("SingleCellExperiment")
 install.packages("dplyr")
 ```
 
-### Installation of ClusterMarkers
+### Installation of MiniMarS
 
-Please run the following to install the `ClusterMarkers` package from the Development branch:
+Please run the following to install the `MiniMarS` package from the Development branch:
 ```
-devtools::install_github("raymondlouie/ClusterMarkers", ref = "Dev")
+devtools::install_github("raymondlouie/MiniMarS", ref = "Dev")
 ```
 
-or download the package [here](https://www.dropbox.com/s/9osz2l9txnc2qw5/ClusterMarkers_0.1.3.tar.gz?dl=0) and install it using the following command
+or download the package [here](https://www.dropbox.com/scl/fi/vqpz8h45t2tf5uxrzrrwo/MiniMarS_0.2.0.tar.gz?rlkey=u0y0o03j0xqnz1usp8gjmpz3m&dl=0) and install it using the following command
 ```
-install.packages("~/Downloads/ClusterMarkers_0.1.3.tar.gz", type = "source", repo = NULL)
+install.packages("~/Downloads/MiniMarS_0.2.0.tar.gz", type = "source", repo = NULL)
 ```
 
 ## Example workflow
 
-Here is an example of the `ClusterMarkers` workflow to get started:
+Here is an example of the `MiniMarS` workflow to get started:
 
 Load libraries and example data.
 ```{r}
 # Check to see if packages are installed.
-packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","ClusterMarkers")
+packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","MiniMarS")
 packages_required_not_installed=setdiff(packages_required, rownames(installed.packages()))
 if (length(packages_required_not_installed)>0){
     stop(paste0("Please install packages ",packages_required_not_installed,"\n"))
 }
 
-library(ClusterMarkers)
+library(MiniMarS)
 library(dplyr)
 library(SingleCellExperiment)
 ```
@@ -171,7 +171,7 @@ sessionInfo()
  [1] sp_1.4-6                    SeuratObject_4.1.0          Seurat_4.1.1.9002           SingleCellExperiment_1.16.0
  [5] SummarizedExperiment_1.24.0 Biobase_2.54.0              GenomicRanges_1.46.1        GenomeInfoDb_1.30.0        
  [9] IRanges_2.28.0              S4Vectors_0.32.3            BiocGenerics_0.40.0         MatrixGenerics_1.6.0       
-[13] matrixStats_0.61.0          dplyr_1.0.7                 ClusterMarkers_0.1.0 
+[13] matrixStats_0.61.0          dplyr_1.0.7                 MiniMarS_0.1.0 
 ```
 
 <br>
@@ -192,7 +192,7 @@ print(own_list_performance)
 <br>
 
 ## Public datasets
-We provide below public datasets for users to try the `ClusterMarkers` package. The datasets all contain protein features as well as either cell annotation or cluster labels from the corresponding papers or websites.
+We provide below public datasets for users to try the `MiniMarS` package. The datasets all contain protein features as well as either cell annotation or cluster labels from the corresponding papers or websites.
 
 ### Dataset 1
 Human bone marrow samples from the BD Rhapsody assay.<br>
