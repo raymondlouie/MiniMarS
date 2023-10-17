@@ -164,8 +164,7 @@ geneBasisWrapper <- function (sce, clusters, num_markers=15, ...) {
 
     # Set the warning level to 1
     options(warn = 1)
-    
-    print("mark")
+  
     num_markers_original = num_markers
 
     sce = geneBasisR::retain_informative_genes(sce, ...)
