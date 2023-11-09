@@ -158,23 +158,30 @@ sc2markerWrapper <- function (input_matrix,
 #'
 #' @return The most informative markers determined by geneBasis
 #' @export
-geneBasisWrapper <- function (sce,
-                              clusters,
-                              num_markers=15,
-                              ...){
-    num_markers_original=num_markers
+geneBasisWrapper <- function (sce, clusters, num_markers=15, ...) {
+    # Save the current warning setting
+    original_warn_setting <- getOption("warn")
 
-    sce = geneBasisR::retain_informative_genes(sce,
-                                               ...)
+    # Set the warning level to 1
+    options(warn = 1)
+  
+    num_markers_original = num_markers
+
+    sce = geneBasisR::retain_informative_genes(sce, ...)
+    cat("\n")
     geneBasis_num_markers = dim(sce)[1]
-    if (geneBasis_num_markers<num_markers){
-        warning("\n Number of markers from geneBasis is less than the number of input markers. Reducing number of markers. \n")
-        num_markers = geneBasis_num_markers-1
-    }
-    marker_output = geneBasisR::gene_search(sce, n_genes_total = num_markers,...)
-    return(c(marker_output$gene,rep(NA,num_markers_original-num_markers)))
-
+    if (geneBasis_num_markers <= num_markers) {
+        num_markers = geneBasis_num_markers - 1
+        warning("\nNumber of markers from geneBasis is no larger than the number of input markers.\nReducing the number of markers.\n", paste0(num_markers, " markers used now."))
+            }
+    marker_output = geneBasisR::gene_search(sce, n_genes_total = num_markers, ...)
+    
+    # Restore the original warning setting
+    options(warn = original_warn_setting)
+    
+    return(c(marker_output$gene, rep(NA, num_markers_original - num_markers)))
 }
+
 
 
 

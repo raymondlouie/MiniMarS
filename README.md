@@ -1,6 +1,6 @@
-# ClusterMarkers
+# MiniMarS
  
-ClusterMarkers finds the markers which best define a cluster, using a number of different pre-exisitng methods.
+MiniMarS finds the markers that best define a cluster, using a number of different pre-existing methods.
 
 ## Installation
 
@@ -38,37 +38,37 @@ BiocManager::install("SingleCellExperiment")
 install.packages("dplyr")
 ```
 
-### Installation of ClusterMarkers
+### Installation of MiniMarS
 
-Please run the following to install the `ClusterMarkers` package from Development branch:
+Please run the following to install the `MiniMarS` package from the Development branch:
 ```
-devtools::install_github("raymondlouie/ClusterMarkers", ref = "Dev")
-```
-
-or download the package [here](https://www.dropbox.com/s/9osz2l9txnc2qw5/ClusterMarkers_0.1.3.tar.gz?dl=0) and install it using the following command
-```
-install.packages("~/Downloads/ClusterMarkers_0.1.3.tar.gz", type = "source", repo = NULL)
+devtools::install_github("raymondlouie/MiniMarS", ref = "Dev")
 ```
 
-## Example work flow
+or download the package [here](https://www.dropbox.com/scl/fi/ydsqi464o0delamf5d2en/MiniMarS_0.2.0.tar.gz?rlkey=g3l9rt9dwbjq9kkxi8c1zazi1&dl=0) and install it using the following command
+```
+install.packages("~/Downloads/MiniMarS_0.2.0.tar.gz", type = "source", repo = NULL)
+```
 
-Here is an example of the `ClusterMarkers` work flow to get started:
+## Example workflow
+
+Here is an example of the `MiniMarS` workflow to get started:
 
 Load libraries and example data.
 ```{r}
 # Check to see if packages are installed.
-packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","ClusterMarkers")
+packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","MiniMarS")
 packages_required_not_installed=setdiff(packages_required, rownames(installed.packages()))
 if (length(packages_required_not_installed)>0){
     stop(paste0("Please install packages ",packages_required_not_installed,"\n"))
 }
 
-library(ClusterMarkers)
+library(MiniMarS)
 library(dplyr)
 library(SingleCellExperiment)
 ```
 
-The input data can  either be a i) feature matrix (with cluster vectors), ii) Seurat object or SCE object. 
+The input data can  either be i) a feature matrix (with cluster vectors), ii) a Seurat object or an SCE object. 
 
 Here we use the SCE object included in the package as an example
 ```{r}
@@ -86,7 +86,7 @@ sc_in = processInputFormat(sc_object = sce,
 # Feature matrix with cluster vector example.
 # The 'input_matrix' should be formatted as feature x cell matrix
 input_matrix = sce@assays@data$counts
-# The 'clusters'should be a vector of cell cluster annotations corresponding to each cell (i.e., row of the input_matrix)
+# The 'clusters' should be a vector of cell cluster annotations corresponding to each cell (i.e., the row of the input_matrix)
 clusters = sce$cell_type
 sc_in = processInputFormat(sc_object = input_matrix,
                                clusters_all = clusters,
@@ -95,14 +95,14 @@ sc_in = processInputFormat(sc_object = input_matrix,
 sc_in_all=sc_in                               
 # Seurat input example.
 library(Seurat)
-# Create a seurat object or read in user's own object
+# Create a Seurat object or read in the user's own object
 sc_object = CreateSeuratObject(input_matrix, assay = "Protein")
 Idents(object = sc_object) <- clusters
 sc_in = processInputFormat(sc_object = sc_object,
                            verbose=TRUE)
 ```
 
-Second, we select a subset of clusters (`clusters_sel`) to identify markers for. Default is using all clusters.
+Second, we select a subset of clusters (`clusters_sel`) to identify markers. The default is to use all clusters.
 ```{r}
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
                  "naive thymus-derived CD8-positive, alpha-beta T cell")
@@ -136,7 +136,7 @@ names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in
 list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
 ```
 
-Finally, we  evaulate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
+Finally, we  evaluate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
 ```{r}
 list_performance = performanceAllMarkers(list_markers,
                                          final_out = final_out,
@@ -171,13 +171,28 @@ sessionInfo()
  [1] sp_1.4-6                    SeuratObject_4.1.0          Seurat_4.1.1.9002           SingleCellExperiment_1.16.0
  [5] SummarizedExperiment_1.24.0 Biobase_2.54.0              GenomicRanges_1.46.1        GenomeInfoDb_1.30.0        
  [9] IRanges_2.28.0              S4Vectors_0.32.3            BiocGenerics_0.40.0         MatrixGenerics_1.6.0       
-[13] matrixStats_0.61.0          dplyr_1.0.7                 ClusterMarkers_0.1.0 
+[13] matrixStats_0.61.0          dplyr_1.0.7                 MiniMarS_0.1.0 
+```
+
+<br>
+
+## Using the user's own marker panel
+Under some scenarios, the users may want to test their own customised marker panel instead of the predicted ones. We recommend using the following codes to evaluate the performance of the user's customised marker input.
+```{r}
+user_markers = c("CD80", "CD86", "CD274", "CD273", "CD275", "CD11b", "CD137L", "CD70", "unidentified_marker1","unidentified_marker2")
+own_list_performance = performanceOwnMarkers(user_markers,
+                                         final_out = final_out,
+                                         method = "all",
+                                         nrounds = 1500,
+                                         nthread = 6,
+                                         verbose = TRUE)
+print(own_list_performance)
 ```
 
 <br>
 
 ## Public datasets
-We provide below public datasets for users to try the `ClusterMarkers` package. The datasets all contain protein features as well as either cell annotation or cluster labels from the corresponding papers or websites.
+We provide below public datasets for users to try the `MiniMarS` package. The datasets all contain protein features as well as either cell annotation or cluster labels from the corresponding papers or websites.
 
 ### Dataset 1
 Human bone marrow samples from the BD Rhapsody assay.<br>
