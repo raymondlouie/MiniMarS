@@ -96,6 +96,8 @@ findClusterMarkers <- function (final_out,
 
     list_markers = list()
     runtime_secs <- c()
+    
+    message("TEST")
 
     for (i in 1:length(method)) {
         curr_method = method[[i]]
