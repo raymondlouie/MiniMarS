@@ -92,8 +92,7 @@ performanceMarkers <- function (markers_sel,
                                                  unique_clusters_sample)
 
             performance_df <- calculatePerformance (test_prediction,
-                                                    unique_clusters_sample,
-                                                    method = "precision")
+                                                    unique_clusters_sample)
             performance_cluster_df = performance_df[[1]]
             performance_all_df = performance_df[[2]]
 
@@ -117,8 +116,7 @@ performanceMarkers <- function (markers_sel,
                                                nthread=nthread,
                                                ...)
             performance_df <- calculatePerformance (test_prediction,
-                                                    unique_clusters_sample,
-                                                    method = "precision")
+                                                    unique_clusters_sample)
             performance_cluster_df = performance_df[[1]]
             performance_all_df = performance_df[[2]]
 
