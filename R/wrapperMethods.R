@@ -111,8 +111,8 @@ sc2markerWrapper <- function (input_matrix,
     seurat_object = Seurat::CreateSeuratObject(input_matrix,
                                                meta.data =data.frame(cell_type=clusters) )
     Seurat::Idents(object = seurat_object)=clusters
-    seruat_object@assays$RNA@counts = input_matrix
-    seruat_object@assays$RNA@data = input_matrix
+    seurat_object@assays$RNA@counts = input_matrix
+    seurat_object@assays$RNA@data = input_matrix
     
     message("here2")
     
