@@ -106,6 +106,8 @@ sc2markerWrapper <- function (input_matrix,
                               ...){
 
   message("here")
+  print(dim(input_matrix))
+  print(table(clusters))
     seurat_object = Seurat::CreateSeuratObject(input_matrix,
                                                meta.data =data.frame(cell_type=clusters) )
     Seurat::Idents(object = seurat_object)=clusters
