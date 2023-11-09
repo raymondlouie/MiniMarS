@@ -105,19 +105,19 @@ sc2markerWrapper <- function (input_matrix,
                               num_markers=15,
                               ...){
 
-  message("here")
+  # message("here")
   print(dim(input_matrix))
   print(table(clusters))
     seurat_object = Seurat::CreateSeuratObject(input_matrix,
                                                meta.data =data.frame(cell_type=clusters) )
     Seurat::Idents(object = seurat_object)=clusters
-    seurat_object@assays$RNA@counts = input_matrix
-    seurat_object@assays$RNA@data = input_matrix
+    # seurat_object@assays$RNA@counts = input_matrix
+    # seurat_object@assays$RNA@data = input_matrix
     
-    message("here2")
+    # message("here2")
     
     all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
-    message("here3")
+    # message("here3")
     
     unique_clusters = names(all.markers)
     num_clusters = length(unique_clusters)
