@@ -63,6 +63,7 @@ seuratWrapper <- function (input_matrix,
     Seurat::Idents(object = seurat_object)=clusters
 
     markers_df = Seurat::FindAllMarkers(seurat_object,
+                                        slot="counts",
                                         test.use = method,
                                         only.pos=TRUE)
 
