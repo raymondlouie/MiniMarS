@@ -116,9 +116,10 @@ sc2markerWrapper <- function (input_matrix,
     
     # message("here2")
     
-    all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
+    # all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
     # message("here3")
-    
+    all.markers = "test"
+    print("here")
     unique_clusters = names(all.markers)
     num_clusters = length(unique_clusters)
 
