@@ -106,57 +106,63 @@ sc2markerWrapper <- function (input_matrix,
                               num_markers=15,
                               ...){
 
+
   # message("here")
   print(dim(input_matrix))
   print(table(clusters))
-    seurat_object = Seurat::CreateSeuratObject(input_matrix,
-                                               meta.data =data.frame(cell_type=clusters) )
-    Seurat::Idents(object = seurat_object)=clusters
-    # seurat_object@assays$RNA@counts = input_matrix
-    # seurat_object@assays$RNA@data = input_matrix
-    
-    # message("here2")
-    
-    all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
-    # message("here3")
-    # all.markers = "test"
-    # print("here")
-    unique_clusters = names(all.markers)
-    num_clusters = length(unique_clusters)
 
-    # old code
-    # list_markers= list()
-    # for (i in 1:num_markers){
-    #     ii = (i-1) %% num_clusters
-    #     curr_df = all.markers[[ii+1]]
-    #     curr_df = curr_df[which(curr_df$direction %in% "+"),]
-    #     index_remove = which(curr_df$gene %in% unlist(list_markers))
-    #     if (length(index_remove)>0){
-    #         curr_df = curr_df[-index_remove,]
-    #     }
-    #     list_markers[[i]] = curr_df$gene[[1]]
-    # }
-    message(num_markers)
-    icount=1
-    list_markers= list()
-    for (i in 1:num_markers){
-        ii = (i-1) %% num_clusters
-        curr_df = all.markers[[ii+1]]
-        curr_df = curr_df[which(curr_df$direction %in% "+"),]
-        index_remove = which(curr_df$gene %in% unlist(list_markers))
-        if (length(index_remove)>0){
-            curr_df = curr_df[-index_remove,]
-        }
-        message(i)
-        message(paste(curr_df$gene,collapse=", "))
-        # message(paste0(capture.output(curr_df), collapse = "\n"))
-        # print(curr_df)
-        if (dim(curr_df)[1]>0){
-            list_markers[[icount]] = curr_df$gene[[1]]
-            icount=icount+1
-        }
-    }
-    return(unlist(list_markers))
+  seurat_object = Seurat::CreateSeuratObject(input_matrix,
+                                             meta.data =data.frame(cell_type=clusters) )
+  # print("here2")
+
+  Seurat::Idents(object = seurat_object)=clusters
+  # seurat_object@assays$RNA@counts = input_matrix
+  # seurat_object@assays$RNA@data = input_matrix
+
+  # message("here2")
+
+  all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
+  
+  # message("here3")
+  # all.markers = "test"
+  # print("here")
+
+  unique_clusters = names(all.markers)
+  num_clusters = length(unique_clusters)
+
+  # old code
+  # list_markers= list()
+  # for (i in 1:num_markers){
+  #     ii = (i-1) %% num_clusters
+  #     curr_df = all.markers[[ii+1]]
+  #     curr_df = curr_df[which(curr_df$direction %in% "+"),]
+  #     index_remove = which(curr_df$gene %in% unlist(list_markers))
+  #     if (length(index_remove)>0){
+  #         curr_df = curr_df[-index_remove,]
+  #     }
+  #     list_markers[[i]] = curr_df$gene[[1]]
+  # }
+  message(num_markers)
+  icount=1
+  list_markers= list()
+  for (i in 1:num_markers){
+      ii = (i-1) %% num_clusters
+      curr_df = all.markers[[ii+1]]
+      curr_df = curr_df[which(curr_df$direction %in% "+"),]
+      index_remove = which(curr_df$gene %in% unlist(list_markers))
+      if (length(index_remove)>0){
+          curr_df = curr_df[-index_remove,]
+      }
+      message(i)
+      message(paste(curr_df$gene,collapse=", "))
+      # message(paste0(capture.output(curr_df), collapse = "\n"))
+      # print(curr_df)
+      if (dim(curr_df)[1]>0){
+          list_markers[[icount]] = curr_df$gene[[1]]
+          icount=icount+1
+      }
+  }
+  return(unlist(list_markers))
 
 }
 
