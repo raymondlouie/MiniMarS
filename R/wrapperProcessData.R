@@ -175,7 +175,7 @@ processClusterSelection =function(sc_out,
 #'   \item \code{test_clusters_num}:
 #' }
 #' @export
-processSubsampling =function(cluster_selection_out,
+processSubsamplingOLD =function(cluster_selection_out,
                              subsample_num=1000,
                              train_test_ratio = 0.5,
                              cluster_proportion= "proportional",
@@ -330,7 +330,7 @@ processSubsampling =function(cluster_selection_out,
 #'   \item \code{test_clusters_num}:
 #' }
 #' @export
-processSubsampling2 =function(cluster_selection_out,
+processSubsampling =function(cluster_selection_out,
                               subsample_num=1000,
                               # train_test_ratio = 0.5,
                               cluster_proportion= "proportional",
