@@ -15,7 +15,7 @@
 #' @export
 performanceAllMarkers <- function (list_markers,
                                    final_out,
-                                   method="all",
+                                   method="xgBoost",
                                    nrounds=1500,
                                    nthread=6,
                                    testSet = "test",
