@@ -1,6 +1,6 @@
 # MiniMarS
  
-MiniMarS finds the markers that best define a cluster, using a number of different pre-existing methods.
+MiniMarS finds the protein markers that best define biological clusters, using a number of different pre-existing methods for marker selection.
 
 ## Installation
 
@@ -54,7 +54,7 @@ install.packages("~/Downloads/MiniMarS_0.3.0.tar.gz", type = "source", repos = N
 
 Here is an example of the `MiniMarS` workflow to get started:
 
-Load libraries and example data.
+### Load libraries and process the input data in three different formats.
 ```{r}
 # Check to see if packages are installed.
 packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","MiniMarS")
@@ -68,7 +68,7 @@ library(dplyr)
 library(SingleCellExperiment)
 ```
 
-The input data can  either be i) a feature matrix (with cluster vectors), ii) a Seurat object or an SCE object. 
+The input data can be i) an SCE object, ii) a matrix of features and a vector of biological cluster labels, or iii) a Seurat object. 
 
 Here we use the SCE object included in the package as an example
 ```{r}
@@ -76,33 +76,32 @@ Here we use the SCE object included in the package as an example
 data(sce)
 ```
 
-First, we convert the input to the desired format required for downstream analysis, showing all three input data examples:
+### Convert the input to the desired format. 
+It's required for downstream analysis, showing input data in three different formats:
 ```{r}
-# SCE input example. 
+## Example i) SCE object. 
 sc_in = processInputFormat(sc_object = sce,
-                           sce_cluster = "cell_type",
+                           sce_cluster = "cell_type", #pre-defined in the SCE object
                            verbose = TRUE)
                                
-# Feature matrix with cluster vector example.
-# The 'input_matrix' should be formatted as feature x cell matrix
+## Example ii) Feature matrix (feature x cell) and a vector of biological cluster labels for each cell (the length of this vector should be the same as the number of columns of the input_matrix).
 input_matrix = sce@assays@data$counts
-# The 'clusters' should be a vector of cell cluster annotations corresponding to each cell (i.e., the row of the input_matrix)
 clusters = sce$cell_type
 sc_in = processInputFormat(sc_object = input_matrix,
                                clusters_all = clusters,
                                verbose = TRUE)
 
 sc_in_all=sc_in                               
-# Seurat input example.
+## Example iii) Seurat object.
 library(Seurat)
-# Create a Seurat object or read in the user's own object
+# Create a Seurat object
 sc_object = CreateSeuratObject(input_matrix, assay = "Protein")
 Idents(object = sc_object) <- clusters
 sc_in = processInputFormat(sc_object = sc_object,
                            verbose=TRUE)
 ```
 
-Second, we select a subset of clusters (`clusters_sel`) to identify markers. The default is to use all clusters.
+### Select a subset of clusters (`clusters_sel`) to identify markers. The default is to use all clusters.
 ```{r}
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
                  "naive thymus-derived CD8-positive, alpha-beta T cell")
@@ -112,17 +111,17 @@ cluster_selection_out= processClusterSelection(sc_in,
                                                verbose = TRUE)
 ```   
 
-Third, we i) sub-sample  the data, and ii) divide the data into a training and test set.
+### Sub-sample and divide the dataset into training, validation, and testing sets.
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
                                subsample_num = 1000,
-                               train_test_ratio = 0.9,
                                cluster_proportion = "proportional",
                                verbose = TRUE,
                                seed = 8)
 ```
 
-Fourth, we now find the markers to identify the clusters. There are four methods implemented to identify the clusters using the `method` argument:  "citeFUSE", "sc2marker", "geneBasis" and "xgBoost". The default option is to use "all" methods. 
+### Find the markers to identify the clusters. 
+Several methods implemented to find markers for identifying the clusters using the `method` argument: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". The default option is to use "all" methods. The methods with "consensus_" naming return an integration of results from several methods run.
 ```{r}
 list_markers_time = findClusterMarkers(final_out$training_matrix,
                                   final_out$training_clusters,
@@ -136,23 +135,26 @@ names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in
 list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
 ```
 
-Finally, we  evaluate the performance of the markers using the test data. There are two methods implemented to test the performance using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "all" methods. 
+### Evaluate the performance of the markers using the testing set. 
+There are two methods implemented to assess the performance of each marker selection method using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "xgBoost". 
 ```{r}
 list_performance = performanceAllMarkers(list_markers,
                                          final_out = final_out,
-                                         method = "all",
+                                         method = "xgBoost",
                                          nrounds = 1500,
                                          nthread = 6,
+                                         testSet = "test",
                                          verbose = TRUE)
 ```
 
-We can print out the identified markers and their performance:
+### Print out the identified markers and their performance.
 ```{r}
 library(ggplot2)
 
 plotMarkers(list_markers)
 plotPerformance(list_performance)
 
+## Visualisation
 library(RColorBrewer)
 plotExpression(list_markers,
                    sc_in_all,
