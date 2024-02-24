@@ -281,6 +281,9 @@ findClusterMarkers <- function (final_out,
         list_markers[[i]] = intersect(names(fstat),list_markers[[i]])
        
     }
+    
+    list_markers[["runtime_secs"]] <- runtime_secs
+    
     return(list_markers)
     
 }
