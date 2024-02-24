@@ -97,7 +97,10 @@ findClusterMarkers <- function (final_out,
     list_markers = list()
     runtime_secs <- c()
     
-    message("TEST")
+    # message("TEST")
+    
+    fstat=apply(t(input_matrix),2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
+    fstat <- fstat[order(unlist(fstat), decreasing = T)]
     
     for (i in 1:length(method)) {
         curr_method = method[[i]]
@@ -176,6 +179,9 @@ findClusterMarkers <- function (final_out,
             names(runtime_secs)[i] <- curr_method
             
         }
+        
+        # Order markers according to fstat
+        curr_markers = intersect(names(fstat),curr_markers)
         
         list_markers[[curr_method]] = curr_markers
         
