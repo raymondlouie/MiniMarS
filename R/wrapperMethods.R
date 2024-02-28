@@ -7,6 +7,7 @@
 #' @export
 citeFuseWrapper <- function (sce,
                              num_markers=15,
+                             min_freq=3,
                              ...){
 
     # Remove cells with very low library size, which causes issues in CiteFuse
@@ -21,7 +22,7 @@ citeFuseWrapper <- function (sce,
 
     table_df = data.frame(table(sce$cell_type))
 
-    cell_remove_type = table_df$Var1[which(table_df$Freq<5)]
+    cell_remove_type = table_df$Var1[which(table_df$Freq < min_freq)]
     index_remove= which(sce$cell_type %in% cell_remove_type)
 
     if (length(index_remove)>0){
