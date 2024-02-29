@@ -7,6 +7,7 @@
 #'   \item \code{sc2marker}
 #'   \item \code{geneBasis}
 #'   \item \code{xgBoost}
+#'   \item \code{seurat}
 #'   \item \code{all}: Use all methods
 #' }
 #'
