@@ -27,7 +27,7 @@ devtools::install_github("MarioniLab/geneBasisR")
 install.packages('Seurat')
 
 # xgboost
-install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
+install.packages("xgboost")
 
 # SingleCellExperiment
 if (!require("BiocManager", quietly = TRUE))
