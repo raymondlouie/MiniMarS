@@ -123,8 +123,7 @@ final_out = processSubsampling(cluster_selection_out,
 ### Find the markers to identify the clusters. 
 Several methods implemented to find markers for identifying the clusters using the `method` argument: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". The default option is to use "all" methods. The methods with "consensus_" naming return an integration of results from several methods run.
 ```{r}
-list_markers_time = findClusterMarkers(final_out$training_matrix,
-                                  final_out$training_clusters,
+list_markers_time = findClusterMarkers(final_out,
                                   num_markers = 15,
                                   method = "all",
                                   verbose = TRUE)
