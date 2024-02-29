@@ -27,7 +27,7 @@ devtools::install_github("MarioniLab/geneBasisR")
 install.packages('Seurat')
 
 # xgboost
-install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
+install.packages("xgboost")
 
 # SingleCellExperiment
 if (!require("BiocManager", quietly = TRUE))
@@ -38,7 +38,7 @@ BiocManager::install("SingleCellExperiment")
 install.packages("dplyr")
 ```
 
-### Installation of MiniMarS
+### Install `MiniMarS`
 
 Please run the following to install the `MiniMarS` package from the Development branch:
 ```
@@ -50,13 +50,11 @@ or download the package [here](https://www.dropbox.com/scl/fi/2ngr7k6jmu5s9kwsyn
 install.packages("~/Downloads/MiniMarS_0.3.0.tar.gz", type = "source", repos = NULL)
 ```
 
-## Example workflow
+## Standard `MiniMarS` workflow
 
-Here is an example of the `MiniMarS` workflow to get started:
-
-### Load libraries and process the input data in three different formats.
+### Load the libraries
 ```{r}
-# Check to see if packages are installed.
+# Check to see if all the packages are installed.
 packages_required = c("CiteFuse","sc2marker","geneBasisR","xgboost","dplyr","MiniMarS")
 packages_required_not_installed=setdiff(packages_required, rownames(installed.packages()))
 if (length(packages_required_not_installed)>0){
@@ -68,44 +66,46 @@ library(dplyr)
 library(SingleCellExperiment)
 ```
 
-The input data can be i) an SCE object, ii) a matrix of features and a vector of biological cluster labels, or iii) a Seurat object. 
+### Convert the input data to the desired format. 
+The input data can be i) an SCE object, ii) a matrix of features and a vector of cell type annotations, or iii) a Seurat object. 
 
-Here we use the SCE object included in the package as an example
 ```{r}
-# Load the dataset
-data(sce)
+# Load the data
 ```
 
-### Convert the input to the desired format. 
-It's required for downstream analysis, showing input data in three different formats:
+#### i) If you have a SCE object:
 ```{r}
-## Example i) SCE object. 
 sc_in = processInputFormat(sc_object = sce,
                            sce_cluster = "cell_type", #pre-defined in the SCE object
                            verbose = TRUE)
+```
                                
-## Example ii) Feature matrix (feature x cell) and a vector of biological cluster labels for each cell (the length of this vector should be the same as the number of columns of the input_matrix).
-input_matrix = sce@assays@data$counts
-clusters = sce$cell_type
+####  ii) If you have a Feature matrix (feature x cell) and a vector of cell type annotations for each cell (the length of this vector should be the same as the number of columns of the input_matrix):
+```{r}
+input_matrix = object@assays@data$counts
+clusters = object$cell_type 
 sc_in = processInputFormat(sc_object = input_matrix,
                                clusters_all = clusters,
                                verbose = TRUE)
-
-sc_in_all=sc_in                               
-## Example iii) Seurat object.
+```
+                               
+####  iii) If you have a Seurat object:
+```{r}
 library(Seurat)
-# Create a Seurat object
-sc_object = CreateSeuratObject(input_matrix, assay = "Protein")
-Idents(object = sc_object) <- clusters
-sc_in = processInputFormat(sc_object = sc_object,
+
+# Set identity class for your Seurat object to the column that includes the cell type annotations for each cell.
+Idents(seurat_object) <- seurat_object$cell_type
+
+clusters <- Idents(object = seurat_object)
+sc_in = processInputFormat(sc_object = seurat_object,
                            verbose=TRUE)
 ```
 
-### Select a subset of clusters (`clusters_sel`) to identify markers. The default is to use all clusters.
+### Select the clusters (`clusters_sel`) you want to identify the markers for. 
 ```{r}
+# If 'clusters_sel' is not defined, then the default is to use all clusters.
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
                  "naive thymus-derived CD8-positive, alpha-beta T cell")
-
 cluster_selection_out= processClusterSelection(sc_in,
                                                clusters_sel = clusters_sel,
                                                verbose = TRUE)
@@ -147,7 +147,7 @@ list_performance = performanceAllMarkers(list_markers,
                                          verbose = TRUE)
 ```
 
-### Print out the identified markers and their performance.
+### Visualise the identified markers and their performance.
 ```{r}
 library(ggplot2)
 
@@ -157,11 +157,11 @@ plotPerformance(list_performance)
 ## Visualisation
 library(RColorBrewer)
 plotExpression(list_markers,
-                   sc_in_all,
+                   sc_in,
                    plot_type="violin")
 
 plotExpression(list_markers,
-                   sc_in_all,
+                   sc_in,
                    plot_type="umap")
 ```
 
