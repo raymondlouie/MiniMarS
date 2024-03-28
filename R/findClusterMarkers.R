@@ -7,6 +7,7 @@
 #'   \item \code{sc2marker}
 #'   \item \code{geneBasis}
 #'   \item \code{xgBoost}
+#'   \item \code{seurat}
 #'   \item \code{all}: Use all methods
 #' }
 #'
@@ -97,7 +98,9 @@ findClusterMarkers <- function (final_out,
     list_markers = list()
     runtime_secs <- c()
     
-    message("TEST")
+    # message("TEST")
+    
+ 
     
     for (i in 1:length(method)) {
         curr_method = method[[i]]
@@ -176,6 +179,8 @@ findClusterMarkers <- function (final_out,
             names(runtime_secs)[i] <- curr_method
             
         }
+        
+        
         
         list_markers[[curr_method]] = curr_markers
         
@@ -267,6 +272,15 @@ findClusterMarkers <- function (final_out,
         
         
         
+    }
+    
+    fstat=apply(t(input_matrix),2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
+    fstat <- fstat[order(unlist(fstat), decreasing = T)]
+    
+    for (i in 1:length(list_markers)){
+        # Order markers according to fstat
+        list_markers[[i]] = intersect(names(fstat),list_markers[[i]])
+       
     }
     
     list_markers[["runtime_secs"]] <- runtime_secs
