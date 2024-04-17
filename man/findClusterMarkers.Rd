@@ -17,7 +17,7 @@ findClusterMarkers(input_matrix, clusters, num_markers = 15, method = "all")
 \itemize{
   \item \code{citeFUSE}
   \item \code{sc2marker}
-  \item \code{geneBasistest}
+  \item \code{geneBasis}
   \item \code{all}: Use all methods
 }}
 }
