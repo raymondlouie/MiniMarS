@@ -23,6 +23,8 @@
 findClusterMarkers <- function (final_out,
                                 num_markers = 15,
                                 method = "all",
+                                metric_thres = 0,
+                                metric_topnum = 2,
                                 verbose = FALSE,
                                 ...) {
     
@@ -216,6 +218,19 @@ findClusterMarkers <- function (final_out,
         list_weight_num = as.numeric(list_weight)
         list_weight_num= list_weight_num/sum(list_weight_num)
         names(list_weight_num) = names(list_performance_valid)
+        
+        names(list_weight) <- names(list_performance_valid)
+        v_weight <- do.call(c, list_weight)
+        topMethods <- names(v_weight[order(v_weight, decreasing = T)][1:min(metric_topnum,length(v_weight))])
+        thresMethods = names(v_weight)[which(v_weight>metric_thres)]
+        keepMethods = intersect(topMethods,thresMethods)
+        
+        ##only use marker sets from top two methods (with the highest chosen_measure)
+        list_markers_temp <- list_markers_temp[names(list_markers_temp) %in% keepMethods]
+        
+        #the weight vector needs to be adjusted accordingly
+        list_weight_num <- list_weight_num[names(list_weight_num) %in% keepMethods]
+        
         
         if (verbose){
             message(paste0("Weighted list is ", list_weight_num))
