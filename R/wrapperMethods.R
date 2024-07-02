@@ -327,7 +327,7 @@ calculateConsensus <- function (list_markers,
     
     table_compare = data.frame(table(total_df$markers))
     table_compare = table_compare[order(table_compare$Freq,decreasing=TRUE),]
-    table_compare$finalAdd = table_compare$Var1
+    table_compare$finalAdd = table_compare$Freq
     # rownames(table_compare) = NULL
     table_temp = table_compare
     
@@ -424,7 +424,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
                                     # method = "fstat",
                                     chosen_measure= "F1_macro",
                                     metric_thres = 0,
-                                    metric_topnum = 2,
+                                    metric_topnum = 20,
                                     verbose=TRUE,
                                     ...){
     
@@ -436,6 +436,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     list_performance_valid = performanceAllMarkers(list_markers_temp,
                                                    final_out=final_out,
                                                    # method="all",
+                                                   num_markers=num_markers,
                                                    nrounds=1500,
                                                    nthread=6,
                                                    testSet = "valid",
