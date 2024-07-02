@@ -431,6 +431,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     input_matrix = t(as.matrix(final_out$training_matrix))
     
     i = 1
+    runtime_secs = list()
     start_time <- Sys.time()
     
     list_performance_valid = performanceAllMarkers(list_markers_temp,
