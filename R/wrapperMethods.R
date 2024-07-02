@@ -425,6 +425,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
                                     chosen_measure= "F1_macro",
                                     metric_thres = 0,
                                     metric_topnum = 2,
+                                    verbose=TRUE,
                                     ...){
     
     input_matrix = t(as.matrix(final_out$training_matrix))
