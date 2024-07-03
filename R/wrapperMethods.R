@@ -430,7 +430,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     
     input_matrix = t(as.matrix(final_out$training_matrix))
     
-  
+    
     
     list_performance_valid = performanceAllMarkers(list_markers_temp,
                                                    final_out=final_out,
@@ -475,6 +475,11 @@ calculateConsensus_wrap <- function(list_markers_temp,
     topMethods <- names(v_weight[order(v_weight, decreasing = T)][1:min(metric_topnum,length(v_weight))])
     thresMethods = names(v_weight)[which(v_weight>metric_thres)]
     keepMethods = intersect(topMethods,thresMethods)
+    
+    if (length(keepMethods)==0){
+        keepMethods = names(v_weight[order(v_weight, decreasing = T)][1:min(1,length(v_weight))])
+        message(paste0("No methods passed threshold. Choosing top method: ",keepMethods))
+    }
     
     ##only use marker sets from top two methods (with the highest chosen_measure)
     list_markers_temp <- list_markers_temp[names(list_markers_temp) %in% keepMethods]
