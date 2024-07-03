@@ -430,9 +430,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     
     input_matrix = t(as.matrix(final_out$training_matrix))
     
-    i = 1
-    runtime_secs = list()
-    start_time <- Sys.time()
+  
     
     list_performance_valid = performanceAllMarkers(list_markers_temp,
                                                    final_out=final_out,
@@ -489,6 +487,9 @@ calculateConsensus_wrap <- function(list_markers_temp,
         message(paste0("Weighted list is ", list_weight_num))
     }
     
+    i = 1
+    runtime_secs = list()
+    start_time <- Sys.time()
     
     list_markers[["consensus_weighted"]] = calculateConsensus(list_markers_temp,
                                                               t(input_matrix),
