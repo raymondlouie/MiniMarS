@@ -441,6 +441,10 @@ calculateConsensus_wrap <- function(list_markers_temp,
                                                        nthread=6,
                                                        testSet = "valid",
                                                        verbose=FALSE)
+        message("Validation list manually created")
+        
+    } else{
+        message("Validation list provided")
         
     }
     clusters = final_out$training_clusters
