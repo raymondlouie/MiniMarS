@@ -423,6 +423,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
                                     num_markers=num_markers,
                                     # method = "fstat",
                                     chosen_measure= "F1_macro",
+                                    list_performance_valid=0,
                                     metric_thres = 0,
                                     metric_topnum = 20,
                                     verbose=TRUE,
@@ -431,16 +432,17 @@ calculateConsensus_wrap <- function(list_markers_temp,
     input_matrix = t(as.matrix(final_out$training_matrix))
     
     
-    
-    list_performance_valid = performanceAllMarkers(list_markers_temp,
-                                                   final_out=final_out,
-                                                   # method="all",
-                                                   num_markers=num_markers,
-                                                   nrounds=1500,
-                                                   nthread=6,
-                                                   testSet = "valid",
-                                                   verbose=FALSE)
-    
+    if (list_performance_valid==0){
+        list_performance_valid = performanceAllMarkers(list_markers_temp,
+                                                       final_out=final_out,
+                                                       # method="all",
+                                                       num_markers=num_markers,
+                                                       nrounds=1500,
+                                                       nthread=6,
+                                                       testSet = "valid",
+                                                       verbose=FALSE)
+        
+    }
     clusters = final_out$training_clusters
     
     if (length(clusters) != dim(input_matrix)[2]) {
