@@ -423,7 +423,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
                                     num_markers=num_markers,
                                     # method = "fstat",
                                     chosen_measure= "F1_macro",
-                                    list_performance_valid=0,
+                                    list_performance_valid=NA,
                                     metric_thres = 0,
                                     metric_topnum = 20,
                                     verbose=TRUE,
@@ -432,7 +432,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     input_matrix = t(as.matrix(final_out$training_matrix))
     
     
-    if (list_performance_valid==0){
+    if (is.na(list_performance_valid){
         list_performance_valid = performanceAllMarkers(list_markers_temp,
                                                        final_out=final_out,
                                                        # method="all",
