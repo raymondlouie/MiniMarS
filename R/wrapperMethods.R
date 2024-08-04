@@ -484,8 +484,18 @@ calculateConsensus_wrap <- function(list_markers_temp,
     
     if (length(keepMethods)==0){
         keepMethods = names(v_weight[order(v_weight, decreasing = T)][1:min(1,length(v_weight))])
-        message(paste0("No methods passed threshold. Choosing top method: ",keepMethods))
+        # message(paste0("No methods passed threshold. Choosing top method: ",keepMethods))
+        message(paste0("No methods passed threshold. Choosing top method"))
+        
+        # } else{
+        # message(paste("Methods used to calculate consensus:",keepMethods,collapse=", "))
+        
     }
+    message(paste("Methods used to calculate consensus:",keepMethods, " with measure ",
+                  chosen_measure, ", threshold: ",
+                  metric_thres, " and keeping the top ",metric_topnum, " methods."
+                  collapse=", "))
+    
     
     ##only use marker sets from top two methods (with the highest chosen_measure)
     list_markers_temp <- list_markers_temp[names(list_markers_temp) %in% keepMethods]
