@@ -491,12 +491,13 @@ calculateConsensus_wrap <- function(list_markers_temp,
         # message(paste("Methods used to calculate consensus:",keepMethods,collapse=", "))
         
     }
-    message(paste("Methods used to calculate consensus:",keepMethods, " with measure ",
+    message(paste0("Methods used to calculate consensus using measure ",
                   chosen_measure, ", threshold: ",
                   metric_thres, 
                   " and keeping the top ",
                   metric_topnum, 
-                  " methods.",
+                  " methods: ",
+                  keepMethods,
                   collapse=", "))
     
     
@@ -508,7 +509,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     
     
     if (verbose){
-        message(paste0("Weighted list is ", list_weight_num))
+        message(paste0("Weighted list is ", list_weight_num, collapse=", "))
     }
     
     i = 1
