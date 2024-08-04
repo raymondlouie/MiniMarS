@@ -493,7 +493,10 @@ calculateConsensus_wrap <- function(list_markers_temp,
     }
     message(paste("Methods used to calculate consensus:",keepMethods, " with measure ",
                   chosen_measure, ", threshold: ",
-                  metric_thres, " and keeping the top ",metric_topnum, " methods."
+                  metric_thres, 
+                  " and keeping the top ",
+                  metric_topnum, 
+                  " methods.",
                   collapse=", "))
     
     
