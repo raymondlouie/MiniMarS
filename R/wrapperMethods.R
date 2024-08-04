@@ -497,8 +497,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
                   " and keeping the top ",
                   metric_topnum, 
                   " methods: ",
-                  keepMethods,
-                  collapse=", "))
+                  paste0(keepMethods,collapse=", ")))
     
     
     ##only use marker sets from top two methods (with the highest chosen_measure)
@@ -509,7 +508,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     
     
     if (verbose){
-        message(paste0("Weighted list is ", list_weight_num, collapse=", "))
+        message(paste0("Weighted list is ", paste0(list_weight_num, collapse=", ")))
     }
     
     i = 1
