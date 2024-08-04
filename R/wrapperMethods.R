@@ -478,6 +478,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     
     names(list_weight) <- names(list_performance_valid)
     v_weight <- do.call(c, list_weight)
+    num_total_methods = length(v_weight)
     topMethods <- names(v_weight[order(v_weight, decreasing = T)][1:min(metric_topnum,length(v_weight))])
     thresMethods = names(v_weight)[which(v_weight>metric_thres)]
     keepMethods = intersect(topMethods,thresMethods)
@@ -495,7 +496,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
                   chosen_measure, ", threshold: ",
                   metric_thres, 
                   " and keeping the top ",
-                  metric_topnum, 
+                  min(metric_topnum,num_total_methods), 
                   " methods: ",
                   paste0(keepMethods,collapse=", ")))
     
@@ -507,9 +508,9 @@ calculateConsensus_wrap <- function(list_markers_temp,
     list_weight_num <- list_weight_num[names(list_weight_num) %in% keepMethods]
     
     
-    if (verbose){
-        message(paste0("Weighted list is ", paste0(list_weight_num, collapse=", ")))
-    }
+    # if (verbose){
+    #     message(paste0("Weighted list is ", paste0(list_weight_num, collapse=", ")))
+    # }
     
     i = 1
     runtime_secs = list()
