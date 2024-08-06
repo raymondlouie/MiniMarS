@@ -45,9 +45,9 @@ Please run the following to install the `MiniMarS` package from the Development 
 devtools::install_github("raymondlouie/MiniMarS", ref = "Dev")
 ```
 
-or download the package [here](https://www.dropbox.com/scl/fi/2ngr7k6jmu5s9kwsyndy1/MiniMarS_0.3.0.tar.gz?rlkey=9q9zzr2f2azphle1eevfomhe8&dl=0) and install it using the following command
+or download the package [here](https://www.dropbox.com/scl/fi/2vk9wy1j1tw7j2vutzp2q/MiniMarS_0.3.1.tar.gz?rlkey=kt5dj2oqyozwn9u82v6d9mhhz&dl=0) and install it using the following command
 ```
-install.packages("~/Downloads/MiniMarS_0.3.0.tar.gz", type = "source", repos = NULL)
+install.packages("~/Downloads/MiniMarS_0.3.1.tar.gz", type = "source", repos = NULL)
 ```
 
 ## Standard `MiniMarS` workflow
