@@ -2,7 +2,7 @@ Package: MiniMarS
 Type: Package
 Title: Identifying the minimal number of protein markers for cell type
         annotation by consensus-based methods
-Version: 0.3.0
+Version: 0.3.1
 Author: Dhruti Parikh, Angli Xue, Hsiao-Chi Liao, Felix Marsh-Wakefield, Raymond Hall Yip Louie
 Maintainer: Raymond Louie <raylouie@hotmail.com>
 Description: MiniMarS finds the markers that best define a cluster, using a number of existing and newly developed methods.
@@ -12,4 +12,4 @@ LazyData: true
 RoxygenNote: 7.1.2
 Depends: R (>= 2.10)
 NeedsCompilation: no
-Packaged: 2024-01-25 02:33:02 UTC; anglix
+Packaged: 2024-08-06 03:55:40 UTC; angli
