@@ -44,14 +44,14 @@ citeFuseWrapper <- function (sce,
 }
 
 
-#' Wrapper function for sc2marker
+#' Wrapper function for Seurat
 #'
 #' @param input_matrix Marker matrix (cell vs markers)
 #' @param clusters Cell type annotation
 #' @param num_markers Number of markers to output
-#' @param method Differential algorithm
+#' @param method Differential algorithm used in Seruat's FindAllMarkers
 #'
-#' @return The most informative markers determined by sc2marker
+#' @return The most informative markers determined by Seurat, based on FC
 #' @export
 seuratWrapper <- function (input_matrix,
                            clusters,
@@ -131,19 +131,7 @@ sc2markerWrapper <- function (input_matrix,
     unique_clusters = names(all.markers)
     num_clusters = length(unique_clusters)
     
-    # old code
-    # list_markers= list()
-    # for (i in 1:num_markers){
-    #     ii = (i-1) %% num_clusters
-    #     curr_df = all.markers[[ii+1]]
-    #     curr_df = curr_df[which(curr_df$direction %in% "+"),]
-    #     index_remove = which(curr_df$gene %in% unlist(list_markers))
-    #     if (length(index_remove)>0){
-    #         curr_df = curr_df[-index_remove,]
-    #     }
-    #     list_markers[[i]] = curr_df$gene[[1]]
-    # }
-    message(num_markers)
+     message(num_markers)
     icount=1
     list_markers= list()
     for (i in 1:num_markers){
@@ -156,8 +144,7 @@ sc2markerWrapper <- function (input_matrix,
         }
         message(i)
         message(paste(curr_df$gene,collapse=", "))
-        # message(paste0(capture.output(curr_df), collapse = "\n"))
-        # print(curr_df)
+
         if (dim(curr_df)[1]>0){
             list_markers[[icount]] = curr_df$gene[[1]]
             icount=icount+1
