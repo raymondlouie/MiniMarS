@@ -156,7 +156,7 @@ processClusterSelection =function(sc_out,
 
 #' Sub-sample and split data into training and test set
 #'
-#' @param Output of function `processInputFormat`.
+#' @param cluster_selection_out Output of `processInputFormat`.
 #' @param subsample_num Number of cells after sub-sammpling.
 #' @param train_test_ratio Training to test data ratio.
 #' @param cluster_proportion
@@ -311,9 +311,8 @@ processSubsamplingOLD =function(cluster_selection_out,
 
 #' Sub-sample and split data into training and test set
 #'
-#' @param Output of function `processInputFormat`.
+#' @param cluster_selection_out Output of function `processInputFormat`.
 #' @param subsample_num Number of cells after sub-sammpling.
-#' @param train_test_ratio Training to test data ratio.
 #' @param cluster_proportion
 #' \itemize{
 #'   \item \code{proportional:} (default) Same proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
@@ -325,6 +324,9 @@ processSubsamplingOLD =function(cluster_selection_out,
 #'   \item \code{training_matrix}:
 #'   \item \code{training_clusters}:
 #'   \item \code{training_clusters_num}:
+#'   \item \code{validation_matrix}:
+#'   \item \code{validation_clusters}:
+#'   \item \code{validation_clusters_num}:
 #'   \item \code{test_matrix}:
 #'   \item \code{test_clusters}:
 #'   \item \code{test_clusters_num}:
@@ -332,7 +334,6 @@ processSubsamplingOLD =function(cluster_selection_out,
 #' @export
 processSubsampling =function(cluster_selection_out,
                               subsample_num=1000,
-                              # train_test_ratio = 0.5,
                               cluster_proportion= "proportional",
                               verbose=TRUE,
                               seed = 8,
@@ -382,13 +383,6 @@ processSubsampling =function(cluster_selection_out,
     for (i in 1:length(unique_clusters_all)){
         curr_cluster = unique_clusters_all[[i]]
         index_temp= which(clusters_all %in% curr_cluster)
-
-        # Sub-sample training
-        # sample_training = sample(length(index_temp),
-        #                      subsample_num,
-        #                      replace=FALSE)
-        #
-        # index_training_temp = index_temp[sample_training]
 
         # sub-sample training
         sample_index_training = sample(length(index_temp),

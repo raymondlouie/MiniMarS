@@ -108,26 +108,16 @@ sc2markerWrapper <- function (input_matrix,
                               ...){
     
     
-    # message("here")
     print(dim(input_matrix))
     print(table(clusters))
     
     seurat_object = Seurat::CreateSeuratObject(input_matrix,
                                                meta.data =data.frame(cell_type=clusters) )
-    # print("here2")
-    
+
     Seurat::Idents(object = seurat_object)=clusters
-    # seurat_object@assays$RNA@counts = input_matrix
-    # seurat_object@assays$RNA@data = input_matrix
-    
-    # message("here2")
-    
+
     all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
-    
-    # message("here3")
-    # all.markers = "test"
-    # print("here")
-    
+
     unique_clusters = names(all.markers)
     num_clusters = length(unique_clusters)
     
@@ -162,6 +152,7 @@ sc2markerWrapper <- function (input_matrix,
 #'
 #' @return The most informative markers determined by geneBasis
 #' @export
+#' 
 geneBasisWrapper <- function (sce, clusters, num_markers=15, ...) {
     # Save the current warning setting
     original_warn_setting <- getOption("warn")
@@ -188,34 +179,19 @@ geneBasisWrapper <- function (sce, clusters, num_markers=15, ...) {
 
 
 
-
-#' Wrapper function for xgBoost
+#' Wrapper function for fstat
 #'
 #' @param input_matrix Marker matrix with cells as rows, and features as columns.
 #' @param clusters Cell type annotation
 #' @param num_markers Number of markers to output
 #'
-#' @return The most informative markers determined by xgBoost
+#' @return The most informative markers determined by fstat
 #' @export
 fstatWrapper <- function (input_matrix, clusters,num_markers,  ...){
     
-    # unique_clusters = unique(clusters)
-    # num_clust= length(unique_clusters)
-    # label <- 0:(num_clust-1)
-    # names(unique_clusters) = label
-    # clusters_newlabel = unlist(lapply(clusters,
-    #                                   function (x) as.numeric(names(unique_clusters)[which(as.character(unique_clusters) %in% x)])))
-    
-    # convert features to numbers, because xgb.importance seems to have trouble with greek letters
-    # marker_num = 1:dim(input_matrix)[2]
-    # names(marker_num) = colnames(input_matrix)
-    # colnames(input_matrix) = marker_num
-    
     fstat=apply(input_matrix,2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
     fstat <- fstat[order(unlist(fstat), decreasing = T)]
-    # markers_fstat <- names(fstat)[1:min(num_markers*3,dim(input_matrix)[2])]
-    
-    
+
     return(names(fstat)[1:num_markers])
     
 }
@@ -279,12 +255,23 @@ xgBoostWrapper <- function (input_matrix, clusters,num_markers, nrounds=1500,nth
 }
 
 
-
-
-
-
-
-#' Wrapper function for Consensus function
+#' Wrapper function to calculate consensus
+#' 
+#' @param list_markers List of string vector, with each element of list corresponding to a marker method
+#' @param input_matrix_train Training feature matrix (cells as rows, features as columns)
+#' @param clusters_train Training cluster annotation vector
+#' @param num_markers Number of markers 
+#' @param method Consensus method, based on the methods in `list_markers`
+#' \itemize{
+#'   \item \code{other} (default) Consensus calculated based on majority rule.
+#'   \item \code{weighted}: The contribution of each marker is weighted according `list_weight_num`
+#'   \item \code{fstat}: The contribution of each marker is weighted according to the fstat algorithm.
+#'   \item \code{xgBoost}: The contribution of each marker is weighted according xgBoost.
+#' }
+#' @param list_weight_num Weight of each marker. Only used if `method` is weighted.
+#'
+#' @return Consensus markers
+#' @export
 
 calculateConsensus <- function (list_markers,
                                 input_matrix_train,
@@ -404,11 +391,23 @@ calculateConsensus <- function (list_markers,
     
 }
 
+#' Wrapper function to calculate consensus whilst selecting certain methods
+#' 
+#' @param list_markers_temp List of string vector, with each element of list corresponding to a marker method
+#' @param final_out List of matrix and cluster information produced by function `processSubsampling`
+#' @param num_markers Number of markers 
+#' @param chosen_measure The performance measure used to choose the methods used in the consensus. Options are precision_weighted, precision_macro, recall_weighted, recall_macro, F1_macro, F1_weighted, precision_micro
+#' @param list_performance_valid Performance of the chosen markers using the validation matrix. Each element in list corresponds to a method.
+#' @param metric_thres Threshold above which a method will be considered in the consensus calculation, based on `chosen_measure`
+#' @param metric_topnum Number of methods to consider in consensus (based on sorted `chosen_measure`).
+#' @return Consensus markers
+#' @export
+
+
 
 calculateConsensus_wrap <- function(list_markers_temp,
                                     final_out,
                                     num_markers=num_markers,
-                                    # method = "fstat",
                                     chosen_measure= "F1_macro",
                                     list_performance_valid=list(),
                                     metric_thres = 0,

@@ -5,7 +5,6 @@
 #' @param clusters_sel Selected clusters
 #' @param num_markers Number of markers to output.
 #' @param subsample_num Number of cells to sub-sample
-#' @param sub.seed Seed number of sub-sample
 #' @param train_test_ratio Ratio of training to test data
 #' @param method_cluster List of methods to find cluster markers.
 #' \itemize{
@@ -38,7 +37,6 @@ findClusterPerformance <- function (matrix_all,
                                     clusters_sel = "ALLCLUSTER",
                                     num_markers,
                                     subsample_num,
-                                    # sub.seed = 42,
                                     train_test_ratio = 0.9,
                                     method_cluster = "all",
                                     method_performance = "all",
@@ -46,8 +44,6 @@ findClusterPerformance <- function (matrix_all,
                                     verbose = FALSE,
                                     ...) {
 
-    # print("findClusterPerformance")
-    # print(dim(matrix_all))
 
     if (length(clusters) != dim(matrix_all)[1]){
         stop("Number of cluster annotation cells is not equal to the number of cells in feature matrix.")
@@ -204,16 +200,6 @@ findClusterPerformance <- function (matrix_all,
     for (i in 1:length(list_markers)){
         markers_sel = list_markers[[i]]
         markers_sel= markers_sel[!is.na(markers_sel)]
-        # print("ite list_markers")
-        # if (verbose){
-        #     print(names(list_markers)[[i]])
-        #     print(table(clusters_num_train))
-        #     print(table(clusters_train))
-        #     print(table(clusters_num_test))
-        #     print(table(clusters_test))
-        #     print(dim(input_matrix_train))
-        #     print(dim(input_matrix_test))
-        # }
 
 
         list_performance[[names(list_markers)[[i]]]] = performanceMarkers(markers_sel,
