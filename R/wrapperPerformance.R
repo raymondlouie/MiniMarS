@@ -203,33 +203,6 @@ xgboostPredictCell <- function (markers_sel,
                                                      function (x) unique_clusters_sample[which(names(unique_clusters_sample) %in% x)]))
 
 
-
-
-    # for (i in 1:length(unique_clusters_sample)){
-    #     curr_cluster = unique_clusters_sample[[i]]
-    #     curr_test_predict = test_prediction[which(test_prediction$true_lab %in% curr_cluster),]
-    #     number_correct= which(curr_test_predict$true_lab==curr_test_predict$predict_lab)
-    #     curr_TP = length(number_correct)/dim(curr_test_predict)[1]
-    #     curr_df = data.frame(cluster = curr_cluster,
-    #                          TP = curr_TP)
-    #     if (i==1){
-    #         performance_xgBoost_df = curr_df
-    #     } else{
-    #         performance_xgBoost_df = rbind(performance_xgBoost_df,curr_df)
-    #
-    #     }
-    # }
-    #
-    # number_correct_all= which(test_prediction$true_lab==test_prediction$predict_lab)
-    # TP_all = length(number_correct_all)/dim(test_prediction)[1]
-    # performance_xgBoost_df = rbind(performance_xgBoost_df,
-    #                                data.frame(cluster = "all",
-    #                                           TP = TP_all))
-    #
-    #
-    # out_performance = list(TP = performance_xgBoost_df,
-    #                        feature = importance_train.mt)
-
     return(test_prediction)
 
 }
@@ -262,31 +235,7 @@ geneBasisPredictCell <- function (markers_sel,
                                                    return.stat = T)
 
     test_prediction=cluster_map$mapping
-    # test_stat = cluster_map$stat
 
-
-
-    # for (i in 1:length(unique_clusters_sample)){
-    #     curr_cluster = unique_clusters_sample[[i]]
-    #     curr_test_predict = test_prediction[which(test_prediction$celltype %in% curr_cluster),]
-    #     number_correct= which(curr_test_predict$celltype==curr_test_predict$mapped_celltype)
-    #     curr_TP = length(number_correct)/dim(curr_test_predict)[1]
-    #     curr_df = data.frame(cluster = curr_cluster,
-    #                          TP = curr_TP)
-    #     if (i==1){
-    #         performance_genebasis_df = curr_df
-    #     } else{
-    #         performance_genebasis_df = rbind(performance_genebasis_df,curr_df)
-    #
-    #     }
-    # }
-    #
-    #
-    # number_correct_all= which(test_prediction$celltype==test_prediction$mapped_celltype)
-    # TP_all = length(number_correct_all)/dim(test_prediction)[1]
-    # performance_genebasis_df = rbind(performance_genebasis_df,
-    #                                  data.frame(cluster = "all",
-    #                                             TP = TP_all))
 
     return(test_prediction)
 
@@ -295,12 +244,10 @@ geneBasisPredictCell <- function (markers_sel,
 
 #' Wrapper function for geneBasisPerformance
 #'
-#' @param markers_sel Selected markers
-#' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
-#' @param clusters_test Cluster annotation for test set
+#' @param test_prediction Selected markers
 #' @param unique_clusters_sample Unique clusters
 #'
-#' @return True positive rate calculated using get_celltype_mapping from geneBasisR
+#' @return List of two elements: performance of each cluster, and performance over all clusters. Metrics include precision_weighted, precision_macro, recall_weighted, recall_macro, F1_macro, F1_weighted, precision_micro
 #' @export
 calculatePerformance <- function (test_prediction,
                                   unique_clusters_sample,
@@ -347,9 +294,6 @@ calculatePerformance <- function (test_prediction,
 
         }
     }
-
-
-    # accuracy = length(which(test_prediction$celltype==test_prediction$mapped_celltype))/dim(test_prediction)[1]
 
 
     performance_all_df = data.frame(

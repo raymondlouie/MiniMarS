@@ -1,6 +1,7 @@
 #' Find the most informative cluster markers
 #'
-#' @param num_markers Number of markers to output.
+#' @param final_out List of matrix and cluster information produced by function `processSubsampling`
+#' @param num_markers Number of markers 
 #' @param method List of methods to find cluster markers.
 #' \itemize{
 #'   \item \code{citeFuse}
@@ -10,6 +11,9 @@
 #'   \item \code{seurat}
 #'   \item \code{all}: Use all methods
 #' }
+#' 
+#' @param metric_thres Methods to consider in consensus, which are above this threshold based on F1_macro
+#' @param metric_topnum Number of methods to consider in consensus, based on sorted F1_macro.
 #'
 #' @return A list containing
 #' \itemize{
@@ -23,10 +27,11 @@
 findClusterMarkers <- function (final_out,
                                 num_markers = 15,
                                 method = "all",
+                                metric_thres = 0,
+                                metric_topnum = 2,
                                 verbose = FALSE,
                                 ...) {
     
-    # input_matrix= t(as.matrix(input_matrix))
     input_matrix = t(as.matrix(final_out$training_matrix))
     clusters = final_out$training_clusters
     
@@ -34,11 +39,7 @@ findClusterMarkers <- function (final_out,
     
     all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
                     "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
-    
-    # # put to lower in case of user typo
-    # method_old = all_methods
-    #     all_methods=unlist(lapply(all_methods, tolower))
-    # method=unlist(lapply(method, tolower))
+
     
     if ((length(method)==1 && method == "all") | (identical(sort(method), sort(all_methods)))){
         message("Using all methods.")
@@ -55,24 +56,7 @@ findClusterMarkers <- function (final_out,
         }
     }
     
-    # # Recognize the input methods
-    # if (length(method) == 0) {
-    #   stop("No method or invalid method selected.")
-    #
-    # # } else if((length(method) == 1 & all(method=="all") | all(method %in% all_methods))) {
-    # } else if (method=="all") {
-    #   method = all_methods
-    # } else {
-    #   diff_methods = setdiff(method, all_methods)
-    #   if(length(diff_methods) >  0 & length(diff_methods) < length(method)){
-    #     warning(paste0(paste(diff_methods, collapse = ", "), " not found. Using the remaining method(s)."))
-    #     method = intersect(method,all_methods)
-    #   } else if(length(diff_methods) != 0){
-    #     stop(paste0("No available method selected.\nPlease select at least one method from the following: ",
-    #                 paste(all_methods, collapse = ", ")))
-    #   }
-    # }
-    
+
     # Print out the methods used after checks
     message(paste0("Methods used in this analysis: ", paste(method, collapse = ", "),"\n"))
     
@@ -97,10 +81,6 @@ findClusterMarkers <- function (final_out,
     
     list_markers = list()
     runtime_secs <- c()
-    
-    # message("TEST")
-    
- 
     
     for (i in 1:length(method)) {
         curr_method = method[[i]]
@@ -216,6 +196,19 @@ findClusterMarkers <- function (final_out,
         list_weight_num = as.numeric(list_weight)
         list_weight_num= list_weight_num/sum(list_weight_num)
         names(list_weight_num) = names(list_performance_valid)
+        
+        names(list_weight) <- names(list_performance_valid)
+        v_weight <- do.call(c, list_weight)
+        topMethods <- names(v_weight[order(v_weight, decreasing = T)][1:min(metric_topnum,length(v_weight))])
+        thresMethods = names(v_weight)[which(v_weight>metric_thres)]
+        keepMethods = intersect(topMethods,thresMethods)
+        
+        ##only use marker sets from top two methods (with the highest chosen_measure)
+        list_markers_temp <- list_markers_temp[names(list_markers_temp) %in% keepMethods]
+        
+        #the weight vector needs to be adjusted accordingly
+        list_weight_num <- list_weight_num[names(list_weight_num) %in% keepMethods]
+        
         
         if (verbose){
             message(paste0("Weighted list is ", list_weight_num))
