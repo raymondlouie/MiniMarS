@@ -42,7 +42,7 @@ install.packages("dplyr")
 
 Please run the following to install the `MiniMarS` package from the Development branch:
 ```
-devtools::install_github("raymondlouie/MiniMarS", ref = "Dev")
+devtools::install_github("raymondlouie/MiniMarS", ref = "main")
 ```
 
 or download the package [here](https://www.dropbox.com/scl/fi/2vk9wy1j1tw7j2vutzp2q/MiniMarS_0.3.1.tar.gz?rlkey=kt5dj2oqyozwn9u82v6d9mhhz&dl=0) and install it using the following command
