@@ -39,7 +39,7 @@ findClusterMarkers <- function (final_out,
     
     all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
                     "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
-
+    
     
     if ((length(method)==1 && method == "all") | (identical(sort(method), sort(all_methods)))){
         message("Using all methods.")
@@ -56,7 +56,7 @@ findClusterMarkers <- function (final_out,
         }
     }
     
-
+    
     # Print out the methods used after checks
     message(paste0("Methods used in this analysis: ", paste(method, collapse = ", "),"\n"))
     
@@ -168,104 +168,104 @@ findClusterMarkers <- function (final_out,
     
     list_markers_temp = list_markers
     
-    # calculate consensus if more than one method chosen
-    if (length(method)>1){
-        
-        i = length(runtime_secs)+1
-        start_time <- Sys.time()
-        
-        list_performance_valid = performanceAllMarkers(list_markers_temp,
-                                                       final_out=final_out,
-                                                       method="all",
-                                                       nrounds=1500,
-                                                       nthread=6,
-                                                       testSet = "valid",
-                                                       verbose=FALSE)
-        
-        chosen_measure = "F1_macro"
-        index_remove = grep("consensus",names(list_performance_valid))
-        if (length(index_remove)>0){
-            list_performance_valid = list_performance_valid[-index_remove]
-        }
-        
-        list_weight = list()
-        for (jj in 1:length(list_performance_valid)){
-            curr_list_measures = list_performance_valid[[jj]]$xgBoost_performance_all
-            list_weight[[names(list_performance_valid)[[jj]]]] = as.numeric(curr_list_measures[which(names(curr_list_measures) %in% chosen_measure)])
-        }
-        list_weight_num = as.numeric(list_weight)
-        list_weight_num= list_weight_num/sum(list_weight_num)
-        names(list_weight_num) = names(list_performance_valid)
-        
-        names(list_weight) <- names(list_performance_valid)
-        v_weight <- do.call(c, list_weight)
-        topMethods <- names(v_weight[order(v_weight, decreasing = T)][1:min(metric_topnum,length(v_weight))])
-        thresMethods = names(v_weight)[which(v_weight>metric_thres)]
-        keepMethods = intersect(topMethods,thresMethods)
-        
-        ##only use marker sets from top two methods (with the highest chosen_measure)
-        list_markers_temp <- list_markers_temp[names(list_markers_temp) %in% keepMethods]
-        
-        #the weight vector needs to be adjusted accordingly
-        list_weight_num <- list_weight_num[names(list_weight_num) %in% keepMethods]
-        
-        
-        if (verbose){
-            message(paste0("Weighted list is ", list_weight_num))
-        }
-        
-        
-        list_markers[["consensus_weighted"]] = calculateConsensus(list_markers_temp,
-                                                                  t(input_matrix),
-                                                                  clusters,
-                                                                  num_markers=num_markers,
-                                                                  method = "weighted",
-                                                                  list_weight_num = list_weight_num,
-                                                                  verbose=TRUE)
-        
-        end_time <- Sys.time()
-        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-        names(runtime_secs)[i] <- "consensus_weighted"
-        
-        i = length(runtime_secs)+1
-        start_time <- Sys.time()
-        list_markers[["consensus_naive"]] = calculateConsensus(list_markers_temp,
-                                                               t(input_matrix),
-                                                               clusters,
-                                                               num_markers=num_markers,
-                                                               verbose=TRUE)
-        end_time <- Sys.time()
-        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-        names(runtime_secs)[i] <- "consensus_naive"
-        
-        i = length(runtime_secs)+1
-        start_time <- Sys.time()
-        list_markers[["consensus_fstat"]] =  calculateConsensus(list_markers_temp,
-                                                                t(input_matrix),
-                                                                clusters,
-                                                                num_markers=num_markers,
-                                                                method = "fstat",
-                                                                verbose=TRUE)
-        end_time <- Sys.time()
-        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-        names(runtime_secs)[i] <- "consensus_fstat"
-        
-        i = length(runtime_secs)+1
-        start_time <- Sys.time()
-        list_markers[["consensus_xgboost"]] = calculateConsensus(list_markers_temp,
-                                                                 t(input_matrix),
-                                                                 clusters,
-                                                                 num_markers=num_markers,
-                                                                 method = "xgBoost",
-                                                                 verbose=TRUE)
-        end_time <- Sys.time()
-        runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-        names(runtime_secs)[i] <- "consensus_xgboost"
-        
-        
-        
-        
-    }
+    # # calculate consensus if more than one method chosen
+    # if (length(method)>1){
+    #     
+    #     i = length(runtime_secs)+1
+    #     start_time <- Sys.time()
+    #     
+    #     list_performance_valid = performanceAllMarkers(list_markers_temp,
+    #                                                    final_out=final_out,
+    #                                                    method="all",
+    #                                                    nrounds=1500,
+    #                                                    nthread=6,
+    #                                                    testSet = "valid",
+    #                                                    verbose=FALSE)
+    #     
+    #     chosen_measure = "F1_macro"
+    #     index_remove = grep("consensus",names(list_performance_valid))
+    #     if (length(index_remove)>0){
+    #         list_performance_valid = list_performance_valid[-index_remove]
+    #     }
+    #     
+    #     list_weight = list()
+    #     for (jj in 1:length(list_performance_valid)){
+    #         curr_list_measures = list_performance_valid[[jj]]$xgBoost_performance_all
+    #         list_weight[[names(list_performance_valid)[[jj]]]] = as.numeric(curr_list_measures[which(names(curr_list_measures) %in% chosen_measure)])
+    #     }
+    #     list_weight_num = as.numeric(list_weight)
+    #     list_weight_num= list_weight_num/sum(list_weight_num)
+    #     names(list_weight_num) = names(list_performance_valid)
+    #     
+    #     names(list_weight) <- names(list_performance_valid)
+    #     v_weight <- do.call(c, list_weight)
+    #     topMethods <- names(v_weight[order(v_weight, decreasing = T)][1:min(metric_topnum,length(v_weight))])
+    #     thresMethods = names(v_weight)[which(v_weight>metric_thres)]
+    #     keepMethods = intersect(topMethods,thresMethods)
+    #     
+    #     ##only use marker sets from top two methods (with the highest chosen_measure)
+    #     list_markers_temp <- list_markers_temp[names(list_markers_temp) %in% keepMethods]
+    #     
+    #     #the weight vector needs to be adjusted accordingly
+    #     list_weight_num <- list_weight_num[names(list_weight_num) %in% keepMethods]
+    #     
+    #     
+    #     if (verbose){
+    #         message(paste0("Weighted list is ", list_weight_num))
+    #     }
+    #     
+    #     
+    #     list_markers[["consensus_weighted"]] = calculateConsensus(list_markers_temp,
+    #                                                               t(input_matrix),
+    #                                                               clusters,
+    #                                                               num_markers=num_markers,
+    #                                                               method = "weighted",
+    #                                                               list_weight_num = list_weight_num,
+    #                                                               verbose=TRUE)
+    #     
+    #     end_time <- Sys.time()
+    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+    #     names(runtime_secs)[i] <- "consensus_weighted"
+    #     
+    #     i = length(runtime_secs)+1
+    #     start_time <- Sys.time()
+    #     list_markers[["consensus_naive"]] = calculateConsensus(list_markers_temp,
+    #                                                            t(input_matrix),
+    #                                                            clusters,
+    #                                                            num_markers=num_markers,
+    #                                                            verbose=TRUE)
+    #     end_time <- Sys.time()
+    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+    #     names(runtime_secs)[i] <- "consensus_naive"
+    #     
+    #     i = length(runtime_secs)+1
+    #     start_time <- Sys.time()
+    #     list_markers[["consensus_fstat"]] =  calculateConsensus(list_markers_temp,
+    #                                                             t(input_matrix),
+    #                                                             clusters,
+    #                                                             num_markers=num_markers,
+    #                                                             method = "fstat",
+    #                                                             verbose=TRUE)
+    #     end_time <- Sys.time()
+    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+    #     names(runtime_secs)[i] <- "consensus_fstat"
+    #     
+    #     i = length(runtime_secs)+1
+    #     start_time <- Sys.time()
+    #     list_markers[["consensus_xgboost"]] = calculateConsensus(list_markers_temp,
+    #                                                              t(input_matrix),
+    #                                                              clusters,
+    #                                                              num_markers=num_markers,
+    #                                                              method = "xgBoost",
+    #                                                              verbose=TRUE)
+    #     end_time <- Sys.time()
+    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+    #     names(runtime_secs)[i] <- "consensus_xgboost"
+    #     
+    #     
+    #     
+    #     
+    # }
     
     fstat=apply(t(input_matrix),2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
     fstat <- fstat[order(unlist(fstat), decreasing = T)]
@@ -273,7 +273,7 @@ findClusterMarkers <- function (final_out,
     for (i in 1:length(list_markers)){
         # Order markers according to fstat
         list_markers[[i]] = intersect(names(fstat),list_markers[[i]])
-       
+        
     }
     
     list_markers[["runtime_secs"]] <- runtime_secs
