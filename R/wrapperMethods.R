@@ -553,6 +553,8 @@ calculateConsensus_wrap <- function(list_markers_temp,
         names(runtime_secs)[i] <- "consensus_xgboost"
         
     } else{
+        message("Only one method chosen.")
+        print(list_markers_temp)
         list_markers[["consensus_top"]] = list_markers_temp
         runtime_secs = NA
     }
