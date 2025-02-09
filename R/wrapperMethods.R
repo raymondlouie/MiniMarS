@@ -306,6 +306,10 @@ calculateConsensus <- function (list_markers,
     table_temp = table_compare
     
     if (method =="fstat"){
+        if (verbose){
+            message("Calculating consensus using majority and fstat to resolve ties.")
+        }
+        
         fstat=apply(input_matrix_train,2,
                     function (x) na.omit(anova(aov(x~as.factor(clusters_train)))$"F value"))
         temp_gain <- fstat[order(unlist(fstat), decreasing = T)]
@@ -316,12 +320,13 @@ calculateConsensus <- function (list_markers,
                                                                             names(temp_gain))]
         table_compare$finalAdd =table_compare$Freq + tempValue
         
-        if (verbose){
-            message("Calculating consensus using majority and fstat to resolve ties.")
-        }
-        
+       
         
     } else if (method=="xgBoost"){
+        
+        if (verbose){
+            message("Calculating consensus using majority and xgBoost to resolve ties.")
+        }
         
         unique_clusters = unique(clusters_train)
         num_clust= length(unique_clusters)
@@ -357,11 +362,14 @@ calculateConsensus <- function (list_markers,
         
         table_compare$finalAdd =table_compare$Freq + tempValue
         
-        if (verbose){
-            message("Calculating consensus using majority and xgBoost to resolve ties.")
-        }
+       
         
     } else if (method=="weighted"){
+        
+        if (verbose){
+            message("Calculating consensus using weighted.")
+            print(table_compare)
+        }
         
         # table_compare= table_weighted$wt[which(table_weighted$var %in% table_compare$Var1)]
         table_compare=aggregate(x = list("wt" = total_df$weight),
@@ -370,10 +378,7 @@ calculateConsensus <- function (list_markers,
         colnames(table_compare) = c("Var1","finalAdd")
         print(table_compare)
         
-        if (verbose){
-            message("Calculating consensus using weighted.")
-            print(table_compare)
-        }
+      
         
         
     } else{
