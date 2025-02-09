@@ -411,7 +411,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
                                     chosen_measure= "F1_macro",
                                     list_performance_valid=list(),
                                     metric_thres = 0,
-                                    metric_topnum = 20,
+                                    metric_topnum = 1,
                                     verbose=TRUE,
                                     ...){
     
