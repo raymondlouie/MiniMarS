@@ -561,9 +561,9 @@ calculateConsensus_wrap <- function(list_markers_temp,
         
     } else{
         message("Only one method chosen.")
-        names(list_markers_temp) = paste0(names(list_markers_temp),"_","consensus")
+        names(list_markers_temp) = paste0("consensusTop","_",names(list_markers_temp))
         list_markers = list_markers_temp
-        runtime_secs = c("consensus_top" = 0)
+        runtime_secs = c("consensusTop" = 0)
 
     }
     
