@@ -563,7 +563,8 @@ calculateConsensus_wrap <- function(list_markers_temp,
         message("Only one method chosen.")
         names(list_markers_temp) = paste0(names(list_markers_temp),"_","consensus")
         list_markers = list_markers_temp
-        runtime_secs = 0
+        runtime_secs = c("consensus top" = 0)
+
     }
     
     fstat=apply(t(input_matrix),2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
