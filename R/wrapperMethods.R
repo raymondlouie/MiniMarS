@@ -318,6 +318,8 @@ calculateConsensus <- function (list_markers,
         common_names = intersect(table_compare$Var1,names(temp_gain))
         tempValue[match(common_names,table_compare$Var1)] = temp_gain[match(common_names,
                                                                             names(temp_gain))]
+        print(table_compare$Freq)
+        print(tempValue)
         table_compare$finalAdd =table_compare$Freq + tempValue
         
        
