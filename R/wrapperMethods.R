@@ -498,7 +498,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
     #     message(paste0("Weighted list is ", paste0(list_weight_num, collapse=", ")))
     # }
     
-    # i = 1
+    i = 1
     runtime_secs = list()
     start_time <- Sys.time()
     list_markers= list()
@@ -556,7 +556,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
         message("Only one method chosen.")
         names(list_markers_temp) = paste0(names(list_markers_temp),"_","consensus")
         list_markers = list_markers_temp
-        runtime_secs = NA
+        runtime_secs = 0
     }
     
     fstat=apply(t(input_matrix),2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
