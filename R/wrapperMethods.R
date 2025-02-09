@@ -316,13 +316,13 @@ calculateConsensus <- function (list_markers,
         
         tempValue = rep(0,dim(table_compare)[1])
         common_names = intersect(table_compare$Var1,names(temp_gain))
-        tempValue[match(common_names,table_compare$Var1)] = temp_gain[match(common_names,
-                                                                            names(temp_gain))]
+        tempValue[match(common_names,table_compare$Var1)] = as.numeric(temp_gain[match(common_names,
+                                                                                       names(temp_gain))])
         print(table_compare$Freq)
         print(tempValue)
         table_compare$finalAdd =table_compare$Freq + tempValue
         
-       
+        
         
     } else if (method=="xgBoost"){
         
@@ -364,7 +364,7 @@ calculateConsensus <- function (list_markers,
         
         table_compare$finalAdd =table_compare$Freq + tempValue
         
-       
+        
         
     } else if (method=="weighted"){
         
@@ -380,7 +380,7 @@ calculateConsensus <- function (list_markers,
         colnames(table_compare) = c("Var1","finalAdd")
         print(table_compare)
         
-      
+        
         
         
     } else{
