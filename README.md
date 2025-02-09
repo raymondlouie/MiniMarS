@@ -42,7 +42,8 @@ install.packages("dplyr")
 
 Please run the following to install the `MiniMarS` package from the Development branch:
 ```
-devtools::install_github("raymondlouie/MiniMarS", ref = "main")
+devtools::install_github("https://github.com/raymondlouie/MiniMarS",force=TRUE)
+
 ```
 
 or download the package [here](https://www.dropbox.com/scl/fi/2vk9wy1j1tw7j2vutzp2q/MiniMarS_0.3.1.tar.gz?rlkey=kt5dj2oqyozwn9u82v6d9mhhz&dl=0) and install it using the following command
@@ -114,8 +115,7 @@ cluster_selection_out= processClusterSelection(sc_in,
 ### Sub-sample and divide the dataset into training, validation, and testing sets.
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
-                               subsample_num = 1000,
-                               cluster_proportion = "proportional",
+                               subsample_num = 100,
                                verbose = TRUE,
                                seed = 8)
 ```
@@ -123,26 +123,25 @@ final_out = processSubsampling(cluster_selection_out,
 ### Find the markers to identify the clusters. 
 Several methods implemented to find markers for identifying the clusters using the `method` argument: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". The default option is to use "all" methods. The methods with "consensus_" naming return an integration of results from several methods run.
 ```{r}
-list_markers_time = findClusterMarkers(final_out,
-                                  num_markers = 15,
-                                  method = "all",
-                                  verbose = TRUE)
+list_markers_time_consensus= calculateConsensus_wrap(list_markers,
+                                                     final_out,
+                                                     num_markers=numMarkers)
 
-list_time = list_markers_time$runtime_secs
-names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
-                                                                                    "runtime_secs")))]
-list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
+
+list_time_all = c(list_time,list_markers_time_consensus$runtime_secs)
+
+list_markers_all = c(list_markers,list_markers_time_consensus)
+list_markers_all = list_markers_all[which(!(names(list_markers_all) %in% c("runtime_secs")))]
 ```
 
 ### Evaluate the performance of the markers using the testing set. 
 There are two methods implemented to assess the performance of each marker selection method using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "xgBoost". 
 ```{r}
-list_performance = performanceAllMarkers(list_markers,
+list_performance_all = performanceAllMarkers(list_markers_all,
                                          final_out = final_out,
                                          method = "xgBoost",
                                          nrounds = 1500,
                                          nthread = 6,
-                                         testSet = "test",
                                          verbose = TRUE)
 ```
 
@@ -150,8 +149,8 @@ list_performance = performanceAllMarkers(list_markers,
 ```{r}
 library(ggplot2)
 
-plotMarkers(list_markers)
-plotPerformance(list_performance)
+plotMarkers(list_markers_all)
+plotPerformance(list_performance_all)
 
 ## Visualisation
 library(RColorBrewer)
