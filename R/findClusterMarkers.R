@@ -82,8 +82,9 @@ findClusterMarkers <- function (final_out,
     runtime_secs <- c()
     
     for (i in 1:length(method)) {
+        omitflag=0
         curr_method = method[[i]]
-
+        
         if (verbose){
             message(paste0("\nCaclulating markers using ", curr_method,".\n"))
         }
@@ -102,7 +103,8 @@ findClusterMarkers <- function (final_out,
         if (curr_method == "sc2marker") {
             start_time <- Sys.time()
             if (packageVersion("Seurat")>="5"){
-                message("sc2marker doesn't work with Seurat v5. Please try Seurat v4.")
+                message("sc2marker doesn't work with Seurat v5. Please try Seurat v4. Omitting sc2marker in the calculations.")
+                omitflag=1
             } else{
                 curr_markers = sc2markerWrapper(input_matrix,
                                                 clusters,
@@ -159,9 +161,9 @@ findClusterMarkers <- function (final_out,
         }
         
         
-        
-        list_markers[[curr_method]] = curr_markers
-        
+        if (omitflag==0){
+            list_markers[[curr_method]] = curr_markers
+        }
     }
     
     list_markers_temp = list_markers
