@@ -4,7 +4,7 @@
 #' @param num_markers Number of markers 
 #' @param method List of methods to find cluster markers.
 #' \itemize{
-#'   \item \code{citeFuse}
+#'   \item \code{CiteFuse}
 #'   \item \code{sc2marker}
 #'   \item \code{geneBasis}
 #'   \item \code{xgBoost}
@@ -37,7 +37,7 @@ findClusterMarkers <- function (final_out,
     
     num_markers_original = num_markers
     
-    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
+    all_methods = c("CiteFuse","sc2marker","geneBasis","xgBoost","fstat",
                     "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
     
     
@@ -65,7 +65,6 @@ findClusterMarkers <- function (final_out,
     }
     
     
-    # print(colnames(input_matrix))
     if (is.null(colnames(input_matrix))){
         warning("No cell names in matrix. Manually assigning names. Please manually check the input matrix matches up with cluster input.\n")
         colnames(input_matrix) = 1:dim(input_matrix)[2]
@@ -84,21 +83,20 @@ findClusterMarkers <- function (final_out,
     
     for (i in 1:length(method)) {
         curr_method = method[[i]]
-        # curr_method_old = method_old[[i]]
-        
+
         if (verbose){
             message(paste0("\nCaclulating markers using ", curr_method,".\n"))
         }
         
         
-        if (curr_method == "citeFuse") {
+        if (curr_method == "CiteFuse") {
             start_time <- Sys.time()
             curr_markers = citeFuseWrapper(sce,
                                            num_markers,
                                            subsample = TRUE)
             end_time <- Sys.time()
             runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-            names(runtime_secs)[i] <- "citeFuse"
+            names(runtime_secs)[i] <- "CiteFuse"
         }
         
         if (curr_method == "sc2marker") {
