@@ -74,14 +74,14 @@ The input data can be i) an SCE object, ii) a matrix of features and a vector of
 # Load the data
 ```
 
-#### i) If you have a SCE object `r sce`:
+#### i) If you have a SCE object `sce`:
 ```{r}
 sc_in = processInputFormat(sc_object = sce,
                            sce_cluster = "cell_type", #pre-defined in the SCE object
                            verbose = TRUE)
 ```
                                
-####  ii) If you have a feature matrix (feature x cell) `r input_matrix` and a vector of cell type annotations for each cell `r cluster` (the length of this vector should be the same as the number of columns of the `r input_matrix`):
+####  ii) If you have a feature matrix (feature x cell) `input_matrix` and a vector of cell type annotations for each cell `cluster` (the length of this vector should be the same as the number of columns of the `input_matrix`):
 ```{r}
 sc_in = processInputFormat(sc_object = input_matrix,
                                clusters_all = clusters,
