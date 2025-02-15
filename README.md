@@ -92,15 +92,11 @@ iii) If you have a Seurat object:
 ```{r}
 library(Seurat)
 
-# Set identity class for your Seurat object to the column that includes the cell type annotations for each cell.
-Idents(seurat_object) <- seurat_object$cell_type
-
-clusters <- Idents(object = seurat_object)
 sc_in = processInputFormat(sc_object = seurat_object,
                            verbose=TRUE)
 ```
 
-### Select the clusters (`clusters_sel`) you want to identify the markers for. 
+### Select the clusters you want to identify the markers for. 
 ```{r}
 # If 'clusters_sel' is not defined, then the default is to use all clusters.
 clusters_sel = c("CD4-positive, alpha-beta memory T cell",
