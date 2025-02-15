@@ -34,10 +34,13 @@ citeFuseWrapper <- function (sce,
     SingleCellExperiment::altExp(sce, "protein") <- sce_alt
     
     # set.seed(2020)
+    print("test")
     sce <- CiteFuse::importanceADT(sce,
                                    group = factor(sce$cell_type),
                                    altExp_name ="protein",
                                    exprs_value = "raw")
+    
+    print("Test2")
     
     importance_scores = sort(sce@metadata$importanceADT,decreasing=TRUE)
     return(names(importance_scores[1:num_markers]))
