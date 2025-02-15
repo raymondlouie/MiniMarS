@@ -171,13 +171,14 @@ plotPerformance(list_performance_all)
 
 ## Visualisation
 library(RColorBrewer)
-plotExpression(list_markers,
+plotExpression(list_markers_all,
                    sc_in,
                    plot_type="violin")
 
-plotExpression(list_markers,
+plotExpression(list_markers_all,
                    sc_in,
                    plot_type="umap")
+
 ```
 
 ```{r}
