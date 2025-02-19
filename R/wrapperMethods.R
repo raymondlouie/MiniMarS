@@ -72,7 +72,7 @@ seuratWrapper <- function (input_matrix,
                                         slot="counts",
                                         test.use = method,
                                         only.pos=TRUE)
-    save(markers_df,"testClusters.RData")
+    save(markers_df,file="testClusters.RData")
     
     num_markers_each = floor(num_markers/length(unique(clusters)))
     
