@@ -64,7 +64,8 @@ seuratWrapper <- function (input_matrix,
                            ...){
     
     
-    seurat_object = Seurat::CreateSeuratObject(input_matrix)
+    seurat_object = Seurat::CreateSeuratObject(input_matrix,
+                                               meta.data = data.frame(clusters=clusters))
     Seurat::Idents(object = seurat_object)=clusters
     
     markers_df = Seurat::FindAllMarkers(seurat_object,
