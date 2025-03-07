@@ -63,6 +63,11 @@ seuratWrapper <- function (input_matrix,
     seurat_object = Seurat::CreateSeuratObject(input_matrix)
     Seurat::Idents(object = seurat_object)=clusters
     
+    # Convert if assay is V5
+    if(class(seurat_object@assays$RNA)[1]=="Assay5"){
+      seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
+    }
+  
     markers_df = Seurat::FindAllMarkers(seurat_object,
                                         slot="counts",
                                         test.use = method,
