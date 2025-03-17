@@ -66,7 +66,7 @@ seuratWrapper <- function (input_matrix,
     # Convert if assay is V5
     if(class(seurat_object@assays$RNA)[1]=="Assay5"){
       # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
-      seurat_object[["RNA"]] <- CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
+      seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
     }
   
     markers_df = Seurat::FindAllMarkers(seurat_object,
@@ -125,7 +125,7 @@ sc2markerWrapper <- function (input_matrix,
     # Convert if assay is V5
     if(class(seurat_object@assays$RNA)[1]=="Assay5"){
       # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
-      seurat_object[["RNA"]] <- CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
+      seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
     }
     
     all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)

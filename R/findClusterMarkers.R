@@ -103,16 +103,12 @@ findClusterMarkers <- function (final_out,
         
         if (curr_method == "sc2marker") {
             start_time <- Sys.time()
-            if (packageVersion("Seurat")>="5"){
-                message("sc2marker doesn't work with Seurat v5. Please try Seurat v4.")
-            } else{
-                curr_markers = sc2markerWrapper(input_matrix,
-                                                clusters,
-                                                num_markers)
-                end_time <- Sys.time()
-                runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-                names(runtime_secs)[i] <- "sc2marker"
-            }
+            curr_markers = sc2markerWrapper(input_matrix,
+                                            clusters,
+                                            num_markers)
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "sc2marker"
         }
         
         if (curr_method == "geneBasis") {
