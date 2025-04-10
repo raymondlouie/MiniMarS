@@ -74,22 +74,7 @@ plotPerformance =function(list_performance,
         }
         
     }
-    
-    
-    # performance_melt_df = reshape2::melt(performance_df,
-    #                                      id.vars = grep("performance.cluster",colnames(performance_df)))
-    # performance_melt_df2 = reshape2::melt(performance_melt_df,
-    #                                       id.vars = c("variable","value"))
-    # colnames(performance_melt_df2) = c("name","TP","name2","Clusters")
-    # performance_plot_df = performance_melt_df2[,c("name", "TP","Clusters")]
-    # tempSplit = lapply(as.character(performance_plot_df$name),
-    #                    function (x) strsplit(x,split="[.]")[[1]])
-    # performance_plot_df$marker_method = unlist(lapply(tempSplit,
-    #                                                   function (x) x[[1]]))
-    # 
-    # performance_plot_df$performance_method = unlist(lapply(tempSplit,
-    #                                                        function (x) x[[2]]))
-    # performance_plot_df$performance_method = gsub("_performance","",performance_plot_df$performance_method)
+
     performance_plot_df$TPround = round(performance_plot_df$TP,digits=3)
     
     
