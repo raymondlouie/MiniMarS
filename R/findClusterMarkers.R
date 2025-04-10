@@ -4,7 +4,7 @@
 #' @param num_markers Number of markers 
 #' @param method List of methods to find cluster markers.
 #' \itemize{
-#'   \item \code{CiteFuse}
+#'   \item \code{citeFuse}
 #'   \item \code{sc2marker}
 #'   \item \code{geneBasis}
 #'   \item \code{xgBoost}
@@ -37,7 +37,7 @@ findClusterMarkers <- function (final_out,
     
     num_markers_original = num_markers
     
-    all_methods = c("CiteFuse","sc2marker","geneBasis","xgBoost","fstat",
+    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
                     "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
     
     
@@ -65,6 +65,7 @@ findClusterMarkers <- function (final_out,
     }
     
     
+    # print(colnames(input_matrix))
     if (is.null(colnames(input_matrix))){
         warning("No cell names in matrix. Manually assigning names. Please manually check the input matrix matches up with cluster input.\n")
         colnames(input_matrix) = 1:dim(input_matrix)[2]
@@ -82,37 +83,32 @@ findClusterMarkers <- function (final_out,
     runtime_secs <- c()
     
     for (i in 1:length(method)) {
-        omitflag=0
         curr_method = method[[i]]
+        # curr_method_old = method_old[[i]]
         
         if (verbose){
             message(paste0("\nCaclulating markers using ", curr_method,".\n"))
         }
         
         
-        if (curr_method == "CiteFuse") {
+        if (curr_method == "citeFuse") {
             start_time <- Sys.time()
             curr_markers = citeFuseWrapper(sce,
                                            num_markers,
                                            subsample = TRUE)
             end_time <- Sys.time()
             runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-            names(runtime_secs)[i] <- "CiteFuse"
+            names(runtime_secs)[i] <- "citeFuse"
         }
         
         if (curr_method == "sc2marker") {
             start_time <- Sys.time()
-            if (packageVersion("Seurat")>="5"){
-                message("sc2marker doesn't work with Seurat v5. Please try Seurat v4. Omitting sc2marker in the calculations.")
-                omitflag=1
-            } else{
-                curr_markers = sc2markerWrapper(input_matrix,
-                                                clusters,
-                                                num_markers)
-                end_time <- Sys.time()
-                runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-                names(runtime_secs)[i] <- "sc2marker"
-            }
+            curr_markers = sc2markerWrapper(input_matrix,
+                                            clusters,
+                                            num_markers)
+            end_time <- Sys.time()
+            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
+            names(runtime_secs)[i] <- "sc2marker"
         }
         
         if (curr_method == "geneBasis") {
@@ -161,9 +157,9 @@ findClusterMarkers <- function (final_out,
         }
         
         
-        if (omitflag==0){
-            list_markers[[curr_method]] = curr_markers
-        }
+        
+        list_markers[[curr_method]] = curr_markers
+        
     }
     
     list_markers_temp = list_markers

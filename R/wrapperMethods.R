@@ -12,7 +12,6 @@ citeFuseWrapper <- function (sce,
     
     # Remove cells with very low library size, which causes issues in CiteFuse
     totalCount = colSums(sce@assays@data$counts)
-    # print(hist(totalCount))
     # index_remove = which(totalCount < quantile(totalCount,0.1))
     index_remove = which(totalCount < (-60))
     
@@ -34,13 +33,10 @@ citeFuseWrapper <- function (sce,
     SingleCellExperiment::altExp(sce, "protein") <- sce_alt
     
     # set.seed(2020)
-    # print("test")
     sce <- CiteFuse::importanceADT(sce,
                                    group = factor(sce$cell_type),
                                    altExp_name ="protein",
                                    exprs_value = "raw")
-    
-    # print("Test2")
     
     importance_scores = sort(sce@metadata$importanceADT,decreasing=TRUE)
     return(names(importance_scores[1:num_markers]))
@@ -65,14 +61,18 @@ seuratWrapper <- function (input_matrix,
     
     
     seurat_object = Seurat::CreateSeuratObject(input_matrix)
-                                               # meta.data = data.frame(clusters=clusters))
     Seurat::Idents(object = seurat_object)=clusters
     
+    # Convert if assay is V5
+    if(class(seurat_object@assays$RNA)[1]=="Assay5"){
+      # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
+      seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
+    }
+  
     markers_df = Seurat::FindAllMarkers(seurat_object,
                                         slot="counts",
                                         test.use = method,
                                         only.pos=TRUE)
-    save(markers_df,file="testClusters.RData")
     
     num_markers_each = floor(num_markers/length(unique(clusters)))
     
@@ -121,6 +121,12 @@ sc2markerWrapper <- function (input_matrix,
                                                meta.data =data.frame(cell_type=clusters) )
     
     Seurat::Idents(object = seurat_object)=clusters
+    
+    # Convert if assay is V5
+    if(class(seurat_object@assays$RNA)[1]=="Assay5"){
+      # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
+      seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
+    }
     
     all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
     
