@@ -49,65 +49,56 @@ plotMarkers =function(list_markers,
 #'
 #' @return A list of ggplot outputs
 #' @export
-plotPerformance =function(list_performance,
-                          tile_text_size = 7,
-                          text_size = 20,
-                          ...){
+plotPerformance <- function(list_performance,
+                            metric="F1", #other options are "precision" and "recall"
+                            tile_text_size = 3,
+                            text_size = 8,
+                            ...){
     
-    # Create dataframe suitable for plotting
-    performance_df = data.frame(list_performance)
-    
-    for (i in seq(1,dim(performance_df)[2],2)){
-        curr_df = performance_df[,c(i,i+1)]
-        tempSplit = unlist(lapply(as.character(colnames(curr_df)),
-                                  function (x) strsplit(x,split="[.]")[[1]]))
-        colnames(curr_df) = c("Clusters","TP")
-        curr_df$marker_method=tempSplit[[1]]
-        curr_df$performance_method=gsub("_performance",
-                                        "",
-                                        tempSplit[[2]])
-        curr_df$TP
-        if (i==1){
-            performance_plot_df = curr_df
-        } else{
-            performance_plot_df = rbind(performance_plot_df,curr_df)
-        }
-        
+   
+    #extracting performance_cluster
+    use.ls <- list()
+    for(i in 1:length(list_performance)){
+        ls.here <- list_performance[[i]]
+        ls.here[[1]]$marker_method <- names(list_performance)[i]
+        use.ls[[i]] <- ls.here[[1]]
     }
-
-    performance_plot_df$TPround = round(performance_plot_df$TP,digits=3)
+    names(use.ls) <- names(list_performance)
     
+    curr_plot <- do.call(rbind, use.ls)
+    names(curr_plot)[1] <- c("Clusters")
+    curr_plot[,2:4] <- apply(curr_plot[,2:4], 2, function(x){round(x, digits=3)})
     
-    unique_performance = unique(performance_plot_df$performance_method)
-    
-    performance_plot_df$marker_method = factor(performance_plot_df$marker_method,
-                                               levels = names(list_performance))
-    
-    list_p1 = list()
-    for (i in 1:length(unique_performance)){
-        
-        curr_performance = unique_performance[[i]]
-        curr_plot = performance_plot_df[which(performance_plot_df$performance_method %in% curr_performance),]
-        
-        p1=ggplot(curr_plot, aes(x = marker_method, y = Clusters,fill=TP)) +
-            geom_tile(color="black") + theme_bw()+
-            scale_fill_gradient(low = "white", high = "red") +
-
-            theme(axis.text = element_text(size = text_size),
-                  axis.title = element_text(size = text_size),
-                  axis.text.x = element_text(angle = 45, hjust = 1, size = text_size),
-                  plot.title = element_text(size = text_size),
-
-                  legend.position="none")+
-            xlab("Method") + ylab("Clusters") +
-            coord_fixed(ratio=0.2)+
-            geom_text(aes(marker_method, Clusters, label = TPround), colour = "black", check_overlap = FALSE,
-                      size = tile_text_size)  +
-            ggtitle(curr_performance)
-        list_p1[[i]] = p1
-        
+    if(metric == "F1"){
+        colnames(curr_plot)[which(colnames(curr_plot) == "F1")] <- "Metric"
+    }else if(metric == "precision"){
+        colnames(curr_plot)[which(colnames(curr_plot) == "precision")] <- "Metric"
+    }else if(metric == "recall"){
+        colnames(curr_plot)[which(colnames(curr_plot) == "recall")] <- "Metric"
     }
     
-    return(list_p1)
+    
+    p1 <- ggplot(curr_plot, aes(x = marker_method, y = Clusters, fill=Metric)) +
+        geom_tile(color="black") + theme_bw()+
+        scale_fill_gradient(low = "white", high = "red") +
+        
+        theme(axis.text = element_text(size = text_size),
+              axis.title = element_text(size = text_size),
+              axis.text.x = element_text(angle = 45, hjust = 1, size = text_size),
+              plot.title = element_text(size = text_size),
+              
+              legend.position="none")+
+        xlab("Method") + ylab("Clusters") +
+        coord_fixed(ratio=0.2)+
+        geom_text(aes(marker_method, Clusters, label = Metric), colour = "black", check_overlap = FALSE,
+                  size = tile_text_size)  +
+        ggtitle(paste0("performance by cluster (xgBoost): ", metric)) 
+    # print(p1)
+    # list_p1[[i]] = p1
+    
+    # }
+    
+    return(p1)
+    # return(list_p1)
     
 }
