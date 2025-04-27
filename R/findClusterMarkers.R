@@ -37,9 +37,10 @@ findClusterMarkers <- function (final_out,
     
     num_markers_original = num_markers
     
-    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
+    # all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
+                    # "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
+    all_methods = c("citeFuse","sc2marker","xgBoost","fstat",
                     "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
-    
     
     if ((length(method)==1 && method == "all") | (identical(sort(method), sort(all_methods)))){
         message("Using all methods.")
