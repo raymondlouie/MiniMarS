@@ -37,10 +37,10 @@ findClusterMarkers <- function (final_out,
     
     num_markers_original = num_markers
     
-    # all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
-                    # "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
-    all_methods = c("citeFuse","sc2marker","xgBoost","fstat",
+    all_methods = c("citeFuse","sc2marker","geneBasis","xgBoost","fstat",
                     "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
+    # all_methods = c("citeFuse","sc2marker","xgBoost","fstat",
+    #                 "seurat_wilcox","seurat_bimod","seurat_roc","seurat_t","seurat_LR")
     
     if ((length(method)==1 && method == "all") | (identical(sort(method), sort(all_methods)))){
         message("Using all methods.")
@@ -77,12 +77,12 @@ findClusterMarkers <- function (final_out,
     sce  <- SingleCellExperiment::SingleCellExperiment(list(counts=input_matrix),
                                                        colData=data.frame(cell_type=clusters))
     
+    
     # logcounts(sce) <- log2(input_matrix + 1)
     SingleCellExperiment::logcounts(sce) <- input_matrix
-    
     list_markers = list()
     runtime_secs <- c()
-    
+    list_errors = list()
     for (i in 1:length(method)) {
         curr_method = method[[i]]
         # curr_method_old = method_old[[i]]
@@ -91,22 +91,39 @@ findClusterMarkers <- function (final_out,
             message(paste0("\nCaclulating markers using ", curr_method,".\n"))
         }
         
-        
+        flag=0
         if (curr_method == "citeFuse") {
             start_time <- Sys.time()
-            curr_markers = citeFuseWrapper(sce,
-                                           num_markers,
-                                           subsample = TRUE)
-            end_time <- Sys.time()
-            runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-            names(runtime_secs)[i] <- "citeFuse"
+            
+            # curr_markers=NULL
+            tryCatch({
+                curr_markers <- citeFuseWrapper(sce,
+                                                num_markers,
+                                                subsample = TRUE)
+            }, error = function(e) {
+                error_txt <<- paste0(curr_method, " has error: ", e$message)
+                curr_markers <<- NULL  # Optional: to avoid using undefined variable later
+                flag <<- 1
+            })
+            
+            
         }
         
         if (curr_method == "sc2marker") {
             start_time <- Sys.time()
-            curr_markers = sc2markerWrapper(input_matrix,
-                                            clusters,
-                                            num_markers)
+            
+            
+            tryCatch({
+                curr_markers = sc2markerWrapper(input_matrix,
+                                                clusters,
+                                                num_markers)
+            }, error = function(e) {
+                error_txt <<- paste0(curr_method, " has error: ", e$message)
+                curr_markers <<- NULL  # Optional: to avoid using undefined variable later
+                flag <<- 1
+            })
+            
+            
             end_time <- Sys.time()
             runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
             names(runtime_secs)[i] <- "sc2marker"
@@ -116,9 +133,18 @@ findClusterMarkers <- function (final_out,
             start_time <- Sys.time()
             SingleCellExperiment::logcounts(sce) <- input_matrix-min(input_matrix)
             
-            curr_markers = geneBasisWrapper(sce,
-                                            clusters,
-                                            num_markers)
+            
+            tryCatch({
+                curr_markers = geneBasisWrapper(sce,
+                                                clusters,
+                                                num_markers)
+            }, error = function(e) {
+                error_txt <<- paste0(curr_method, " has error: ", e$message)
+                curr_markers <<- NULL  # Optional: to avoid using undefined variable later
+                flag <<- 1
+            })
+            
+            
             end_time <- Sys.time()
             runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
             names(runtime_secs)[i] <- "geneBasis"
@@ -126,9 +152,17 @@ findClusterMarkers <- function (final_out,
         
         if (curr_method == "xgBoost") {
             start_time <- Sys.time()
-            curr_markers = xgBoostWrapper(t(input_matrix),
-                                          clusters,
-                                          num_markers)
+            
+            tryCatch({
+                curr_markers =     curr_markers = xgBoostWrapper(t(input_matrix),
+                                                                 clusters,
+                                                                 num_markers)
+            }, error = function(e) {
+                error_txt <<- paste0(curr_method, " has error: ", e$message)
+                curr_markers <<- NULL  # Optional: to avoid using undefined variable later
+                flag <<- 1
+            })
+            
             end_time <- Sys.time()
             runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
             names(runtime_secs)[i] <- "xgBoost"
@@ -136,9 +170,18 @@ findClusterMarkers <- function (final_out,
         
         if (curr_method == "fstat") {
             start_time <- Sys.time()
-            curr_markers = fstatWrapper(t(input_matrix),
-                                        clusters,
-                                        num_markers)
+            
+            
+            tryCatch({
+                curr_markers = fstatWrapper(t(input_matrix),
+                                            clusters,
+                                            num_markers)
+            }, error = function(e) {
+                error_txt <<- paste0(curr_method, " has error: ", e$message)
+                curr_markers <<- NULL  # Optional: to avoid using undefined variable later
+                flag <<- 1
+            })
+            
             end_time <- Sys.time()
             runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
             names(runtime_secs)[i] <- "fstat"
@@ -147,10 +190,18 @@ findClusterMarkers <- function (final_out,
         if (length(grep("seurat",curr_method))>0){
             start_time <- Sys.time()
             curr_method2 = gsub("seurat_","",curr_method)
-            curr_markers = seuratWrapper(input_matrix,
-                                         clusters,
-                                         num_markers,
-                                         curr_method2)
+            
+            tryCatch({
+                curr_markers = seuratWrapper(input_matrix,
+                                             clusters,
+                                             num_markers,
+                                             curr_method2)
+            }, error = function(e) {
+                error_txt <<- paste0(curr_method, " has error: ", e$message)
+                curr_markers <<- NULL  # Optional: to avoid using undefined variable later
+                flag <<- 1
+            })
+            
             end_time <- Sys.time()
             runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
             names(runtime_secs)[i] <- curr_method
@@ -158,111 +209,21 @@ findClusterMarkers <- function (final_out,
         }
         
         
-        
-        list_markers[[curr_method]] = curr_markers
-        
+        if (flag == 0){
+            list_markers[[curr_method]] = curr_markers
+        } else{
+            list_errors[[curr_method]] = error_txt
+            message(error_txt)
+        }
+    }
+    
+    if (verbose){
+        message(cat("Method with no errors: ",paste0(names(list_markers),collapse=", ")))
+        message(cat("Methods with errors: ",paste0(names(list_errors),collapse=", ")))
     }
     
     list_markers_temp = list_markers
     
-    # # calculate consensus if more than one method chosen
-    # if (length(method)>1){
-    #     
-    #     i = length(runtime_secs)+1
-    #     start_time <- Sys.time()
-    #     
-    #     list_performance_valid = performanceAllMarkers(list_markers_temp,
-    #                                                    final_out=final_out,
-    #                                                    method="all",
-    #                                                    nrounds=1500,
-    #                                                    nthread=6,
-    #                                                    testSet = "valid",
-    #                                                    verbose=FALSE)
-    #     
-    #     chosen_measure = "F1_macro"
-    #     index_remove = grep("consensus",names(list_performance_valid))
-    #     if (length(index_remove)>0){
-    #         list_performance_valid = list_performance_valid[-index_remove]
-    #     }
-    #     
-    #     list_weight = list()
-    #     for (jj in 1:length(list_performance_valid)){
-    #         curr_list_measures = list_performance_valid[[jj]]$xgBoost_performance_all
-    #         list_weight[[names(list_performance_valid)[[jj]]]] = as.numeric(curr_list_measures[which(names(curr_list_measures) %in% chosen_measure)])
-    #     }
-    #     list_weight_num = as.numeric(list_weight)
-    #     list_weight_num= list_weight_num/sum(list_weight_num)
-    #     names(list_weight_num) = names(list_performance_valid)
-    #     
-    #     names(list_weight) <- names(list_performance_valid)
-    #     v_weight <- do.call(c, list_weight)
-    #     topMethods <- names(v_weight[order(v_weight, decreasing = T)][1:min(metric_topnum,length(v_weight))])
-    #     thresMethods = names(v_weight)[which(v_weight>metric_thres)]
-    #     keepMethods = intersect(topMethods,thresMethods)
-    #     
-    #     ##only use marker sets from top two methods (with the highest chosen_measure)
-    #     list_markers_temp <- list_markers_temp[names(list_markers_temp) %in% keepMethods]
-    #     
-    #     #the weight vector needs to be adjusted accordingly
-    #     list_weight_num <- list_weight_num[names(list_weight_num) %in% keepMethods]
-    #     
-    #     
-    #     if (verbose){
-    #         message(paste0("Weighted list is ", list_weight_num))
-    #     }
-    #     
-    #     
-    #     list_markers[["consensus_weighted"]] = calculateConsensus(list_markers_temp,
-    #                                                               t(input_matrix),
-    #                                                               clusters,
-    #                                                               num_markers=num_markers,
-    #                                                               method = "weighted",
-    #                                                               list_weight_num = list_weight_num,
-    #                                                               verbose=TRUE)
-    #     
-    #     end_time <- Sys.time()
-    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-    #     names(runtime_secs)[i] <- "consensus_weighted"
-    #     
-    #     i = length(runtime_secs)+1
-    #     start_time <- Sys.time()
-    #     list_markers[["consensus_naive"]] = calculateConsensus(list_markers_temp,
-    #                                                            t(input_matrix),
-    #                                                            clusters,
-    #                                                            num_markers=num_markers,
-    #                                                            verbose=TRUE)
-    #     end_time <- Sys.time()
-    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-    #     names(runtime_secs)[i] <- "consensus_naive"
-    #     
-    #     i = length(runtime_secs)+1
-    #     start_time <- Sys.time()
-    #     list_markers[["consensus_fstat"]] =  calculateConsensus(list_markers_temp,
-    #                                                             t(input_matrix),
-    #                                                             clusters,
-    #                                                             num_markers=num_markers,
-    #                                                             method = "fstat",
-    #                                                             verbose=TRUE)
-    #     end_time <- Sys.time()
-    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-    #     names(runtime_secs)[i] <- "consensus_fstat"
-    #     
-    #     i = length(runtime_secs)+1
-    #     start_time <- Sys.time()
-    #     list_markers[["consensus_xgboost"]] = calculateConsensus(list_markers_temp,
-    #                                                              t(input_matrix),
-    #                                                              clusters,
-    #                                                              num_markers=num_markers,
-    #                                                              method = "xgBoost",
-    #                                                              verbose=TRUE)
-    #     end_time <- Sys.time()
-    #     runtime_secs[i] <- as.numeric(end_time-start_time, units="secs")
-    #     names(runtime_secs)[i] <- "consensus_xgboost"
-    #     
-    #     
-    #     
-    #     
-    # }
     
     fstat=apply(t(input_matrix),2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
     fstat <- fstat[order(unlist(fstat), decreasing = T)]
