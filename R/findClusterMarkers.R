@@ -217,10 +217,10 @@ findClusterMarkers <- function (final_out,
         }
     }
     
-    # if (verbose){
+    if (verbose){
         message(cat("Method with no errors: ",paste0(names(list_markers),collapse=", ")))
         message(cat("Methods with errors: ",paste0(names(list_errors),collapse=", ")))
-    # }
+    }
     
     list_markers_temp = list_markers
     
