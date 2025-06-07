@@ -2,9 +2,9 @@
 % Please edit documentation in R/wrapperMethods.R
 \name{citeFuseWrapper}
 \alias{citeFuseWrapper}
-\title{Wrapper function for citeFUSE}
+\title{Wrapper function for CiteFuse}
 \usage{
-citeFuseWrapper(sce, num_markers = 15, ...)
+citeFuseWrapper(sce, num_markers = 15, min_freq = 3, ...)
 }
 \arguments{
 \item{sce}{Single cell experiment object}
@@ -12,8 +12,8 @@ citeFuseWrapper(sce, num_markers = 15, ...)
 \item{num_markers}{Number of markers to output}
 }
 \value{
-The most informative markers determined by citeFUSE
+The most informative markers determined by CiteFuse
 }
 \description{
-Wrapper function for citeFUSE
+Wrapper function for CiteFuse
 }

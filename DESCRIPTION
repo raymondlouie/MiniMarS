@@ -9,7 +9,7 @@ Description: MiniMarS finds the markers that best define a cluster, using a numb
 License: GPL-3.0 license
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Depends: R (>= 2.10)
 NeedsCompilation: no
 Packaged: 2024-08-06 03:55:40 UTC; angli

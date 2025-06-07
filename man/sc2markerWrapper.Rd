@@ -7,9 +7,11 @@
 sc2markerWrapper(input_matrix, clusters, num_markers = 15, ...)
 }
 \arguments{
-\item{num_markers}{Number of markers to output}
+\item{input_matrix}{Marker matrix (cell vs markers)}
 
-\item{sce}{Single cell experiment object}
+\item{clusters}{Cell type annotation}
+
+\item{num_markers}{Number of markers to output}
 }
 \value{
 The most informative markers determined by sc2marker

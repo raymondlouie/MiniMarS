@@ -4,22 +4,34 @@
 \alias{findClusterMarkers}
 \title{Find the most informative cluster markers}
 \usage{
-findClusterMarkers(input_matrix, clusters, num_markers = 15, method = "all")
+findClusterMarkers(
+  final_out,
+  num_markers = 15,
+  method = "all",
+  metric_thres = 0,
+  metric_topnum = 2,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
-\item{input_matrix}{Feature matrix with cells as columns, and features as rows.}
+\item{final_out}{List of matrix and cluster information produced by function `processSubsampling`}
 
-\item{clusters}{Cluster annotation for each cell.}
-
-\item{num_markers}{Number of markers to output.}
+\item{num_markers}{Number of markers}
 
 \item{method}{List of methods to find cluster markers.
 \itemize{
-  \item \code{citeFUSE}
+  \item \code{citeFuse}
   \item \code{sc2marker}
   \item \code{geneBasis}
+  \item \code{xgBoost}
+  \item \code{seurat}
   \item \code{all}: Use all methods
 }}
+
+\item{metric_thres}{Methods to consider in consensus, which are above this threshold based on F1_macro}
+
+\item{metric_topnum}{Number of methods to consider in consensus, based on sorted F1_macro.}
 }
 \value{
 A list containing
@@ -28,6 +40,7 @@ A list containing
   \item \code{score_min}: Minimum of cell type scores as predicted by geneBasis
   \item \code{score_median}: Median of cell type scores as predicted by geneBasis
   \item \code{celltype_stat}: Cell type stats as predicted by geneBasis
+  \item \code{runtime}: Computation time for each method
 }
 }
 \description{

@@ -9,6 +9,8 @@ geneBasisWrapper(sce, clusters, num_markers = 15, ...)
 \arguments{
 \item{sce}{Single cell experiment object}
 
+\item{clusters}{Cell type annotation}
+
 \item{num_markers}{Number of markers to output}
 }
 \value{
