@@ -309,10 +309,10 @@ processSubsamplingOLD =function(cluster_selection_out,
 }
 
 
-#' Sub-sample and split data into training and test set
+#' Sub-sample and split data into training, validation and test set
 #'
 #' @param cluster_selection_out Output of function `processInputFormat`.
-#' @param subsample_num Number of cells after sub-sammpling.
+#' @param subsample_num Number of cells in each of the training, validation, and test sets after sub-sampling.
 #' @param cluster_proportion
 #' \itemize{
 #'   \item \code{proportional:} (default) Same proportion of cells in each cluster, for the training and data sets, compared to the original cluster proportion.
