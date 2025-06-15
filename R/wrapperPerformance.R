@@ -141,7 +141,7 @@ performanceMarkers <- function (markers_sel,
 
 
 
-#' Wrapper function for xgboostPerformance
+#' Predict cells based on xgBoost trained model
 #'
 #' @param markers_sel Single cell experiment object
 #' @param input_matrix_train Feature training matrix with cells as columns, and features as rows.
@@ -209,7 +209,7 @@ xgboostPredictCell <- function (markers_sel,
 
 
 
-#' Wrapper function for geneBasisPerformance
+#' Prediction of cell based on algorithm provided by geneBasis
 #'
 #' @param markers_sel Selected markers
 #' @param input_matrix_test Feature test matrix with cells as columns, and features as rows.
@@ -242,7 +242,7 @@ geneBasisPredictCell <- function (markers_sel,
 }
 
 
-#' Wrapper function for geneBasisPerformance
+#' Calculate various performanc metrics based on predicted cell
 #'
 #' @param test_prediction Selected markers
 #' @param unique_clusters_sample Unique clusters
