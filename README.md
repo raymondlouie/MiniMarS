@@ -40,7 +40,7 @@ install.packages("dplyr")
 
 ### Install `MiniMarS`
 
-Please run the following to install the `MiniMarS` package from the Development branch:
+Please run the following to install the `MiniMarS` package:
 ```
 devtools::install_github("https://github.com/raymondlouie/MiniMarS",force=TRUE)
 
@@ -235,4 +235,6 @@ Number of protein features: 17<br>
 11 cell types/clusters from the data provider<br>
 [Click here to access the data](https://support.10xgenomics.com/single-cell-gene-expression/datasets/3.0.0/pbmc_10k_protein_v3)<br>
 
+## Citation and Runtime
 
+Please see our [paper](https://www.biorxiv.org/cgi/content/short/2025.07.14.664825v1) for more details, including runtime. 
