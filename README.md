@@ -40,7 +40,7 @@ install.packages("dplyr")
 
 ### Install `MiniMarS`
 
-Please run the following to install the `MiniMarS` package:
+Please run the following to install the `MiniMarS` package (typical install time: 5-10 minutes):
 ```
 devtools::install_github("https://github.com/raymondlouie/MiniMarS",force=TRUE)
 
@@ -51,7 +51,9 @@ or download the package [here](https://www.dropbox.com/scl/fi/2vk9wy1j1tw7j2vutz
 install.packages("~/Downloads/MiniMarS_0.3.1.tar.gz", type = "source", repos = NULL)
 ```
 
-## Standard `MiniMarS` workflow
+## Standard `MiniMarS` workflow demo
+
+Expected runtime: 1 minute
 
 ### Load the libraries
 ```{r}
