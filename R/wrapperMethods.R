@@ -593,3 +593,76 @@ calculateConsensus_wrap <- function(list_markers_temp,
     return(list_markers)
     
 }
+
+
+#' Find the minimum number of markers to satisfy performance threshold
+#' 
+#' @param final_out List of matrix and cluster information produced by function `processSubsampling`
+#' @param list_markers_test List of markers to test 
+#' @param chosen_measure The performance measure used to choose the methods used in the consensus. Options are precision_weighted, precision_macro, recall_weighted, recall_macro, F1_macro, F1_weighted, precision_micro
+#' @param threshold Minimum threshold for `chosen_measure`
+#' @return Markers and performance.
+#' @export
+
+minMarker <- function (final_out,
+                       list_markers_test=c(5,10,15,20,25,30,40),
+                       chosen_measure = "F1_macro",
+                       threshold  = 0.8,
+                       ...){
+    
+    list_top_method = list()
+    for (i in 1:length(list_markers_test)){
+        
+        numMarkers = list_markers_test[[i]]
+        
+        list_markers_time = findClusterMarkers(final_out,
+                                               num_markers = numMarkers,
+                                               method = "all",
+                                               verbose = TRUE)
+        
+        list_time = list_markers_time$runtime_secs
+        names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
+                                                                                            "runtime_secs")))]
+        list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
+        
+        
+        list_markers_time_consensus= calculateConsensus_wrap(list_markers,
+                                                             final_out,
+                                                             num_markers=numMarkers)
+        
+        list_time_all = c(list_time,list_markers_time_consensus$runtime_secs)
+        
+        list_markers_all = c(list_markers,list_markers_time_consensus)
+        list_markers_all = list_markers_all[which(!(names(list_markers_all) %in% c("runtime_secs")))]
+        
+        
+        
+        list_performance_all = performanceAllMarkers(list_markers_all,
+                                                     final_out = final_out,
+                                                     method = "xgBoost",
+                                                     nrounds = 1500,
+                                                     nthread = 6,
+                                                     verbose = TRUE)
+        
+        curr_performance = list_performance_all[[grep("Top",names(list_performance_all))]]
+        curr_performance_metric = curr_performance$xgBoost_performance_all[[chosen_measure]]
+        if (curr_performance_metric>threshold){
+            break;
+        }
+        # list_top_method[[i]] = curr_performance
+        
+    }
+    
+    list_all= NULL
+    if (curr_performance_metric>threshold){
+        list_all= list(markers = list_markers_all[[grep("Top",names(list_markers_all))]],
+                       performance = curr_performance)
+        message(paste0("Threshold reached with ", numMarkers, " markers and ", chosen_measure,
+                       " score of ", curr_performance_metric," (user threshold=", threshold,")."))
+        
+    } else{
+        message("Threshold not reached.")
+        
+    }
+    return(list_all)
+}
