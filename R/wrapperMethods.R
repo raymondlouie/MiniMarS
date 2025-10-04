@@ -65,10 +65,10 @@ seuratWrapper <- function (input_matrix,
     
     # Convert if assay is V5
     if(class(seurat_object@assays$RNA)[1]=="Assay5"){
-      # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
-      seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
+        # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
+        seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
     }
-  
+    
     markers_df = Seurat::FindAllMarkers(seurat_object,
                                         slot="counts",
                                         test.use = method,
@@ -124,8 +124,8 @@ sc2markerWrapper <- function (input_matrix,
     
     # Convert if assay is V5
     if(class(seurat_object@assays$RNA)[1]=="Assay5"){
-      # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
-      seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
+        # seurat_object[["RNA"]] <- as(object = seurat_object[["RNA"]], Class = "Assay")
+        seurat_object[["RNA"]] <- SeuratObject::CreateAssayObject(counts = seurat_object[["RNA"]]$counts)
     }
     
     all.markers <- sc2marker::Detect_single_marker_all(seurat_object, ...)
@@ -576,7 +576,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
         names(list_markers_temp) = paste0("consensusTop","_",names(list_markers_temp))
         list_markers = list_markers_temp
         runtime_secs = c("consensusTop" = 0)
-
+        
     }
     
     fstat=apply(t(input_matrix),2,function (x) na.omit(anova(aov(x~as.factor(clusters)))$"F value"))
@@ -608,9 +608,11 @@ minMarker <- function (final_out,
                        list_markers_test=c(5,10,15,20,25,30,40),
                        chosen_measure = "F1_macro",
                        threshold  = 0.8,
+                       seed=44,
                        ...){
     
-    list_top_method = list()
+    list_all = list()
+    
     for (i in 1:length(list_markers_test)){
         
         numMarkers = list_markers_test[[i]]
@@ -646,21 +648,22 @@ minMarker <- function (final_out,
         
         curr_performance = list_performance_all[[grep("Top",names(list_performance_all))]]
         curr_performance_metric = curr_performance$xgBoost_performance_all[[chosen_measure]]
+        list_all[[i]]= list(markers = list_markers_all[[grep("Top",names(list_markers_all))]],
+                            performance = curr_performance)
         if (curr_performance_metric>threshold){
             break;
         }
-        # list_top_method[[i]] = curr_performance
-        
     }
+    names(list_all) = list_markers_test[1:length(list_all)]
     
-    list_all= NULL
     if (curr_performance_metric>threshold){
-        list_all= list(markers = list_markers_all[[grep("Top",names(list_markers_all))]],
-                       performance = curr_performance)
+
         message(paste0("Threshold reached with ", numMarkers, " markers and ", chosen_measure,
                        " score of ", curr_performance_metric," (user threshold=", threshold,")."))
         
     } else{
+        list_all= NULL
+        
         message("Threshold not reached.")
         
     }
