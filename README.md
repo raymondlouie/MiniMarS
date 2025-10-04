@@ -117,7 +117,7 @@ final_out = processSubsampling(cluster_selection_out,
 ```
 
 ### Find the minimum number of markers to identify the clusters. 
-Finds the minimum number of markers using our wrapper function, which selects the top method by default, out of the following methods: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". 
+Finds the minimum number of markers to satisfy a certain threshold using a particular macro metric (i.e, a single metric across all clusters) using our wrapper function, which selects the top method by default, out of the following methods: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". 
 ```{r}
 minMarker_result <- minMarker(final_out,
                               list_markers_test=c(5,10,15,20,25,30,40),
@@ -127,6 +127,7 @@ minMarker_result <- minMarker(final_out,
                               threshold  = 0.7)
 ```
 
+Alternatively, the user can find the minimum number of markers to satisfy a threshold considering selected clusters, given a list of number of markers to sweep through.
 ```{r}
 
 minMarkerCluster_result <- minMarker_clusters(final_out,

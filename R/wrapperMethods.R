@@ -602,7 +602,7 @@ calculateConsensus_wrap <- function(list_markers_temp,
 #' @param chosen_measure The performance measure used to choose the methods used in the consensus. Options are precision_weighted, precision_macro, recall_weighted, recall_macro, F1_macro, F1_weighted, precision_micro
 #' @param threshold Minimum threshold for `chosen_measure`
 #' @return List containing 
-#' - Markers corresponding to best method
+#' - Markers (minimum number) corresponding to best method
 #' - Performance of these markers
 #' - Markers corresponding to all methods
 #' - Performance of all methods
@@ -686,7 +686,7 @@ minMarker <- function (final_out,
 #' @param threshold Minimum threshold over all clusters for `chosen_measure`
 #' @param clusters_sel Clusters to consider.
 #' @return List containing 
-#' - Markers corresponding to best method
+#' - Markers (minimum number) corresponding to best method
 #' - Performance of these markers
 #' - Markers corresponding to all methods
 #' - Performance of all methods
