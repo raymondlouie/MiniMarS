@@ -595,10 +595,10 @@ calculateConsensus_wrap <- function(list_markers_temp,
 }
 
 
-#' Find the minimum number of markers to satisfy performance threshold
+#' Find the minimum number of markers to satisfy performance threshold. 
 #' 
 #' @param final_out List of matrix and cluster information produced by function `processSubsampling`
-#' @param list_markers_test List of markers to test 
+#' @param list_markers_test List of marker numbers to sweep through. Stops when threshold is satisfied.
 #' @param chosen_measure The performance measure used to choose the methods used in the consensus. Options are precision_weighted, precision_macro, recall_weighted, recall_macro, F1_macro, F1_weighted, precision_micro
 #' @param threshold Minimum threshold for `chosen_measure`
 #' @return List containing 
@@ -681,7 +681,7 @@ minMarker <- function (final_out,
 #' Find the minimum number of markers to satisfy performance threshold across all clusters
 #' 
 #' @param final_out List of matrix and cluster information produced by function `processSubsampling`
-#' @param list_markers_test List of markers to test 
+#' @param list_markers_test List of marker numbers to sweep through. Stops when threshold is satisfied.
 #' @param chosen_measure The performance measure used to choose the methods used in the consensus. Options are precision_weighted, precision_macro, recall_weighted, recall_macro, F1_macro, F1_weighted, precision_micro
 #' @param threshold Minimum threshold over all clusters for `chosen_measure`
 #' @param clusters_sel Clusters to consider.
