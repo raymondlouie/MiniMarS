@@ -127,6 +127,15 @@ minMarker_result <- minMarker(final_out,
                               threshold  = 0.7)
 ```
 
+```{r}
+
+minMarkerCluster_result <- minMarker_clusters(final_out,
+                              list_markers_test=c(5,10,15,20,25,30,40),
+                              chosen_measure = "F1",
+                              cluster = "all",
+                              threshold  = 0.2)
+```
+
 
 ### Visualise the identified markers and their performance.
 ```{r}
