@@ -773,5 +773,6 @@ minMarker_clusters <- function (final_out,
         message("Threshold not reached.")
         list_all= NULL
     }
+    return(list_all)
     
 }    
