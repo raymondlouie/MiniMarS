@@ -648,8 +648,10 @@ minMarker <- function (final_out,
         
         curr_performance = list_performance_all[[grep("Top",names(list_performance_all))]]
         curr_performance_metric = curr_performance$xgBoost_performance_all[[chosen_measure]]
-        list_all[[i]]= list(markers = list_markers_all[[grep("Top",names(list_markers_all))]],
-                            performance = curr_performance)
+        list_all[[i]]= list(markersTop = list_markers_all[[grep("Top",names(list_markers_all))]],
+                            performanceAll = curr_performance,
+                            markersAll=list_markers_all,
+                            timeAll = list_time_all)
         if (curr_performance_metric>threshold){
             break;
         }
@@ -737,8 +739,10 @@ minMarker_clusters <- function (final_out,
         curr_performance_metric= curr_performance_metric[which(names(curr_performance_metric) %in% clusters_sel2)]
         message(paste0("Clusters selected: ", paste0(clusters_sel2,collapse=", ")))
         
-        list_all[[i]]= list(markers = list_markers_all[[grep("Top",names(list_markers_all))]],
-                            performance = curr_performance)
+        list_all[[i]]= list(markersTop = list_markers_all[[grep("Top",names(list_markers_all))]],
+                            performanceAll = curr_performance,
+                            markersAll=list_markers_all,
+                            timeAll = list_time_all)
         
         if (min(curr_performance_metric)>threshold){
             break;
