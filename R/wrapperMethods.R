@@ -654,10 +654,10 @@ minMarker <- function (final_out,
             break;
         }
     }
-    names(list_all) = list_markers_test[1:length(list_all)]
+    names(list_all) = paste0(list_markers_test[1:length(list_all)], " markers")
     
     if (curr_performance_metric>threshold){
-
+        
         message(paste0("Threshold reached with ", numMarkers, " markers and ", chosen_measure,
                        " score of ", curr_performance_metric," (user threshold=", threshold,")."))
         
@@ -669,3 +669,92 @@ minMarker <- function (final_out,
     }
     return(list_all)
 }
+
+#' Find the minimum number of markers to satisfy performance threshold across all clusters
+#' 
+#' @param final_out List of matrix and cluster information produced by function `processSubsampling`
+#' @param list_markers_test List of markers to test 
+#' @param chosen_measure The performance measure used to choose the methods used in the consensus. Options are precision_weighted, precision_macro, recall_weighted, recall_macro, F1_macro, F1_weighted, precision_micro
+#' @param threshold Minimum threshold over all clusters for `chosen_measure`
+#' @param clusters_sel Clusters to consider.
+#' @return Markers and performance.
+#' @export
+
+minMarker_clusters <- function (final_out,
+                                list_markers_test=c(5,10,15,20,25,30,40),
+                                chosen_measure = "F1",
+                                threshold  = 0.8,
+                                clusters_sel="all",
+                                seed=44,
+                                ...){
+    
+    list_all = list()
+    for (i in 1:length(list_markers_test)){
+        
+        numMarkers = list_markers_test[[i]]
+        
+        list_markers_time = findClusterMarkers(final_out,
+                                               num_markers = numMarkers,
+                                               method = "all",
+                                               verbose = TRUE)
+        
+        list_time = list_markers_time$runtime_secs
+        names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
+                                                                                            "runtime_secs")))]
+        list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
+        
+        
+        list_markers_time_consensus= calculateConsensus_wrap(list_markers,
+                                                             final_out,
+                                                             num_markers=numMarkers)
+        
+        list_time_all = c(list_time,list_markers_time_consensus$runtime_secs)
+        
+        list_markers_all = c(list_markers,list_markers_time_consensus)
+        list_markers_all = list_markers_all[which(!(names(list_markers_all) %in% c("runtime_secs")))]
+        
+        
+        
+        list_performance_all = performanceAllMarkers(list_markers_all,
+                                                     final_out = final_out,
+                                                     method = "xgBoost",
+                                                     nrounds = 1500,
+                                                     nthread = 6,
+                                                     verbose = TRUE)
+        
+        curr_performance = list_performance_all[[grep("Top",names(list_performance_all))]]
+        curr_performance_metric = curr_performance$xgBoost_performance_cluster[,metric]
+        names(curr_performance_metric) = curr_performance$xgBoost_performance_cluster$cluster
+        
+        if (clusters_sel == "all"){
+            clusters_sel2 = curr_performance$xgBoost_performance_cluster$cluster
+        } else{
+            clusters_sel2 = intersect(clusters_sel,curr_performance$xgBoost_performance_cluster$cluster)
+        }
+        if (length(clusters_sel2)==0){
+            warning("Please choose valid clusters.")
+        }
+        curr_performance_metric= curr_performance_metric[which(names(curr_performance_metric) %in% clusters_sel2)]
+        message(paste0("Clusters selected: ", paste0(clusters_sel2,collapse=", ")))
+        
+        list_all[[i]]= list(markers = list_markers_all[[grep("Top",names(list_markers_all))]],
+                            performance = curr_performance)
+        
+        if (min(curr_performance_metric)>threshold){
+            break;
+        }
+        
+    }
+    names(list_all) = paste0(list_markers_test[1:length(list_all)], " markers")
+    
+    
+    if (min(curr_performance_metric)>threshold){
+        message(paste0("Threshold reached with ", numMarkers, " markers and ", metric,
+                       " score (minimum over all clusters) of ", min(curr_performance_metric)," ( user threshold=", threshold,")."))
+        
+    } else{
+        message("Threshold not reached.")
+        list_all= NULL
+    }
+    
+}    
