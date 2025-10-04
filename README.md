@@ -116,8 +116,18 @@ final_out = processSubsampling(cluster_selection_out,
                                seed = 8)
 ```
 
-### Find the markers to identify the clusters. 
-Several methods implemented to find markers for identifying the clusters using the `method` argument: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". The default option is to use "all" methods. The methods with "consensus_" naming return an integration of results from several methods run.
+### Find the minimum number of markers to identify the clusters. 
+Several methods implemented to find markers for identifying the clusters using the `method` argument: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". The following obtains th
+```{r}
+minMarker_result <- minMarker(final_out,
+                              list_markers_test=c(5,10,15,20,25,30,40),
+                              # numTimes = 50,
+                              metric = "F1_macro",
+                              cluster = "all",
+                              threshold  = 0.7)
+```
+
+
 ```{r}
 
 numMarkers=15
@@ -191,6 +201,7 @@ sessionInfo()
 <br>
 
 ## Using the user's own marker panel
+
 Under some scenarios, the users may want to test their own customised marker panel instead of the predicted ones. We recommend using the following codes to evaluate the performance of the user's customised marker input.
 ```{r}
 user_markers = c("CD80", "CD86", "CD274", "CD273", "CD275", "CD11b", "CD137L", "CD70", "unidentified_marker1","unidentified_marker2")

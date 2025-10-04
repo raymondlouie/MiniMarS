@@ -723,7 +723,7 @@ minMarker_clusters <- function (final_out,
                                                      verbose = TRUE)
         
         curr_performance = list_performance_all[[grep("Top",names(list_performance_all))]]
-        curr_performance_metric = curr_performance$xgBoost_performance_cluster[,metric]
+        curr_performance_metric = curr_performance$xgBoost_performance_cluster[,chosen_measure]
         names(curr_performance_metric) = curr_performance$xgBoost_performance_cluster$cluster
         
         if (clusters_sel == "all"){
@@ -749,7 +749,7 @@ minMarker_clusters <- function (final_out,
     
     
     if (min(curr_performance_metric)>threshold){
-        message(paste0("Threshold reached with ", numMarkers, " markers and ", metric,
+        message(paste0("Threshold reached with ", numMarkers, " markers and ", chosen_measure,
                        " score (minimum over all clusters) of ", min(curr_performance_metric)," ( user threshold=", threshold,")."))
         
     } else{
