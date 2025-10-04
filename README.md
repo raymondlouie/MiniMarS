@@ -117,7 +117,7 @@ final_out = processSubsampling(cluster_selection_out,
 ```
 
 ### Find the minimum number of markers to identify the clusters. 
-Several methods implemented to find markers for identifying the clusters using the `method` argument: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". The following obtains th
+Finds the minimum number of markers using our wrapper function, which selects the top method by default, out of the following methods: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". 
 ```{r}
 minMarker_result <- minMarker(final_out,
                               list_markers_test=c(5,10,15,20,25,30,40),
