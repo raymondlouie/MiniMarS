@@ -691,6 +691,7 @@ minMarker <- function (final_out,
 #' - Markers corresponding to all methods
 #' - Performance of all methods
 #' - Time of all methods
+#' 
 #' @export
 
 minMarker_clusters <- function (final_out,
