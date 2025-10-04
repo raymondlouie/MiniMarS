@@ -128,49 +128,12 @@ minMarker_result <- minMarker(final_out,
 ```
 
 
-```{r}
-
-numMarkers=15
-list_markers_time = findClusterMarkers(final_out,
-                                       num_markers = numMarkers,
-                                       method = "all",
-                                       verbose = TRUE)
-
-list_time = list_markers_time$runtime_secs
-names(list_time) = names(list_markers_time)[which(!(names(list_markers_time) %in% c("consensus",
-                                                                                    "runtime_secs")))]
-list_markers = list_markers_time[which(!(names(list_markers_time) %in% c("runtime_secs")))]
-
-```
-
-Run the consensus method.
-
-```{r}
-list_markers_time_consensus= calculateConsensus_wrap(list_markers,
-                                                     final_out,
-                                                     num_markers=numMarkers)
-
-
-list_time_all = c(list_time,list_markers_time_consensus$runtime_secs)
-
-list_markers_all = c(list_markers,list_markers_time_consensus)
-list_markers_all = list_markers_all[which(!(names(list_markers_all) %in% c("runtime_secs")))]
-```
-
-### Evaluate the performance of the markers using the testing set. 
-There are two methods implemented to assess the performance of each marker selection method using the `method` argument:  "xgBoost" and "geneBasis". The default option is to use "xgBoost". 
-```{r}
-list_performance_all = performanceAllMarkers(list_markers_all,
-                                         final_out = final_out,
-                                         method = "xgBoost",
-                                         nrounds = 1500,
-                                         nthread = 6,
-                                         verbose = TRUE)
-```
-
 ### Visualise the identified markers and their performance.
 ```{r}
 library(ggplot2)
+
+list_markers_all = minMarker_result[[length(minMarker_result)]]$markersAll
+list_performance_all= minMarker_result[[length(minMarker_result)]]$performanceAll
 
 plotMarkers(list_markers_all)
 plotPerformance(list_performance_all)
