@@ -651,7 +651,7 @@ minMarker <- function (final_out,
         list_all[[i]]= list(markersTop = list_markers_all[[grep("Top",names(list_markers_all))]],
                             performanceTop = curr_performance,
                             markersAll=list_markers_all,
-                            performanceAll=list_performance_all
+                            performanceAll=list_performance_all,
                             timeAll = list_time_all)
         if (curr_performance_metric>threshold){
             break;
@@ -743,7 +743,7 @@ minMarker_clusters <- function (final_out,
         list_all[[i]]= list(markersTop = list_markers_all[[grep("Top",names(list_markers_all))]],
                             performanceTop = curr_performance,
                             markersAll=list_markers_all,
-                            performanceAll=list_performance_all
+                            performanceAll=list_performance_all,
                             timeAll = list_time_all)
         
         if (min(curr_performance_metric)>threshold){
