@@ -121,9 +121,7 @@ Finds the minimum number of markers to satisfy a certain threshold using a parti
 ```{r}
 minMarker_result <- minMarker(final_out,
                               list_markers_test=c(5,10,15,20,25,30,40),
-                              # numTimes = 50,
-                              metric = "F1_macro",
-                              cluster = "all",
+                              chosen_measure = "F1_macro",
                               threshold  = 0.7)
 ```
 
