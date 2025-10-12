@@ -615,8 +615,10 @@ minMarker <- function (sc_in,
                        clusters_sel="all_clusters",
                        threshold  = 0.8,
                        seed=44,
+                       in_opt=1,
                        ...){
     
+    if (in_opt==1){
     cluster_selection_out= processClusterSelection(sc_in,
                                                    clusters_sel = clusters_sel,
                                                    verbose = TRUE)
@@ -625,6 +627,9 @@ minMarker <- function (sc_in,
                                    subsample_num = 100,
                                    verbose = TRUE,
                                    seed = 8)
+    } else{
+        final_out = sc_in
+    }
     
     list_all = list()
     
