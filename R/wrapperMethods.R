@@ -614,6 +614,7 @@ minMarker <- function (sc_in,
                        chosen_measure = "F1_macro",
                        clusters_sel="all_clusters",
                        threshold  = 0.8,
+                       subsample_num=2500,
                        seed=44,
                        in_opt=1,
                        ...){
@@ -624,7 +625,7 @@ minMarker <- function (sc_in,
                                                    verbose = TRUE)
     
     final_out = processSubsampling(cluster_selection_out,
-                                   subsample_num = 100,
+                                   subsample_num = subsample_num,
                                    verbose = TRUE,
                                    seed = 8)
     } else{
@@ -716,7 +717,8 @@ minMarker_clusters <- function (sc_in,
                                 chosen_measure = "F1",
                                 threshold  = 0.8,
                                 clusters_sel="all_clusters",
-                                seed=44,
+                                subsample_num=2500,
+                                                                seed=44,
                                 in_opt = 1,
                                 ...){
     
@@ -726,7 +728,7 @@ minMarker_clusters <- function (sc_in,
                                                        verbose = TRUE)
         
         final_out = processSubsampling(cluster_selection_out,
-                                       subsample_num = 100,
+                                       subsample_num = subsample_num,
                                        verbose = TRUE,
                                        seed = 8)
         
@@ -792,7 +794,7 @@ minMarker_clusters <- function (sc_in,
         
     } else{
         message("Threshold not reached.")
-        list_all= NULL
+        # list_all= NULL
     }
     return(list_all)
     
