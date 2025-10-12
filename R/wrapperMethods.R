@@ -609,18 +609,28 @@ calculateConsensus_wrap <- function(list_markers_temp,
 #' - Time of all methods
 #' @export
 
-minMarker <- function (final_out,
-                       list_markers_test=c(5,10,15,20,25,30,40),
+minMarker <- function (sc_in,
+                       list_markersNumber=c(5,10,15,20,25,30,40),
                        chosen_measure = "F1_macro",
+                       clusters_sel="all_clusters",
                        threshold  = 0.8,
                        seed=44,
                        ...){
     
+    cluster_selection_out= processClusterSelection(sc_in,
+                                                   clusters_sel = clusters_sel,
+                                                   verbose = TRUE)
+    
+    final_out = processSubsampling(cluster_selection_out,
+                                   subsample_num = 100,
+                                   verbose = TRUE,
+                                   seed = 8)
+    
     list_all = list()
     
-    for (i in 1:length(list_markers_test)){
+    for (i in 1:length(list_markersNumber)){
         
-        numMarkers = list_markers_test[[i]]
+        numMarkers = list_markersNumber[[i]]
         
         list_markers_time = findClusterMarkers(final_out,
                                                num_markers = numMarkers,
@@ -662,7 +672,7 @@ minMarker <- function (final_out,
             break;
         }
     }
-    names(list_all) = paste0(list_markers_test[1:length(list_all)], " markers")
+    names(list_all) = paste0(list_markersNumber[1:length(list_all)], " markers")
     
     if (curr_performance_metric>threshold){
         
@@ -694,18 +704,27 @@ minMarker <- function (final_out,
 #' 
 #' @export
 
-minMarker_clusters <- function (final_out,
-                                list_markers_test=c(5,10,15,20,25,30,40),
+minMarker_clusters <- function (sc_in,
+                                list_markersNumber=c(5,10,15,20,25,30,40),
                                 chosen_measure = "F1",
                                 threshold  = 0.8,
-                                clusters_sel="all",
+                                clusters_sel=clusters_sel,
                                 seed=44,
                                 ...){
     
+    cluster_selection_out= processClusterSelection(sc_in,
+                                                   clusters_sel = clusters_sel,
+                                                   verbose = TRUE)
+    
+    final_out = processSubsampling(cluster_selection_out,
+                                   subsample_num = 100,
+                                   verbose = TRUE,
+                                   seed = 8)
+    
     list_all = list()
-    for (i in 1:length(list_markers_test)){
+    for (i in 1:length(list_markersNumber)){
         
-        numMarkers = list_markers_test[[i]]
+        numMarkers = list_markersNumber[[i]]
         
         list_markers_time = findClusterMarkers(final_out,
                                                num_markers = numMarkers,
@@ -739,18 +758,7 @@ minMarker_clusters <- function (final_out,
         curr_performance = list_performance_all[[grep("Top",names(list_performance_all))]]
         curr_performance_metric = curr_performance$xgBoost_performance_cluster[,chosen_measure]
         names(curr_performance_metric) = curr_performance$xgBoost_performance_cluster$cluster
-        
-        if (clusters_sel == "all"){
-            clusters_sel2 = curr_performance$xgBoost_performance_cluster$cluster
-        } else{
-            clusters_sel2 = intersect(clusters_sel,curr_performance$xgBoost_performance_cluster$cluster)
-        }
-        if (length(clusters_sel2)==0){
-            warning("Please choose valid clusters.")
-        }
-        curr_performance_metric= curr_performance_metric[which(names(curr_performance_metric) %in% clusters_sel2)]
-        message(paste0("Clusters selected: ", paste0(clusters_sel2,collapse=", ")))
-        
+      
         list_all[[i]]= list(markersTop = list_markers_all[[grep("Top",names(list_markers_all))]],
                             performanceTop = curr_performance,
                             markersAll=list_markers_all,
@@ -762,7 +770,7 @@ minMarker_clusters <- function (final_out,
         }
         
     }
-    names(list_all) = paste0(list_markers_test[1:length(list_all)], " markers")
+    names(list_all) = paste0(list_markersNumber[1:length(list_all)], " markers")
     
     
     if (min(curr_performance_metric)>threshold){
