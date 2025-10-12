@@ -710,17 +710,22 @@ minMarker_clusters <- function (sc_in,
                                 threshold  = 0.8,
                                 clusters_sel="all_clusters",
                                 seed=44,
+                                in_opt = 1,
                                 ...){
     
-    cluster_selection_out= processClusterSelection(sc_in,
-                                                   clusters_sel = clusters_sel,
-                                                   verbose = TRUE)
-    
-    final_out = processSubsampling(cluster_selection_out,
-                                   subsample_num = 100,
-                                   verbose = TRUE,
-                                   seed = 8)
-    
+    if (in_opt==1){
+        cluster_selection_out= processClusterSelection(sc_in,
+                                                       clusters_sel = clusters_sel,
+                                                       verbose = TRUE)
+        
+        final_out = processSubsampling(cluster_selection_out,
+                                       subsample_num = 100,
+                                       verbose = TRUE,
+                                       seed = 8)
+        
+    } else{
+        final_out = sc_in
+    }
     list_all = list()
     for (i in 1:length(list_markersNumber)){
         
@@ -758,7 +763,7 @@ minMarker_clusters <- function (sc_in,
         curr_performance = list_performance_all[[grep("Top",names(list_performance_all))]]
         curr_performance_metric = curr_performance$xgBoost_performance_cluster[,chosen_measure]
         names(curr_performance_metric) = curr_performance$xgBoost_performance_cluster$cluster
-      
+        
         list_all[[i]]= list(markersTop = list_markers_all[[grep("Top",names(list_markers_all))]],
                             performanceTop = curr_performance,
                             markersAll=list_markers_all,
