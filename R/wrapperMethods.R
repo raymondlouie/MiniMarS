@@ -637,6 +637,8 @@ minMarker <- function (sc_in,
         
         numMarkers = list_markersNumber[[i]]
         
+        message(paste0("Trying ",numMarkers, " markers"))
+        
         list_markers_time = findClusterMarkers(final_out,
                                                num_markers = numMarkers,
                                                method = "all",
@@ -735,6 +737,7 @@ minMarker_clusters <- function (sc_in,
     for (i in 1:length(list_markersNumber)){
         
         numMarkers = list_markersNumber[[i]]
+        message(paste0("Trying ",numMarkers, " markers"))
         
         list_markers_time = findClusterMarkers(final_out,
                                                num_markers = numMarkers,
