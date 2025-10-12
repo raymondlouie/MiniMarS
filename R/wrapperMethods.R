@@ -708,7 +708,7 @@ minMarker_clusters <- function (sc_in,
                                 list_markersNumber=c(5,10,15,20,25,30,40),
                                 chosen_measure = "F1",
                                 threshold  = 0.8,
-                                clusters_sel=clusters_sel,
+                                clusters_sel="all_clusters",
                                 seed=44,
                                 ...){
     
