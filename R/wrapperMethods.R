@@ -688,7 +688,7 @@ minMarker <- function (sc_in,
                        " score of ", curr_performance_metric," (user threshold=", threshold,")."))
         
     } else{
-        list_all= NULL
+        # list_all= NULL
         
         message("Threshold not reached.")
         
