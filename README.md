@@ -108,7 +108,7 @@ cluster_selection_out= processClusterSelection(sc_in,
                                                verbose = TRUE)
 ```   
 
-### Sub-sample and divide the dataset into training, validation, and testing sets.
+### Sub-sample and divide the dataset into training, validation, and testing sets. 
 ```{r}
 final_out = processSubsampling(cluster_selection_out,
                                subsample_num = 100,
@@ -119,7 +119,7 @@ final_out = processSubsampling(cluster_selection_out,
 ### Find the minimum number of markers to identify the clusters. 
 Finds the minimum number of markers to satisfy a certain threshold using a particular macro metric (i.e, a single metric across all clusters) using our wrapper function, which selects the top method by default, out of the following methods: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". 
 ```{r}
-minMarker_result <- minMarker(final_out,
+minMarker_result <- minMarker(sc_in,
                               list_markers_test=c(5,10,15,20,25,30,40),
                               chosen_measure = "F1_macro",
                               threshold  = 0.7)
