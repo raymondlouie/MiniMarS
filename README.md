@@ -72,10 +72,6 @@ library(SingleCellExperiment)
 ### Convert the input data to the desired format. 
 The input data can be i) an SCE object, ii) a matrix of features and a vector of cell type annotations, or iii) a Seurat object. 
 
-```{r}
-# Load the data
-```
-
 i) If you have a SCE object `sce`:
 ```{r}
 sc_in = processInputFormat(sc_object = sce,
@@ -98,30 +94,14 @@ sc_in = processInputFormat(sc_object = seurat_object,
                            verbose=TRUE)
 ```
 
-### Select the clusters you want to identify the markers for. 
-```{r}
-# If 'clusters_sel' is not defined, then the default is to use all clusters.
-clusters_sel = c("CD4-positive, alpha-beta memory T cell",
-                 "naive thymus-derived CD8-positive, alpha-beta T cell")
-cluster_selection_out= processClusterSelection(sc_in,
-                                               clusters_sel = clusters_sel,
-                                               verbose = TRUE)
-```   
-
-### Sub-sample and divide the dataset into training, validation, and testing sets. 
-```{r}
-final_out = processSubsampling(cluster_selection_out,
-                               subsample_num = 100,
-                               verbose = TRUE,
-                               seed = 8)
-```
 
 ### Find the minimum number of markers to identify the clusters. 
-Finds the minimum number of markers to satisfy a certain threshold using a particular macro metric (i.e, a single metric across all clusters) using our wrapper function, which selects the top method by default, out of the following methods: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost". 
+Finds the minimum number of markers to satisfy a certain threshold using a particular macro metric (i.e, a single metric across all clusters) using our wrapper function, which selects the top method by default, out of the following methods: "citeFUSE", "sc2marker", "geneBasis", "xgBoost", "fstat", "seurat_wilcox", "seurat_bimod", "seurat_roc", "seurat_t", "seurat_LR", "consensus_weighted", "consensus_naive", "consensus_fstat", and "consensus_xgboost".  The user can also select the clusters to identify the markers for, with all clusters selected as default. 
 ```{r}
 minMarker_result <- minMarker(sc_in,
-                              list_markers_test=c(5,10,15,20,25,30,40),
+                              list_markersNumber=c(5,10,15,20,25,30,40),
                               chosen_measure = "F1_macro",
+			      clusters_sel="all_clusters",
                               threshold  = 0.7)
 ```
 
