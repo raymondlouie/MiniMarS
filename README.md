@@ -101,19 +101,10 @@ Finds the minimum number of markers to satisfy a certain threshold using a parti
 minMarker_result <- minMarker(sc_in,
                               list_markersNumber=c(5,10,15,20,25,30,40),
                               chosen_measure = "F1_macro",
-			      clusters_sel="all_clusters",
+                              clusters_sel="all_clusters",
                               threshold  = 0.7)
 ```
 
-Alternatively, the user can find the minimum number of markers to satisfy a threshold considering selected clusters, given a list of number of markers to sweep through.
-```{r}
-
-minMarkerCluster_result <- minMarker_clusters(final_out,
-                              list_markers_test=c(5,10,15,20,25,30,40),
-                              chosen_measure = "F1",
-                              cluster = "all",
-                              threshold  = 0.2)
-```
 
 
 ### Visualise the identified markers and their performance.
