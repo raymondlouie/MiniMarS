@@ -74,26 +74,31 @@ seuratWrapper <- function (input_matrix,
                                         test.use = method,
                                         only.pos=TRUE)
     
-    num_markers_each = floor(num_markers/length(unique(clusters)))
     
-    # Calculate initial markers
-    markers_df1=markers_df %>%
-        group_by(cluster) %>%
-        slice_max(n = num_markers_each, order_by = avg_log2FC)
+    unique_clusters = as.character(unique(markers_df$cluster))
     
-    # Calculate markers to fill up, based on the top FC
     
-    markers_df2=markers_df %>%
-        group_by(cluster) %>%
-        slice_max(n = num_markers_each+1, order_by = avg_log2FC)
+    markers_df <- markers_df[order(markers_df$cluster, -markers_df$avg_log2FC), ]
     
-    markers_df3 = markers_df2[which(markers_df2$gene %in%
-                                        setdiff(markers_df2$gene,markers_df1$gene)),]
-    
-    first_list = unique(markers_df1$gene)
-    second_list = unique(markers_df3$gene)
-    
-    final_list = c(first_list,second_list[1:(num_markers-length(first_list))])
+    markers_temp_df = markers_df
+    markersFill = num_markers
+    final_list = list()
+    while (markersFill>0){
+        for (i in 1:length(unique_clusters)){
+            curr_cluster = unique_clusters[[i]]
+            index_gene = which(as.character(markers_temp_df$cluster) %in% curr_cluster)
+            if (length(index_gene)>0 & markersFill>0){
+                curr_gene = markers_temp_df$gene[index_gene[1]]
+                final_list = c(final_list,curr_gene)
+                print(dim(markers_temp_df))[1]
+                markers_temp_df = markers_temp_df[-which(markers_temp_df$gene %in% curr_gene),]
+                print(dim(markers_temp_df))[1]
+                
+                markersFill=markersFill-1
+            }
+        }
+    }
+    final_list = unlist(final_list)
     
     
     return(final_list)
@@ -620,14 +625,14 @@ minMarker <- function (sc_in,
                        ...){
     
     if (in_opt==1){
-    cluster_selection_out= processClusterSelection(sc_in,
-                                                   clusters_sel = clusters_sel,
-                                                   verbose = TRUE)
-    
-    final_out = processSubsampling(cluster_selection_out,
-                                   subsample_num = subsample_num,
-                                   verbose = TRUE,
-                                   seed = 8)
+        cluster_selection_out= processClusterSelection(sc_in,
+                                                       clusters_sel = clusters_sel,
+                                                       verbose = TRUE)
+        
+        final_out = processSubsampling(cluster_selection_out,
+                                       subsample_num = subsample_num,
+                                       verbose = TRUE,
+                                       seed = 8)
     } else{
         final_out = sc_in
     }
@@ -718,7 +723,7 @@ minMarker_clusters <- function (sc_in,
                                 threshold  = 0.8,
                                 clusters_sel="all_clusters",
                                 subsample_num=2500,
-                                                                seed=44,
+                                seed=44,
                                 in_opt = 1,
                                 ...){
     
